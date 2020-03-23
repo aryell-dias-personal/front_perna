@@ -8,7 +8,7 @@ class SignInService {
   SignInService({this.googleSignIn});
 
   dynamic silentLogin() async{
-    GoogleSignInAccount user = await this.googleSignIn.signInSilently(suppressErrors: true);
+    GoogleSignInAccount user = await this.googleSignIn.signInSilently();
     if (user != null) {
       return this.assertLogin(user);
     }

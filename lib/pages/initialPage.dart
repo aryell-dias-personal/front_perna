@@ -67,8 +67,9 @@ class InitialPage extends StatelessWidget {
                       backgroundColor: Colors.redAccent, 
                       duration: 3
                     );
+                  } else {
+                    store.dispatch(SignIn(user));
                   }
-                  store.dispatch(SignIn(user));
                 };
               },
               builder: (context, onSignIn) {
@@ -101,8 +102,9 @@ class InitialPage extends StatelessWidget {
                       backgroundColor: Colors.redAccent, 
                       duration: 3
                     );
+                  } else {
+                    store.dispatch(LogIn(user));
                   }
-                  store.dispatch(LogIn(user));
                 };
               },
               builder: (context, onLogIn) {

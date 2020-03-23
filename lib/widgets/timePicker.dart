@@ -6,8 +6,9 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class TimePicker extends StatelessWidget {
   final String labelText;
+  final Function onSelectedTime;
 
-  TimePicker({@required this.labelText});
+  TimePicker({@required this.labelText, @required this.onSelectedTime});
 
   Future<DateTime> _pickTime(context, currentValue) async {
     final date = await showDatePicker(
@@ -35,6 +36,7 @@ class TimePicker extends StatelessWidget {
         labelText: labelText,
       ),
       onShowPicker: _pickTime,
+      onChanged: onSelectedTime
     );
   }
 

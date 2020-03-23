@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "172739913177",
+    "firebase_url": "https://perna-app.firebaseio.com",
+    "project_id": "perna-app",
+    "storage_bucket": "perna-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172739913177:android:38f4c6eb4f67cb674b25c8",
+        "android_client_info": {
+          "package_name": "com.example.perna"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172739913177-fd6qa4ga2varvhdjsd083ubjh8eqvsf2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.perna",
+            "certificate_hash": "050c5a94c874d25bed5959848c47229c2aa272f4"
+          }
+        },
+        {
+          "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
