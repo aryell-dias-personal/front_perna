@@ -77,7 +77,6 @@ class _UsertState extends State<_UserWidget> {
           builder: (context, resources){
             return CardHeader(
               addFunction: (){addFunction(resources['userMarkers'], resources['email']);},
-              listFunction: (){},
               title: "Pedido",
             );
           },

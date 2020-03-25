@@ -103,7 +103,6 @@ class _DriverWidgetState extends State<_DriverWidget> {
               addFunction: (){
                  addFunction(resources['driverMarker'], resources['email']); 
               },
-              listFunction: (){},
               title: "Expediente",
             );
           },

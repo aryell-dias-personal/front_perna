@@ -1,3 +1,4 @@
+import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/store/actions.dart';
@@ -31,6 +32,11 @@ class MainPageWidget extends StatefulWidget {
 }
 
 class _MainPageWidgetState extends State<MainPageWidget> {
+  
+  final Set<Polyline> polyline = Set();
+  List<LatLng> routeCooords = [];
+  GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
+
   Completer<GoogleMapController> mapsController = Completer();
   int currentIndex = 0;
   final Function onLogout;
@@ -41,6 +47,18 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   void initState() {
     super.initState();
     Location location = Location();
+    googleMapPolyline.getCoordinatesWithLocation(
+        origin: LatLng(40.677939, -73.941755),
+        destination: LatLng(40.698432, -73.924038),
+        mode:  RouteMode.driving).then((polylines) async {
+          await googleMapPolyline.getCoordinatesWithLocation(
+            destination: LatLng(40.677939, -73.941755),
+            origin: LatLng(40.698432, -73.924038),
+            mode:  RouteMode.driving).then((polylines2){
+              this.routeCooords.addAll(polylines2);
+              this.routeCooords.addAll(polylines);
+            });
+        });	
     requestLocation(location).then((enabled) async {
       if (enabled) {
         centralize(await location.getLocation());
@@ -51,10 +69,26 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     });
   }
 
+  void onMapCreated(GoogleMapController googleMapController) async {
+    setState(() {
+      this.mapsController.complete(googleMapController);
+      polyline.add(Polyline(
+        polylineId: PolylineId('rota1'),
+        visible: true,
+        points: routeCooords,
+        width: 4,
+        color: Colors.blueAccent,
+        startCap: Cap.roundCap,
+        endCap: Cap.buttCap
+      ));
+    });
+  }
+
   void centralize(LocationData locationData) async {
     final GoogleMapController controller = await this.mapsController.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: LatLng(locationData.latitude, locationData.longitude),
+      // target: LatLng(locationData.latitude, locationData.longitude),
+      target: LatLng(40.677939, -73.941755),
       zoom: 17.8,
     )));
   }
@@ -122,6 +156,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
               GoogleMap(
                 mapType: MapType.normal,
                 onLongPress: resources['onLongPress'][this.currentIndex],
+                polylines: polyline,
                 markers: resources['markers'][this.currentIndex],
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
@@ -129,9 +164,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
                   target: resources['target'],
                   zoom: 17.8,
                 ),
-                onMapCreated: (GoogleMapController controller) {
-                  this.mapsController.complete(controller);
-                },
+                onMapCreated: onMapCreated,
               ),
               MapsHeader(
                 onSelected: (option)=>onSelected(option, resources['logoutFunction'], resources['markers']), 

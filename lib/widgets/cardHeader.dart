@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 
 class CardHeader extends StatelessWidget {
   final Function addFunction;
-  final Function listFunction;
   final String title;
 
-  CardHeader({@required this.addFunction, @required this.listFunction, @required this.title});
+  CardHeader({@required this.addFunction, @required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -36,26 +35,7 @@ class CardHeader extends StatelessWidget {
               ),
               shape: StadiumBorder()
             ),
-            SizedBox(width: 15),
-            RaisedButton(
-              onPressed: listFunction,
-              color: Theme.of(context).primaryColor,
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    'Listar', 
-                    style: TextStyle(
-                      color: Colors.white
-                    )
-                  ),
-                  Icon(
-                    Icons.list,
-                    color: Colors.white,
-                  )
-                ]
-              ),
-              shape: StadiumBorder()
-            )
+            SizedBox(width: 15)
           ]
         )
       ]
