@@ -164,10 +164,6 @@ class _MainPageWidgetState extends State<MainPageWidget> {
             this.onLogout();
             store.dispatch(Logout());
           },
-          // 'onLongPress': [
-          //   (location) => store.dispatch(PutDriverMarker(location)),
-          //   (location) => store.dispatch(PutUserMarker(location))
-          // ],
           'photoUrl':store.state.user?.photoUrl
         };
       },

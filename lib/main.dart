@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/pages/mainPage.dart';
 import 'package:perna/services/signIn.dart';
@@ -19,8 +18,8 @@ GoogleSignIn googleSignIn = GoogleSignIn(
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final persistor = Persistor<StoreState>(
-    storage: FlutterStorage(), // Or use other engines
-    serializer: JsonSerializer<StoreState>(StoreState.fromJson), // Or use other serializers
+    storage: FlutterStorage(),
+    serializer: JsonSerializer<StoreState>(StoreState.fromJson),
   );
 
   final initialState = await persistor.load();
