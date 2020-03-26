@@ -34,6 +34,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   Set<Marker> driverMarkers = Set();
   Set<Marker> userMarkers = Set();
   LocationData currentLocation;
+  Function cancel;
   
   final Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
@@ -75,18 +76,18 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       ]);	
       setState(() {
         this.mapsController.complete(googleMapController);
-        polyline.add(Polyline(
+        this.polyline.add(Polyline(
           polylineId: PolylineId('rota1'), visible: true,
           points: routeCooords, width: 4, color: Colors.blueAccent,
           startCap: Cap.roundCap, endCap: Cap.buttCap
         ));
+        this.cancel = location.onLocationChanged().listen((LocationData currentLocation) {
+          setState(() {
+            this.currentLocation = currentLocation;
+          });
+        }).cancel;
       });
       centralize(await location.getLocation());
-      location.onLocationChanged().listen((LocationData currentLocation) {
-        setState(() {
-          this.currentLocation = currentLocation;
-        });
-      });
     }
   }
 
@@ -136,6 +137,12 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    this.cancel();
+  }
+
   void putDriverMarker(location) {
     setState(() {
       this.driverMarkers = this.driverMarkers.length < 1 ? this.driverMarkers: Set();
@@ -179,7 +186,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
                 initialCameraPosition: CameraPosition(
-                  target: LatLng(0, 0),
+                  target: LatLng(currentLocation?.latitude ?? 0, currentLocation?.longitude ?? 0),
                   zoom: 17.8,
                 ),
                 onMapCreated: onMapCreated,
