@@ -10,23 +10,34 @@ import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
 class UserWidget extends StatelessWidget {
+  final Set<Marker> userMarkers;
+  
+  UserWidget({@required this.userMarkers});
+  
   @override
   Widget build(BuildContext context) {
-    return _UserWidget();
+    return _UserWidget(userMarkers: userMarkers);
   }
 }
 
 class _UserWidget extends StatefulWidget {
-  _UserWidget({ Key key}) : super(key: key);
+  final Set<Marker> userMarkers;
+
+  _UserWidget({ Key key, @required this.userMarkers}) : super(key: key);
 
   @override
-  _UsertState createState() => _UsertState();
+  _UserWidgetState createState() => _UserWidgetState(userMarkers: userMarkers);
 }
 
-class _UsertState extends State<_UserWidget> {
+class _UserWidgetState extends State<_UserWidget> {
+  final Set<Marker> userMarkers;
+  
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
   UserService userService = new UserService();
+
+  
+  _UserWidgetState({@required this.userMarkers});
 
   void onSelectedStartTime(DateTime selectedDate) {
     setState((){
@@ -67,16 +78,13 @@ class _UsertState extends State<_UserWidget> {
     return BottomCard(
       height: 250,
       children: <Widget>[
-        StoreConnector<StoreState, Map<String, dynamic>>(
+        StoreConnector<StoreState, String>(
           converter: (store) {
-            return {
-              'userMarkers': store.state.userMarkers,
-              'email': store.state.currentUser.email
-            };
+            return store.state.user.email;
           },
-          builder: (context, resources){
+          builder: (context, email){
             return CardHeader(
-              addFunction: (){addFunction(resources['userMarkers'], resources['email']);},
+              addFunction: (){addFunction(this.userMarkers, email);},
               title: "Pedido",
             );
           },

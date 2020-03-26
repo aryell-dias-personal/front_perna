@@ -1,20 +1,34 @@
+import 'dart:io';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/pages/mainPage.dart';
 import 'package:perna/services/signIn.dart';
-import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/store/stores.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/pages/initialPage.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_persist/redux_persist.dart';
+import 'package:perna/store/reducers.dart';
+import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final persistor = Persistor<StoreState>(
+    storage: FlutterStorage(), // Or use other engines
+    serializer: JsonSerializer<StoreState>(StoreState.fromJson), // Or use other serializers
+  );
+
+  final initialState = await persistor.load();
+  
+  final store = new Store<StoreState>(
+    reduce, initialState: initialState,
+    middleware: [persistor.createMiddleware()]
+  );
   runApp(new MyApp(store: store));
 }
 
@@ -22,13 +36,7 @@ class MyApp extends StatelessWidget {
   final Store<StoreState> store;
   final SignInService signInService = new SignInService(googleSignIn: googleSignIn);
 
-  MyApp({@required this.store}){
-    signInService.silentLogin().then((user){
-      if(user!=null){
-        store.dispatch(LogIn(user));
-      }
-    });
-  }
+  MyApp({@required this.store});
 
   @override
   Widget build(BuildContext context) {

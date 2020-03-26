@@ -3,7 +3,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/store/stores.dart';
 import 'package:perna/widgets/driverWidget.dart';
 import 'package:perna/widgets/mapsHeader.dart';
 import 'package:perna/widgets/userWidget.dart';
@@ -32,6 +31,9 @@ class MainPageWidget extends StatefulWidget {
 }
 
 class _MainPageWidgetState extends State<MainPageWidget> {
+  Set<Marker> driverMarkers = Set();
+  Set<Marker> userMarkers = Set();
+  LocationData currentLocation;
   
   final Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
@@ -43,52 +45,55 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   _MainPageWidgetState({@required this.onLogout});
 
+  buildRouteCooords(List<LatLng> points) async {
+    if(points.length >= 2){
+      List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
+        destination: points.first,
+        origin: points[1],
+        mode:  RouteMode.driving
+      );
+      setState(() {
+        this.routeCooords.addAll(coords);
+      });
+      await this.buildRouteCooords(points.sublist(1));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    Location location = Location();
-    googleMapPolyline.getCoordinatesWithLocation(
-        origin: LatLng(40.677939, -73.941755),
-        destination: LatLng(40.698432, -73.924038),
-        mode:  RouteMode.driving).then((polylines) async {
-          await googleMapPolyline.getCoordinatesWithLocation(
-            destination: LatLng(40.677939, -73.941755),
-            origin: LatLng(40.698432, -73.924038),
-            mode:  RouteMode.driving).then((polylines2){
-              this.routeCooords.addAll(polylines2);
-              this.routeCooords.addAll(polylines);
-            });
-        });	
-    requestLocation(location).then((enabled) async {
-      if (enabled) {
-        centralize(await location.getLocation());
-        location.onLocationChanged().listen((LocationData currentLocation) {
-          store.dispatch(UpdateLocation(currentLocation));
-        });
-      }
-    });
   }
 
   void onMapCreated(GoogleMapController googleMapController) async {
-    setState(() {
-      this.mapsController.complete(googleMapController);
-      polyline.add(Polyline(
-        polylineId: PolylineId('rota1'),
-        visible: true,
-        points: routeCooords,
-        width: 4,
-        color: Colors.blueAccent,
-        startCap: Cap.roundCap,
-        endCap: Cap.buttCap
-      ));
-    });
+    Location location = Location();
+    bool enabled = await requestLocation(location);
+    if (enabled) {
+      await buildRouteCooords([
+        LatLng(40.677939, -73.941755), 
+        LatLng(40.698432, -73.924038),
+        LatLng(40.677939, -73.941755)
+      ]);	
+      setState(() {
+        this.mapsController.complete(googleMapController);
+        polyline.add(Polyline(
+          polylineId: PolylineId('rota1'), visible: true,
+          points: routeCooords, width: 4, color: Colors.blueAccent,
+          startCap: Cap.roundCap, endCap: Cap.buttCap
+        ));
+      });
+      centralize(await location.getLocation());
+      location.onLocationChanged().listen((LocationData currentLocation) {
+        setState(() {
+          this.currentLocation = currentLocation;
+        });
+      });
+    }
   }
 
   void centralize(LocationData locationData) async {
     final GoogleMapController controller = await this.mapsController.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      // target: LatLng(locationData.latitude, locationData.longitude),
-      target: LatLng(40.677939, -73.941755),
+      target: LatLng(locationData.latitude, locationData.longitude),
       zoom: 17.8,
     )));
   }
@@ -121,6 +126,26 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     }
   }
 
+  void putUserMarker(location) {
+    setState(() {
+      this.userMarkers = this.userMarkers.length < 2 ? this.userMarkers: Set();
+      this.userMarkers.add(Marker(
+        markerId: MarkerId(location.toString()), 
+        position: location
+      ));
+    });
+  }
+
+  void putDriverMarker(location) {
+    setState(() {
+      this.driverMarkers = this.driverMarkers.length < 1 ? this.driverMarkers: Set();
+      this.driverMarkers.add(Marker(
+        markerId: MarkerId(location.toString()), 
+        position: location
+      ));
+    });
+  }
+
   List<PopupMenuEntry<MenuOption>> menuBuilder(BuildContext context) {
     return <PopupMenuEntry<MenuOption>>[
       const PopupMenuItem<MenuOption>(
@@ -135,18 +160,15 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (store) {
         return {
-          'markers': [store.state.driverMarkers, store.state.userMarkers],
-          'target': LatLng(0, 0),
           'logoutFunction': () {
             this.onLogout();
             store.dispatch(Logout());
           },
-          'onLongPress': [
-            (location) => store.dispatch(PutDriverMarker(location)),
-            (location) => store.dispatch(PutUserMarker(location))
-          ],
-          'locationData':store.state.locationData,
-          'photoUrl':store.state.currentUser?.photoUrl
+          // 'onLongPress': [
+          //   (location) => store.dispatch(PutDriverMarker(location)),
+          //   (location) => store.dispatch(PutUserMarker(location))
+          // ],
+          'photoUrl':store.state.user?.photoUrl
         };
       },
       builder: (context, resources) {
@@ -155,13 +177,13 @@ class _MainPageWidgetState extends State<MainPageWidget> {
             children: <Widget>[
               GoogleMap(
                 mapType: MapType.normal,
-                onLongPress: resources['onLongPress'][this.currentIndex],
+                onLongPress: [putDriverMarker, putUserMarker][this.currentIndex],
                 polylines: polyline,
-                markers: resources['markers'][this.currentIndex],
+                markers: [this.driverMarkers, this.userMarkers][this.currentIndex],
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
                 initialCameraPosition: CameraPosition(
-                  target: resources['target'],
+                  target: LatLng(0, 0),
                   zoom: 17.8,
                 ),
                 onMapCreated: onMapCreated,
@@ -171,7 +193,10 @@ class _MainPageWidgetState extends State<MainPageWidget> {
                 menuBuilder: menuBuilder,
                 photoUrl: resources['photoUrl']
               ),
-              [DriverWidget(), UserWidget()][this.currentIndex]
+              [
+                DriverWidget(driverMarkers: driverMarkers), 
+                UserWidget(userMarkers: userMarkers)
+              ][this.currentIndex]
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
@@ -192,7 +217,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
             onTap: _onTapNavigation
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => centralize(resources['locationData']),
+            onPressed: () => centralize(this.currentLocation),
             child: Icon(Icons.gps_fixed),
             backgroundColor: Theme.of(context).primaryColor,
           ),

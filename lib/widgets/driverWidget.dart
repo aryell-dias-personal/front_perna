@@ -11,36 +11,42 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:toast/toast.dart';
 
 class DriverWidget extends StatelessWidget {
+  final Set<Marker> driverMarkers;
+
+  DriverWidget({@required this.driverMarkers});
+
   @override
   Widget build(BuildContext context) {
-    return _DriverWidget();
+    return _DriverWidget(driverMarkers: driverMarkers);
   }
 }
 
 class _DriverWidget extends StatefulWidget {
-  _DriverWidget({ Key key}) : super(key: key);
+  final Set<Marker> driverMarkers;
+
+  _DriverWidget({ Key key, @required this.driverMarkers}) : super(key: key);
 
   @override
-  _DriverWidgetState createState() => _DriverWidgetState();
+  _DriverWidgetState createState() => _DriverWidgetState(driverMarkers: driverMarkers);
 }
 
 class _DriverWidgetState extends State<_DriverWidget> {
+  final Set<Marker> driverMarkers;
   int places = 0; 
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
   DriverService driverService = new DriverService();
   TextEditingController numberControler = new TextEditingController();
 
+  _DriverWidgetState({@required this.driverMarkers});
+
   void _showDialog() {
     showDialog<int>(
       context: context,
       builder: (BuildContext context) {
-        return new NumberPickerDialog.integer(
-          minValue: 0,
-          maxValue: 1000,
-          title: new Text("Quantas vagas disponíveis?"),
-          initialIntegerValue: places,
-        );
+        return new NumberPickerDialog.integer( minValue: 0,
+          maxValue: 1000, title: new Text("Quantas vagas disponíveis?"),
+          initialIntegerValue: places);
       }
     ).then((value) {
       if (value != null) {
@@ -90,18 +96,14 @@ class _DriverWidgetState extends State<_DriverWidget> {
     return BottomCard(
       height: 330,
       children: <Widget>[
-         StoreConnector<StoreState, Map<String, dynamic>>(
+         StoreConnector<StoreState, String>(
           converter: (store) {
-            Set<Marker> driverMarkers = store.state.driverMarkers;
-            return {
-              'driverMarker': driverMarkers?.length == 1? driverMarkers.first : null,
-              'email': store.state.currentUser.email
-            };
+            return store.state.user.email;
           },
-          builder: (context, resources){
+          builder: (context, email){
             return CardHeader(
               addFunction: (){
-                 addFunction(resources['driverMarker'], resources['email']); 
+                 addFunction(this.driverMarkers, email); 
               },
               title: "Expediente",
             );

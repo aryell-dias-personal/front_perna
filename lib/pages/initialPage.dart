@@ -1,10 +1,11 @@
+import 'package:perna/models/signInResponse.dart';
+import 'package:perna/models/user.dart';
 import 'package:perna/services/signIn.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:toast/toast.dart';
 
 class InitialPage extends StatelessWidget {
@@ -60,7 +61,8 @@ class InitialPage extends StatelessWidget {
             StoreConnector<StoreState, Function()>(
               converter: (store) {
                 return () async {
-                  GoogleSignInAccount user = await signInService.signIn();
+                  SignInResponse signInResponse = await signInService.signIn();
+                  User user = signInResponse?.user;
                   if(user==null){
                     Toast.show(
                       "Não foi possivel reconhecer o usuário", context, 
@@ -95,7 +97,8 @@ class InitialPage extends StatelessWidget {
             StoreConnector<StoreState, Future<Null> Function()>(
               converter: (store) {
                 return () async {
-                  GoogleSignInAccount user = await signInService.logIn();
+                  SignInResponse signInResponse = await signInService.logIn();
+                  User user = signInResponse?.user;
                   if(user==null){
                     Toast.show(
                       "Não foi possivel reconhecer o usuário", context, 
