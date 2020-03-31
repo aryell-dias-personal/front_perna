@@ -103,7 +103,7 @@ class _DriverWidgetState extends State<_DriverWidget> {
           builder: (context, email){
             return CardHeader(
               addFunction: (){
-                 addFunction(this.driverMarkers, email); 
+                 addFunction(this.driverMarkers.first, email); 
               },
               title: "Expediente",
             );

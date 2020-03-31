@@ -36,9 +36,7 @@ class SignInService {
       'email': user?.email,
       'isProvider': isProvider,
       'photoUrl': user?.photoUrl,
-      'name': user?.displayName,
-      'askedPoints': [],
-      'agents': []
+      'name': user?.displayName
     });
     return await post("${baseUrl}insertUser", body: body);
   }

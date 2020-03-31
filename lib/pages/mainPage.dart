@@ -1,6 +1,8 @@
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/models/mapsData.dart';
+import 'package:perna/services/maps.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/driverWidget.dart';
@@ -12,22 +14,25 @@ import 'package:location/location.dart';
 import 'dart:async';
 
 class MainPage extends StatelessWidget {
-  final Function onLogout;
 
-  MainPage({@required this.onLogout});
+  final String email;
+  final Function onLogout;
+  MainPage({@required this.email, @required this.onLogout});
+
   @override
   Widget build(BuildContext context) {
-    return MainPageWidget(onLogout: onLogout);
+    return MainPageWidget(onLogout: onLogout, email: email);
   }
 }
 
 class MainPageWidget extends StatefulWidget {
-  final Function onLogout;
 
-  MainPageWidget({@required this.onLogout, Key key}) : super(key: key);
+  final String email;
+  final Function onLogout;
+  MainPageWidget({@required this.email, @required this.onLogout, Key key}) : super(key: key);
 
   @override
-  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout);
+  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, email: email);
 }
 
 class _MainPageWidgetState extends State<MainPageWidget> {
@@ -38,19 +43,22 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   
   final Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
+  LatLng nextPlace;
+
   GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
   Completer<GoogleMapController> mapsController = Completer();
   int currentIndex = 0;
-  final Function onLogout;
 
-  _MainPageWidgetState({@required this.onLogout});
+  final String email;
+  final Function onLogout;
+  _MainPageWidgetState({@required this.email, @required this.onLogout});
 
   buildRouteCooords(List<LatLng> points) async {
     if(points.length >= 2){
       List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
-        destination: points.first,
-        origin: points[1],
+        destination: points[1],
+        origin: points.first,
         mode:  RouteMode.driving
       );
       setState(() {
@@ -63,22 +71,28 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   @override
   void initState() {
     super.initState();
+    MapsService mapsService = MapsService();
+    mapsService.getMapsData(this.email).then((MapsData mapsData){
+      if(mapsData != null){
+        if(mapsData.route != null)
+          this.buildRouteCooords(mapsData.route);
+        if(mapsData.nextPlace != null)
+          this.nextPlace = mapsData.nextPlace;
+      }
+    });
   }
 
   void onMapCreated(GoogleMapController googleMapController) async {
     Location location = Location();
     bool enabled = await requestLocation(location);
-    if (enabled) {
-      await buildRouteCooords([
-        LatLng(40.677939, -73.941755), 
-        LatLng(40.698432, -73.924038),
-        LatLng(40.677939, -73.941755)
-      ]);	
+    if (enabled) {  
       setState(() {
         this.mapsController.complete(googleMapController);
         this.polyline.add(Polyline(
-          polylineId: PolylineId('rota1'), visible: true,
-          points: routeCooords, width: 4, color: Colors.blueAccent,
+          geodesic: true,
+          jointType: JointType.round,
+          polylineId: PolylineId(routeCooords.toString()), visible: true,
+          points: routeCooords.length >1 ? routeCooords: routeCooords, width: 3, color: Theme.of(context).primaryColor,
           startCap: Cap.roundCap, endCap: Cap.buttCap
         ));
         this.cancel = location.onLocationChanged().listen((LocationData currentLocation) {
@@ -182,7 +196,12 @@ class _MainPageWidgetState extends State<MainPageWidget> {
                 mapType: MapType.normal,
                 onLongPress: [putDriverMarker, putUserMarker][this.currentIndex],
                 polylines: polyline,
-                markers: [this.driverMarkers, this.userMarkers][this.currentIndex],
+                markers: [this.driverMarkers, this.userMarkers.union([
+                    Marker(
+                      markerId: MarkerId(nextPlace.toString()),
+                      position: nextPlace
+                    )
+                ].toSet())][this.currentIndex],
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
                 initialCameraPosition: CameraPosition(
@@ -192,7 +211,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
                 onMapCreated: onMapCreated,
               ),
               MapsHeader(
-                onSelected: (option)=>onSelected(option, resources['logoutFunction'], resources['markers']), 
+                onSelected: (option)=>onSelected(option, resources['logoutFunction'], [this.driverMarkers, this.userMarkers]), 
                 menuBuilder: menuBuilder,
                 photoUrl: resources['photoUrl']
               ),

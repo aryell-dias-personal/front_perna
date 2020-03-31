@@ -54,7 +54,15 @@ class MyApp extends StatelessWidget {
               return store.state.logedIn;
             },
             builder: (context, logedIn) {
-              return logedIn ? MainPage(onLogout: signInService.logOut) : InitialPage(signInService: signInService);
+              return logedIn != null && logedIn ? 
+                StoreConnector<StoreState, String>(
+                  converter: (store) {
+                    return store.state.user.email;
+                  },
+                  builder: (context, email) {
+                    return MainPage(onLogout: signInService.logOut, email: email);
+                  }
+                ) : InitialPage(signInService: signInService);
             }
           ),
           theme: ThemeData(
