@@ -177,7 +177,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     if(this.markers.length == 2){
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewAskPage()
+          builder: (context) => AddNewAskPage(userMarkers: markers)
         )
       );
     } else {
@@ -193,7 +193,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     if(this.markers.length == 1){
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewExpedientPage()
+          builder: (context) => AddNewExpedientPage(driverMarkers: this.markers)
         )
       );
     } else {

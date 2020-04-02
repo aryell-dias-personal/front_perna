@@ -1,4 +1,5 @@
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
@@ -35,9 +36,26 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
   DriverService driverService = new DriverService();
+  TextEditingController garageController = TextEditingController();
   TextEditingController numberControler = new TextEditingController();
+  final Geolocator _geolocator = Geolocator();
 
   _ExpedientWidgetState({@required this.driverMarkers});
+
+  String placemarkToString(Placemark placemark){
+    return "${placemark.administrativeArea}, ${placemark.subAdministrativeArea}, ${placemark.subLocality}, ${placemark.thoroughfare}, ${placemark.subThoroughfare}";
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      _geolocator.placemarkFromCoordinates(driverMarkers.last.position.latitude, driverMarkers.last.position.longitude).then((placeMarkers){
+        Placemark placemark = placeMarkers.first;
+        garageController.text = placemarkToString(placemark);
+      });
+    });
+    super.initState();
+  }
 
   void _showDialog() {
     showDialog<int>(
@@ -128,7 +146,8 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           )
         ),
         TextField(
-          // readOnly: true,
+          readOnly: true,
+          controller: garageController,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Local da garagem",
@@ -141,7 +160,13 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           builder: (context, email){
             return RaisedButton(
               onPressed: (){addFunction(this.driverMarkers.first, email);},
-              child: Icon(Icons.add, color: Colors.white),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children:<Widget>[
+                  Text("Adicionar", style: TextStyle(color: Colors.white, fontSize: 18)),
+                  Icon(Icons.add, color: Colors.white, size: 20)
+                ]
+              ),
               color: Theme.of(context).primaryColor,
               shape: StadiumBorder(),
             );

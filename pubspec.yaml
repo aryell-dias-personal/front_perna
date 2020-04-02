@@ -23,6 +23,7 @@ dependencies:
   datetime_picker_formfield: ^1.0.0
   redux_persist_flutter: ^0.8.2
   flutter_bloc: ^2.1.1
+  geolocator: ^5.3.1
 
 dev_dependencies:
   flutter_test:

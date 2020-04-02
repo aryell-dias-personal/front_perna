@@ -1,4 +1,5 @@
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
@@ -30,12 +31,32 @@ class _AskWidget extends StatefulWidget {
 
 class _AskWidgetState extends State<_AskWidget> {
   final Set<Marker> userMarkers;
-  
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
   UserService userService = new UserService();
+  TextEditingController initialController = TextEditingController();
+  TextEditingController endControler = new TextEditingController();
+  final Geolocator _geolocator = Geolocator();
 
-  
+  String placemarkToString(Placemark placemark){
+    return "${placemark.administrativeArea}, ${placemark.subAdministrativeArea}, ${placemark.subLocality}, ${placemark.thoroughfare}, ${placemark.subThoroughfare}";
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      _geolocator.placemarkFromCoordinates(userMarkers.first.position.latitude, userMarkers.first.position.longitude).then((placeMarkers){
+        Placemark placemark = placeMarkers.first;
+        initialController.text = this.placemarkToString(placemark);
+      });
+      _geolocator.placemarkFromCoordinates(userMarkers.last.position.latitude, userMarkers.last.position.longitude).then((placeMarkers){
+        Placemark placemark = placeMarkers.first;
+        endControler.text = this.placemarkToString(placemark);
+      });
+    });
+    super.initState();
+  }
+
   _AskWidgetState({@required this.userMarkers});
 
   void onSelectedStartTime(DateTime selectedDate) {
@@ -101,14 +122,16 @@ class _AskWidgetState extends State<_AskWidget> {
         TimePicker(labelText: "Hora da Partida", onSelectedTime: onSelectedStartTime),
         TimePicker(labelText: "Hora da Chegada", onSelectedTime: onSelectedEndTime),
         TextField(
-          // readOnly: true,
+          readOnly: true,
+          controller: initialController,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Local de Partida",
           )
         ),
         TextField(
-          // readOnly: true,
+          readOnly: true,
+          controller: endControler,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Local de Chegada",
@@ -121,7 +144,13 @@ class _AskWidgetState extends State<_AskWidget> {
           builder: (context, email){
             return RaisedButton(
               onPressed: (){addFunction(this.userMarkers, email);},
-              child: Icon(Icons.add, color: Colors.white),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children:<Widget>[
+                  Text("Adicionar", style: TextStyle(color: Colors.white, fontSize: 18)),
+                  Icon(Icons.add, color: Colors.white, size: 20)
+                ]
+              ),
               color: Theme.of(context).primaryColor,
               shape: StadiumBorder(),
             );
