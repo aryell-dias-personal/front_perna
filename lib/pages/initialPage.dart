@@ -81,12 +81,11 @@ class InitialPage extends StatelessWidget {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25.0,
-                        color: Color(0xFF1c4966)),
+                        color: Theme.of(context).primaryColor),
                   ),
                   onPressed: onSignIn,
                   color: Color(0xEEFFFFFF),
                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  splashColor: Color(0x441c4966),
                   shape: StadiumBorder()
                 );
               } 
@@ -120,9 +119,8 @@ class InitialPage extends StatelessWidget {
                         color: Colors.white),
                   ),
                   onPressed: onLogIn,
-                  color: Color(0x881c4966),
+                  color: Theme.of(context).primaryColor,
                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  splashColor: Color(0x44FFFFFF),
                   shape: StadiumBorder()
                 );
               } 
@@ -130,7 +128,7 @@ class InitialPage extends StatelessWidget {
           ],
         ),
       ),
-      backgroundColor: Color(0xFF1c4966),
+      backgroundColor: Theme.of(context).primaryColor,
     );
   }
 }

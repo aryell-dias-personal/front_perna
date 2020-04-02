@@ -2,34 +2,33 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/bottomCard.dart';
-import 'package:perna/widgets/cardHeader.dart';
+import 'package:perna/widgets/cardContainer.dart';
 import 'package:perna/widgets/timePicker.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
-class UserWidget extends StatelessWidget {
+class AskWidget extends StatelessWidget {
   final Set<Marker> userMarkers;
   
-  UserWidget({@required this.userMarkers});
+  AskWidget({@required this.userMarkers});
   
   @override
   Widget build(BuildContext context) {
-    return _UserWidget(userMarkers: userMarkers);
+    return _AskWidget(userMarkers: userMarkers);
   }
 }
 
-class _UserWidget extends StatefulWidget {
+class _AskWidget extends StatefulWidget {
   final Set<Marker> userMarkers;
 
-  _UserWidget({ Key key, @required this.userMarkers}) : super(key: key);
+  _AskWidget({ Key key, @required this.userMarkers}) : super(key: key);
 
   @override
-  _UserWidgetState createState() => _UserWidgetState(userMarkers: userMarkers);
+  _AskWidgetState createState() => _AskWidgetState(userMarkers: userMarkers);
 }
 
-class _UserWidgetState extends State<_UserWidget> {
+class _AskWidgetState extends State<_AskWidget> {
   final Set<Marker> userMarkers;
   
   double selectedEndTime = 0.0;
@@ -37,7 +36,7 @@ class _UserWidgetState extends State<_UserWidget> {
   UserService userService = new UserService();
 
   
-  _UserWidgetState({@required this.userMarkers});
+  _AskWidgetState({@required this.userMarkers});
 
   void onSelectedStartTime(DateTime selectedDate) {
     setState((){
@@ -75,24 +74,59 @@ class _UserWidgetState extends State<_UserWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomCard(
-      height: 250,
+    return CardContainer(
+      alignment: Alignment.bottomCenter,
+      height: 540,
       children: <Widget>[
+        Row(
+          children:<Widget>[
+            Text(
+              "Novo Pedido",
+              style: TextStyle(
+                fontWeight: FontWeight.bold, 
+                color: Theme.of(context).primaryColor,
+                fontSize: 30.0
+              )
+            ),
+            SizedBox(width: 5),
+            Icon(Icons.scatter_plot, color: Theme.of(context).primaryColor, size: 30)
+          ],
+        ),
+        TextField(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Nome do pedido",
+          )
+        ),
+        TimePicker(labelText: "Hora da Partida", onSelectedTime: onSelectedStartTime),
+        TimePicker(labelText: "Hora da Chegada", onSelectedTime: onSelectedEndTime),
+        TextField(
+          // readOnly: true,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Local de Partida",
+          )
+        ),
+        TextField(
+          // readOnly: true,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Local de Chegada",
+          )
+        ),
         StoreConnector<StoreState, String>(
           converter: (store) {
             return store.state.user.email;
           },
           builder: (context, email){
-            return CardHeader(
-              addFunction: (){addFunction(this.userMarkers, email);},
-              title: "Pedido",
+            return RaisedButton(
+              onPressed: (){addFunction(this.userMarkers, email);},
+              child: Icon(Icons.add, color: Colors.white),
+              color: Theme.of(context).primaryColor,
+              shape: StadiumBorder(),
             );
-          },
+          }
         ),
-        SizedBox(height: 10),
-        TimePicker(labelText: "Partida", onSelectedTime: onSelectedStartTime),
-        SizedBox(height: 20),
-        TimePicker(labelText: "Chegada", onSelectedTime: onSelectedEndTime)
       ]
     );
   }

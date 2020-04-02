@@ -2,35 +2,34 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/bottomCard.dart';
-import 'package:perna/widgets/cardHeader.dart';
+import 'package:perna/widgets/cardContainer.dart';
 import 'package:perna/widgets/timePicker.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:toast/toast.dart';
 
-class DriverWidget extends StatelessWidget {
+class ExpedientWidget extends StatelessWidget {
   final Set<Marker> driverMarkers;
 
-  DriverWidget({@required this.driverMarkers});
+  ExpedientWidget({@required this.driverMarkers});
 
   @override
   Widget build(BuildContext context) {
-    return _DriverWidget(driverMarkers: driverMarkers);
+    return _ExpedientWidget(driverMarkers: driverMarkers);
   }
 }
 
-class _DriverWidget extends StatefulWidget {
+class _ExpedientWidget extends StatefulWidget {
   final Set<Marker> driverMarkers;
 
-  _DriverWidget({ Key key, @required this.driverMarkers}) : super(key: key);
+  _ExpedientWidget({ Key key, @required this.driverMarkers}) : super(key: key);
 
   @override
-  _DriverWidgetState createState() => _DriverWidgetState(driverMarkers: driverMarkers);
+  _ExpedientWidgetState createState() => _ExpedientWidgetState(driverMarkers: driverMarkers);
 }
 
-class _DriverWidgetState extends State<_DriverWidget> {
+class _ExpedientWidgetState extends State<_ExpedientWidget> {
   final Set<Marker> driverMarkers;
   int places = 0; 
   double selectedEndTime = 0.0;
@@ -38,7 +37,7 @@ class _DriverWidgetState extends State<_DriverWidget> {
   DriverService driverService = new DriverService();
   TextEditingController numberControler = new TextEditingController();
 
-  _DriverWidgetState({@required this.driverMarkers});
+  _ExpedientWidgetState({@required this.driverMarkers});
 
   void _showDialog() {
     showDialog<int>(
@@ -93,36 +92,61 @@ class _DriverWidgetState extends State<_DriverWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomCard(
-      height: 330,
+    return CardContainer(
+      alignment: Alignment.bottomCenter,
+      height: 540,
       children: <Widget>[
-         StoreConnector<StoreState, String>(
-          converter: (store) {
-            return store.state.user.email;
-          },
-          builder: (context, email){
-            return CardHeader(
-              addFunction: (){
-                 addFunction(this.driverMarkers.first, email); 
-              },
-              title: "Expediente",
-            );
-          },
+        Row(
+          children:<Widget>[
+            Text(
+              "Novo Expediente",
+              style: TextStyle(
+                fontWeight: FontWeight.bold, 
+                color: Theme.of(context).primaryColor,
+                fontSize: 30.0
+              )
+            ),
+            SizedBox(width: 5),
+            Icon(Icons.work, color: Theme.of(context).primaryColor, size: 30)
+          ],
         ),
-        SizedBox(height: 10),
-        TimePicker(labelText: 'Início', onSelectedTime: onSelectedStartTime),
-        SizedBox(height: 20),
-        TimePicker(labelText: 'Fim', onSelectedTime: onSelectedEndTime),
-        SizedBox(height: 20),
+        TextField(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Nome do expediente",
+          )
+        ),
+        TimePicker(labelText: 'Início do expediente', onSelectedTime: onSelectedStartTime),
+        TimePicker(labelText: 'Fim do expediente', onSelectedTime: onSelectedEndTime),
         TextField(
           onTap: _showDialog,
           controller: numberControler,
           readOnly: true,          
           decoration: InputDecoration(
             border: OutlineInputBorder(),
-            labelText: "Vagas",
+            labelText: "Vagas disponíveis",
           )
-        )
+        ),
+        TextField(
+          // readOnly: true,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Local da garagem",
+          )
+        ),
+        StoreConnector<StoreState, String>(
+          converter: (store) {
+            return store.state.user.email;
+          },
+          builder: (context, email){
+            return RaisedButton(
+              onPressed: (){addFunction(this.driverMarkers.first, email);},
+              child: Icon(Icons.add, color: Colors.white),
+              color: Theme.of(context).primaryColor,
+              shape: StadiumBorder(),
+            );
+          }
+        ),
       ]
     );
   }

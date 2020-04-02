@@ -43,31 +43,26 @@ class MyApp extends StatelessWidget {
         store: store,
         child:MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          backgroundColor: Colors.brown,
-          primarySwatch: Colors.blue,
+        home: StoreConnector<StoreState, bool>(
+          converter: (store) {
+            return store.state.logedIn;
+          },
+          builder: (context, logedIn) {
+            return logedIn != null && logedIn ? 
+              StoreConnector<StoreState, String>(
+                converter: (store) {
+                  return store.state.user.email;
+                },
+                builder: (context, email) {
+                  return MainPage(onLogout: signInService.logOut, email: email);
+                }
+              ) : InitialPage(signInService: signInService);
+          }
         ),
-        home: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: StoreConnector<StoreState, bool>(
-            converter: (store) {
-              return store.state.logedIn;
-            },
-            builder: (context, logedIn) {
-              return logedIn != null && logedIn ? 
-                StoreConnector<StoreState, String>(
-                  converter: (store) {
-                    return store.state.user.email;
-                  },
-                  builder: (context, email) {
-                    return MainPage(onLogout: signInService.logOut, email: email);
-                  }
-                ) : InitialPage(signInService: signInService);
-            }
-          ),
-          theme: ThemeData(
-            primaryColor: Color(0xFF1c4966)
-          )
+        theme: ThemeData(
+          primaryColor: Color(0xFF1c4966),
+          accentColor: Color(0x881c4966),
+          fontFamily: "ProductSans"
         )
       )
     );

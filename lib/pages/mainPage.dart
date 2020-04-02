@@ -2,16 +2,18 @@ import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/models/mapsData.dart';
+import 'package:perna/pages/addNewAskPage.dart';
+import 'package:perna/pages/addNewExpedientPage.dart';
 import 'package:perna/services/maps.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/driverWidget.dart';
-import 'package:perna/widgets/mapsHeader.dart';
-import 'package:perna/widgets/userWidget.dart';
+import 'package:perna/widgets/mainWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:location/location.dart';
 import 'dart:async';
+
+import 'package:toast/toast.dart';
 
 class MainPage extends StatelessWidget {
 
@@ -36,19 +38,14 @@ class MainPageWidget extends StatefulWidget {
 }
 
 class _MainPageWidgetState extends State<MainPageWidget> {
-  Set<Marker> driverMarkers = Set();
-  Set<Marker> userMarkers = Set();
-  LocationData currentLocation;
   Function cancel;
-  
-  final Set<Polyline> polyline = Set();
-  List<LatLng> routeCooords = [];
   LatLng nextPlace;
-
-  GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
-
+  LocationData currentLocation;
+  Set<Marker> markers = Set();
+  Set<Polyline> polyline = Set();
+  List<LatLng> routeCooords = [];
   Completer<GoogleMapController> mapsController = Completer();
-  int currentIndex = 0;
+  GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
   final String email;
   final Function onLogout;
@@ -109,14 +106,8 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     final GoogleMapController controller = await this.mapsController.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
       target: LatLng(locationData.latitude, locationData.longitude),
-      zoom: 17.8,
+      zoom: 20,
     )));
-  }
- 
-  void _onTapNavigation(selectedIndex) {
-    setState(() {
-      this.currentIndex = selectedIndex;
-    });
   }
 
   Future<bool> requestLocation(location) async {
@@ -133,38 +124,44 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
   }
 
-  void onSelected(MenuOption option, Function logoutFunction, List<Set<Marker>> markers) {
-    if (MenuOption.logout == option) {
-      logoutFunction();
-    } else if (MenuOption.clear == option) {
-      markers[this.currentIndex].clear();
-    }
-  }
-
-  void putUserMarker(location) {
-    setState(() {
-      this.userMarkers = this.userMarkers.length < 2 ? this.userMarkers: Set();
-      this.userMarkers.add(Marker(
-        markerId: MarkerId(location.toString()), 
-        position: location
-      ));
-    });
-  }
-
   @override
   void dispose() {
     super.dispose();
     this.cancel();
   }
 
-  void putDriverMarker(location) {
-    setState(() {
-      this.driverMarkers = this.driverMarkers.length < 1 ? this.driverMarkers: Set();
-      this.driverMarkers.add(Marker(
-        markerId: MarkerId(location.toString()), 
-        position: location
-      ));
-    });
+  void putMarker(location) {
+    if(markers.length< 2){
+      setState(() {
+        this.markers.add(Marker(
+          markerId: MarkerId(location.toString()),
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            this.markers.length == 0 ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed
+          ),
+          consumeTapEvents: true,
+          onTap: (){
+            setState(() {
+              this.markers.removeWhere((marker){
+                return marker.markerId.value == location.toString();
+              });
+              if(this.markers.length == 1){
+                LatLng postion = this.markers.first.position;
+                this.markers.clear();
+                putMarker(postion);
+              }
+            });
+          }, 
+          position: location
+        ));
+      });
+    } else {
+      Toast.show(
+        "Você não pode marcar mais de dois pontos", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
+    }
   }
 
   List<PopupMenuEntry<MenuOption>> menuBuilder(BuildContext context) {
@@ -176,6 +173,38 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     ];
   }
 
+  void addNewAsk() {
+    if(this.markers.length == 2){
+      Navigator.push(context, 
+        MaterialPageRoute(
+          builder: (context) => AddNewAskPage()
+        )
+      );
+    } else {
+      Toast.show(
+        "Você deve marcar dois pontos para esta ação", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
+    }
+  }
+
+  void addNewExpedient(){
+    if(this.markers.length == 1){
+      Navigator.push(context, 
+        MaterialPageRoute(
+          builder: (context) => AddNewExpedientPage()
+        )
+      );
+    } else {
+      Toast.show(
+        "Você deve marcar um ponto para esta ação", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<StoreState, Map<String, dynamic>>(
@@ -185,65 +214,35 @@ class _MainPageWidgetState extends State<MainPageWidget> {
             this.onLogout();
             store.dispatch(Logout());
           },
-          'photoUrl':store.state.user?.photoUrl
+          'photoUrl':store.state.user?.photoUrl,
+          'email':store.state.user?.email,
+          'name':store.state.user?.name
         };
       },
       builder: (context, resources) {
-        return Scaffold(
-          body: Stack(
-            children: <Widget>[
-              GoogleMap(
-                mapType: MapType.normal,
-                onLongPress: [putDriverMarker, putUserMarker][this.currentIndex],
-                polylines: polyline,
-                markers: [this.driverMarkers, this.userMarkers.union([
-                    Marker(
-                      markerId: MarkerId(nextPlace.toString()),
-                      position: nextPlace
-                    )
-                ].toSet())][this.currentIndex],
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(currentLocation?.latitude ?? 0, currentLocation?.longitude ?? 0),
-                  zoom: 17.8,
-                ),
-                onMapCreated: onMapCreated,
-              ),
-              MapsHeader(
-                onSelected: (option)=>onSelected(option, resources['logoutFunction'], [this.driverMarkers, this.userMarkers]), 
-                menuBuilder: menuBuilder,
-                photoUrl: resources['photoUrl']
-              ),
-              [
-                DriverWidget(driverMarkers: driverMarkers), 
-                UserWidget(userMarkers: userMarkers)
-              ][this.currentIndex]
-            ],
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.directions_bus),
-                title: Text('Motorista'),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.people),
-                title: Text('Passageiro'),
+        return MainWidget(
+          addNewAsk: this.addNewAsk,
+          addNewExpedient: this.addNewExpedient,
+          email: resources['email'],
+          name: resources['name'],
+          logout: resources['logoutFunction'],
+          photoUrl: resources['photoUrl'],
+          onTap: (location) => centralize(this.currentLocation),
+          putMarker: this.putMarker,
+          cancelselection: (){
+            setState(() {
+              this.markers.clear();
+            });
+          },
+          onMapCreated: this.onMapCreated,
+          polyline: this.polyline,
+          markers: nextPlace != null ? this.markers.union([
+              Marker(
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+                markerId: MarkerId(nextPlace.toString()),
+                position: nextPlace
               )
-            ],
-            elevation: 8,
-            backgroundColor: Colors.white,
-            currentIndex: this.currentIndex,
-            selectedItemColor: Theme.of(context).primaryColor,
-            onTap: _onTapNavigation
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => centralize(this.currentLocation),
-            child: Icon(Icons.gps_fixed),
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked
+          ].toSet()) : this.markers
         );
       }
     );
