@@ -31,10 +31,13 @@ class _ExpedientWidget extends StatefulWidget {
 }
 
 class _ExpedientWidgetState extends State<_ExpedientWidget> {
+  String name;
   final Set<Marker> driverMarkers;
   int places = 0; 
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
+  DateTime selectedEndDateTime;
+  DateTime selectedStartDateTime;
   DriverService driverService = new DriverService();
   TextEditingController garageController = TextEditingController();
   TextEditingController numberControler = new TextEditingController();
@@ -76,21 +79,27 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   }
 
   void onSelectedStartTime(DateTime selectedDate) {
-    setState((){
-      selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
-    });
+    if(selectedDate!=null){
+      setState((){
+        selectedStartDateTime = selectedDate;
+        selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+      });
+    }
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
-    setState((){
-      selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
-    });
+    if(selectedDate!=null){
+      setState((){
+        selectedEndDateTime = selectedDate;
+        selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
+      });
+    }
   }
 
   void addFunction(garage, email) {
     if(garage != null){
       String localName = "${garage.position.latitude}, ${garage.position.longitude}"; 
-      driverService.postNewAgent(localName, places, selectedStartTime, selectedEndTime, email).then((statusCode){
+      driverService.postNewAgent(this.name, localName, places, selectedStartTime, selectedEndTime, email).then((statusCode){
         if(statusCode==200){
           Toast.show(
             "O expediente foi adicionado com sucesso", context, 
@@ -132,10 +141,21 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Nome do expediente",
-          )
+          ),
+          onChanged: (text){
+            this.name = text;
+          }
         ),
-        TimePicker(labelText: 'Início do expediente', onSelectedTime: onSelectedStartTime),
-        TimePicker(labelText: 'Fim do expediente', onSelectedTime: onSelectedEndTime),
+        TimePicker(
+          labelText: 'Início do expediente', 
+          onSelectedTime: onSelectedStartTime, 
+          lastdateTime: selectedEndDateTime
+        ),
+        TimePicker(
+          labelText: 'Fim do expediente', 
+          onSelectedTime: onSelectedEndTime, 
+          firstDateTime: selectedStartDateTime
+        ),
         TextField(
           onTap: _showDialog,
           controller: numberControler,

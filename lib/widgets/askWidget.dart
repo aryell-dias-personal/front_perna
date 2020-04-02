@@ -30,9 +30,12 @@ class _AskWidget extends StatefulWidget {
 }
 
 class _AskWidgetState extends State<_AskWidget> {
+  String name;
   final Set<Marker> userMarkers;
   double selectedEndTime = 0.0;
   double selectedStartTime = 0.0;
+  DateTime selectedEndDateTime;
+  DateTime selectedStartDateTime;
   UserService userService = new UserService();
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
@@ -60,22 +63,28 @@ class _AskWidgetState extends State<_AskWidget> {
   _AskWidgetState({@required this.userMarkers});
 
   void onSelectedStartTime(DateTime selectedDate) {
-    setState((){
-      selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
-    });
+    if(selectedDate!=null){
+      setState((){
+        selectedStartDateTime = selectedDate;
+        selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+      });
+    }
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
-    setState((){
-      selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
-    });
+    if(selectedDate!=null){
+      setState((){
+        selectedEndDateTime = selectedDate;
+        selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
+      });
+    }
   }
 
   void addFunction(Set<Marker> userMarkers, email) {
     if(userMarkers.length == 2){
       String origin = "${userMarkers.first.position.latitude}, ${userMarkers.first.position.longitude}";
       String destiny = "${userMarkers.last.position.latitude}, ${userMarkers.last.position.longitude}"; 
-      userService.postNewAskedPoint(origin, destiny, this.selectedStartTime, this.selectedEndTime, email).then((statusCode){
+      userService.postNewAskedPoint(this.name, origin, destiny, this.selectedStartTime, this.selectedEndTime, email).then((statusCode){
         if(statusCode==200){
           Toast.show(
             "O pedido foi adicionado com sucesso", context, 
@@ -114,13 +123,24 @@ class _AskWidgetState extends State<_AskWidget> {
           ],
         ),
         TextField(
+          onChanged: (text){
+            this.name = text;
+          },
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             labelText: "Nome do pedido",
-          )
+          ), 
         ),
-        TimePicker(labelText: "Hora da Partida", onSelectedTime: onSelectedStartTime),
-        TimePicker(labelText: "Hora da Chegada", onSelectedTime: onSelectedEndTime),
+        TimePicker(
+          labelText: "Hora da Partida", 
+          onSelectedTime: onSelectedStartTime, 
+          lastdateTime: selectedEndDateTime
+        ),
+        TimePicker(
+          labelText: "Hora da Chegada", 
+          onSelectedTime: onSelectedEndTime, 
+          firstDateTime: selectedStartDateTime
+        ),
         TextField(
           readOnly: true,
           controller: initialController,
