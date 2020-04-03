@@ -34,8 +34,8 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   String name;
   final Set<Marker> driverMarkers;
   int places = 0; 
-  double selectedEndTime = 0.0;
-  double selectedStartTime = 0.0;
+  double selectedEndTime;
+  double selectedStartTime;
   DateTime selectedEndDateTime;
   DateTime selectedStartDateTime;
   DriverService driverService = new DriverService();
@@ -79,25 +79,29 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   }
 
   void onSelectedStartTime(DateTime selectedDate) {
-    if(selectedDate!=null){
       setState((){
         selectedStartDateTime = selectedDate;
-        selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+        if(selectedDate!=null){
+          selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+        } else {
+          selectedStartTime = null;
+        }
       });
-    }
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
-    if(selectedDate!=null){
-      setState((){
-        selectedEndDateTime = selectedDate;
+    setState((){
+      selectedEndDateTime = selectedDate;
+      if(selectedDate!=null){
         selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
-      });
-    }
+      } else {
+        selectedEndTime = null;
+      }
+    });
   }
 
   void addFunction(garage, email) {
-    if(garage != null){
+    if(garage != null && places != 0 && this.name != null && this.name != "" && selectedStartTime != null && selectedEndTime != null){
       String localName = "${garage.position.latitude}, ${garage.position.longitude}"; 
       driverService.postNewAgent(this.name, localName, places, selectedStartTime, selectedEndTime, email).then((statusCode){
         if(statusCode==200){
@@ -114,6 +118,12 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           );
         }
       });
+    } else {
+      Toast.show(
+        "preencha todos os campos", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
     }
   }
 

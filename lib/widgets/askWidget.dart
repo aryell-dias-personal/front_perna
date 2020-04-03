@@ -32,8 +32,8 @@ class _AskWidget extends StatefulWidget {
 class _AskWidgetState extends State<_AskWidget> {
   String name;
   final Set<Marker> userMarkers;
-  double selectedEndTime = 0.0;
-  double selectedStartTime = 0.0;
+  double selectedEndTime;
+  double selectedStartTime;
   DateTime selectedEndDateTime;
   DateTime selectedStartDateTime;
   UserService userService = new UserService();
@@ -63,25 +63,29 @@ class _AskWidgetState extends State<_AskWidget> {
   _AskWidgetState({@required this.userMarkers});
 
   void onSelectedStartTime(DateTime selectedDate) {
-    if(selectedDate!=null){
       setState((){
         selectedStartDateTime = selectedDate;
-        selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+        if(selectedDate!=null){
+            selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
+        } else{
+            selectedStartTime = null;
+        }
       });
-    }
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
-    if(selectedDate!=null){
       setState((){
         selectedEndDateTime = selectedDate;
-        selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
+        if(selectedDate!=null){
+            selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
+        } else{
+            selectedEndTime = null;
+        }
       });
-    }
   }
 
-  void addFunction(Set<Marker> userMarkers, email) {
-    if(userMarkers.length == 2){
+  void addFunction(userMarkers, email) {
+    if(userMarkers != null && this.name != null && this.name != "" && userMarkers.length == 2  && selectedStartTime != null && selectedEndTime != null){
       String origin = "${userMarkers.first.position.latitude}, ${userMarkers.first.position.longitude}";
       String destiny = "${userMarkers.last.position.latitude}, ${userMarkers.last.position.longitude}"; 
       userService.postNewAskedPoint(this.name, origin, destiny, this.selectedStartTime, this.selectedEndTime, email).then((statusCode){
@@ -99,6 +103,12 @@ class _AskWidgetState extends State<_AskWidget> {
           );
         }
       });
+    } else {
+      Toast.show(
+        "preencha todos os campos", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
     }
   }
 

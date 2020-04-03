@@ -103,11 +103,13 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   }
 
   void centralize(LocationData locationData) async {
-    final GoogleMapController controller = await this.mapsController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: LatLng(locationData.latitude, locationData.longitude),
-      zoom: 20,
-    )));
+    if(locationData != null){
+      final GoogleMapController controller = await this.mapsController.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: LatLng(locationData.latitude, locationData.longitude),
+        zoom: 20,
+      )));
+    }
   }
 
   Future<bool> requestLocation(location) async {
