@@ -8,13 +8,14 @@ class MainWidget extends StatelessWidget {
   final String name;
   final String email;
   final Function logout;
-
+  final Set<Marker> nextPlaces;
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
   final Set<Marker> markers;
   final Function cancelselection;
+  final Set<Circle> circles;
   final Function addNewAsk;
   final Function addNewExpedient;
 
@@ -28,7 +29,9 @@ class MainWidget extends StatelessWidget {
     @required this.putMarker,
     @required this.onMapCreated,
     @required this.polyline,
+    @required this.nextPlaces,
     @required this.markers,
+    @required this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
     @required this.addNewAsk
@@ -37,7 +40,7 @@ class MainWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _MainWidget(
-      photoUrl: photoUrl, 
+      photoUrl: this.photoUrl, 
       email: this.email, 
       name: this.name, 
       logout: this.logout,
@@ -46,9 +49,11 @@ class MainWidget extends StatelessWidget {
       onMapCreated: this.onMapCreated,
       polyline: this.polyline,
       markers: this.markers,
+      circles: this.circles,
       cancelselection: this.cancelselection,
       addNewExpedient: this.addNewExpedient,
-      addNewAsk: this.addNewAsk
+      addNewAsk: this.addNewAsk,
+      nextPlaces: this.nextPlaces
     );
   }
 }
@@ -58,13 +63,14 @@ class _MainWidget extends StatefulWidget {
   final String email;
   final Function logout;
   final String photoUrl;
-
+  final Set<Marker> nextPlaces;
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
   final Set<Marker> markers;
   final Function cancelselection;
+  final Set<Circle> circles;
   final Function addNewAsk;
   final Function addNewExpedient;
 
@@ -79,26 +85,32 @@ class _MainWidget extends StatefulWidget {
     @required this.onMapCreated,
     @required this.polyline,
     @required this.markers,
-    @required  this.cancelselection,
+    @required this.circles,
+    @required this.nextPlaces,
+    @required this.cancelselection,
     @required this.addNewExpedient, 
     @required this.addNewAsk
   }) : super(key: key);
 
   @override
-  _MainWidgetState createState() => _MainWidgetState(
-    photoUrl: photoUrl, 
-    email: this.email, 
-    name: this.name, 
-    logout: this.logout,
-    onTap: this.onTap,
-    putMarker: this.putMarker,
-    onMapCreated: this.onMapCreated,
-    polyline: this.polyline,
-    markers: this.markers,
-    cancelselection: this.cancelselection,
-    addNewExpedient: this.addNewExpedient, 
-    addNewAsk: this.addNewAsk
-  );
+  _MainWidgetState createState() {
+    return _MainWidgetState(
+      photoUrl: this.photoUrl, 
+      email: this.email, 
+      name: this.name, 
+      logout: this.logout,
+      onTap: this.onTap,
+      putMarker: this.putMarker,
+      onMapCreated: this.onMapCreated,
+      polyline: this.polyline,
+      markers: this.markers,
+      circles: this.circles,
+      cancelselection: this.cancelselection,
+      addNewExpedient: this.addNewExpedient, 
+      addNewAsk: this.addNewAsk,
+      nextPlaces: this.nextPlaces
+    );
+  }
 }
 
 class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderStateMixin {
@@ -106,18 +118,20 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   final String email;
   final Function logout;
   final String photoUrl;
-  bool isCollapsed = true;
-  double screemWidth, screemHeight;
-  AnimationController controller;
-
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
   final Set<Marker> markers;
+  final Set<Marker> nextPlaces;
+  final Set<Circle> circles;
   final Function cancelselection;
   final Function addNewAsk;
   final Function addNewExpedient;
+
+  bool isCollapsed = true;
+  double screemWidth, screemHeight;
+  AnimationController controller;
 
   _MainWidgetState({
     @required this.photoUrl, 
@@ -126,9 +140,11 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     @required this.logout,
     @required this.onTap,
     @required this.putMarker,
+    @required this.nextPlaces,
     @required this.onMapCreated,
     @required this.polyline,
     @required this.markers,
+    @required this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
     @required this.addNewAsk
@@ -167,10 +183,11 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                   GoogleMap(
                     onTap: this.onTap,
                     buildingsEnabled: true,
+                    circles: this.circles,
                     mapType: MapType.normal, 
                     onLongPress: this.putMarker,
                     polylines: this.polyline,
-                    markers: this.markers,
+                    markers: this.markers.union(this.nextPlaces),
                     myLocationEnabled: true,
                     myLocationButtonEnabled: false,
                     initialCameraPosition: CameraPosition(

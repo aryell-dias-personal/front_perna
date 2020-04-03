@@ -39,9 +39,10 @@ class MainPageWidget extends StatefulWidget {
 
 class _MainPageWidgetState extends State<MainPageWidget> {
   Function cancel;
-  LatLng nextPlace;
+  Set<Marker> nextPlaces = Set();
   LocationData currentLocation;
   Set<Marker> markers = Set();
+  Set<Circle> circles = Set();
   Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
   Completer<GoogleMapController> mapsController = Completer();
@@ -50,6 +51,19 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   final String email;
   final Function onLogout;
   _MainPageWidgetState({@required this.email, @required this.onLogout});
+
+  putCircles(List<LatLng> points){
+    setState(() {
+      circles.addAll(points.map((point) => Circle(
+        strokeWidth: 1,
+        strokeColor: Colors.grey,
+        circleId: CircleId(point.toString()),
+        center: point,
+        fillColor: Colors.white,
+        radius: 0.5
+      )).toSet());
+    });
+  }
 
   buildRouteCooords(List<LatLng> points) async {
     if(points.length >= 2){
@@ -72,9 +86,16 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     mapsService.getMapsData(this.email).then((MapsData mapsData){
       if(mapsData != null){
         if(mapsData.route != null)
+          this.putCircles(mapsData.route);
           this.buildRouteCooords(mapsData.route);
         if(mapsData.nextPlace != null)
-          this.nextPlace = mapsData.nextPlace;
+          setState(() {
+            this.nextPlaces.add(Marker(
+              markerId: MarkerId(mapsData.nextPlace.toString()),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+              position: mapsData.nextPlace
+            ));
+          });
       }
     });
   }
@@ -223,6 +244,8 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       },
       builder: (context, resources) {
         return MainWidget(
+          circles: this.circles,
+          nextPlaces: this.nextPlaces,
           addNewAsk: this.addNewAsk,
           addNewExpedient: this.addNewExpedient,
           email: resources['email'],
@@ -238,13 +261,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
           },
           onMapCreated: this.onMapCreated,
           polyline: this.polyline,
-          markers: nextPlace != null ? this.markers.union([
-              Marker(
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-                markerId: MarkerId(nextPlace.toString()),
-                position: nextPlace
-              )
-          ].toSet()) : this.markers
+          markers: this.markers
         );
       }
     );
