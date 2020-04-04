@@ -15,8 +15,8 @@ class HelpPage extends StatelessWidget {
           child: Markdown(
             controller: controller,
             selectable: true,
-            data: markdownHelp,
-            imageDirectory: 'https://raw.githubusercontent.com',
+            data: markdownHelp
+            
           ),
         )
     );

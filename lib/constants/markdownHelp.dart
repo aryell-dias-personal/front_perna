@@ -1,91 +1,38 @@
-// TODO: usar o markdown abaixo para criar a tela de ajuda
+// TODO: fazer a tela de histórico
+// TODO: Splash screen
+// TODO: tornar possível identificar a hora do pin na tela inicial e alterar os pins se possível
 
 final String markdownHelp = """
-# Markdown Example
-Markdown allows you to easily include formatted text, images, and even formatted Dart code in your app.
+# Manual da Aplicação
 
-## Titles
+Este aplicativo tem como intenção facilitar a locomoção dos usuários de transporte coletivo criando uma maior correlação entre demanda dos passageiros e oferta dos motoristas.
 
-Setext-style
+## Marcadores do mapa
 
-```
-This is an H1
-=============
-
-This is an H2
--------------
-```
-
-Atx-style
-
-```
-# This is an H1
-
-## This is an H2
-
-###### This is an H6
-```
-
-Select the valid headers:
-
-- [x] `# hello`
-- [ ] `#hello`
-
-## Links
-
-[Google's Homepage][Google]
-
-```
-[inline-style](https://www.google.com)
-
-[reference-style][Google]
-```
-
-## Images
-
-![Flutter logo](/dart-lang/site-shared/master/src/_assets/image/flutter/icon/64.png)
-
-## Tables
-
-|Syntax                                 |Result                               |
+|Cor do Marcador                        |Significado                          |
 |---------------------------------------|-------------------------------------|
-|`*italic 1*`                           |*italic 1*                           |
-|`_italic 2_`                           | _italic 2_                          |
-|`**bold 1**`                           |**bold 1**                           |
-|`__bold 2__`                           |__bold 2__                           |
-|`This is a ~~strikethrough~~`          |This is a ~~strikethrough~~          |
-|`***italic bold 1***`                  |***italic bold 1***                  |
-|`___italic bold 2___`                  |___italic bold 2___                  |
-|`***~~italic bold strikethrough 1~~***`|***~~italic bold strikethrough 1~~***|
-|`~~***italic bold strikethrough 2***~~`|~~***italic bold strikethrough 2***~~|
+|Verde                                  |Partida ou Garagem                   |
+|Vermelho                               |Chegada                              |
+|Amarela                                |Ponto de atenção                     |
 
-## Styling
-Style text as _italic_, __bold__, ~~strikethrough~~, or `inline code`.
+## Como fazer um novo pedido?
 
-- Use bulleted lists
-- To better clarify
-- Your points
+Selecione um ponto de `Partida` e de `Chegada` no mapa, pressionando no local do mapa até que apareçam os marcadores verde e após o vermelho, conforme a tabela acima. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Pedido`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
 
-## Code blocks
-Formatted Dart code looks really pretty too:
+## Como criar um novo expediente?
 
-```
-void main() {
-  runApp(MaterialApp(
-    home: Scaffold(
-      body: Markdown(data: markdownData),
-    ),
-  ));
-}
-```
+Selecione um ponto onde será a `Garagem` no mapa, pressionando no local do mapa até que apareça o marcador verde. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Expediente`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
 
-## Markdown widget
+## Como centralizar o mapa para o local onde estou?
 
-This is an example of how to create your own Markdown widget:
+Basta tocar em qualquer local do mapa e ele centralizará na sua posição.
 
-    Markdown(data: 'Hello _world_!');
+## Como remover um marcador que esta no mapa?
 
-Enjoy!
+Basta tocar no marcador que se deseja remover do mapa, com exceção dos `Pontos de Atenção` que não podem ser removidos até que um ponto mais relevante seja computado ou que o momento ao qual este ponto foi reservado tenha passado.
 
-[Google]: https://www.google.com/
+## Quando devo fazer meus pedidos?
+
+Os pedidos devem ser feitos com no minimo um dia de antecedência, para que todos os pedidos sejam organizados da melhor forma para todos os envolvidos (motoristas e passageiros).
+
 """;
