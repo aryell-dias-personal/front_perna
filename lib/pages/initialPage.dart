@@ -1,3 +1,5 @@
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
 import 'package:perna/models/signInResponse.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/services/signIn.dart';
@@ -8,16 +10,25 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:toast/toast.dart';
 
-class InitialPage extends StatelessWidget {
-
+class InitialPage extends StatefulWidget {
   final SignInService signInService;
   InitialPage({@required this.signInService});
+
+  @override
+  _InitialPageState createState() => _InitialPageState(signInService: signInService);
+}
+
+class _InitialPageState extends State<InitialPage> {
+  bool isLoading = false;
+
+  final SignInService signInService;
+  _InitialPageState({@required this.signInService});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
+        child: isLoading ? Loading(indicator: BallPulseIndicator(), size: 100.0) : Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             AvatarGlow(
@@ -83,7 +94,16 @@ class InitialPage extends StatelessWidget {
                         fontSize: 25.0,
                         color: Theme.of(context).primaryColor),
                   ),
-                  onPressed: onSignIn,
+                  onPressed: (){
+                    setState(() {
+                      this.isLoading = true;
+                    });
+                    onSignIn().whenComplete((){
+                      setState(() {
+                        this.isLoading = false;
+                      });
+                    });
+                  },
                   color: Color(0xEEFFFFFF),
                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                   shape: StadiumBorder()
@@ -93,7 +113,7 @@ class InitialPage extends StatelessWidget {
             SizedBox(
               height: 20.0,
             ),
-            StoreConnector<StoreState, Future<Null> Function()>(
+            StoreConnector<StoreState, Function()>(
               converter: (store) {
                 return () async {
                   SignInResponse signInResponse = await signInService.logIn();
@@ -118,7 +138,16 @@ class InitialPage extends StatelessWidget {
                         fontSize: 25.0,
                         color: Colors.white),
                   ),
-                  onPressed: onLogIn,
+                  onPressed: (){
+                    setState(() {
+                      this.isLoading = true;
+                    });
+                    onLogIn().whenComplete((){
+                      setState(() {
+                        this.isLoading = false;
+                      });
+                    });
+                  },
                   color: Theme.of(context).primaryColor,
                   padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                   shape: StadiumBorder()

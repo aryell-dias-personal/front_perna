@@ -77,7 +77,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       });
       await this.buildRouteCooords(points.sublist(1));
     }
-  }
+  }  
 
   @override
   void initState() {
@@ -200,7 +200,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     if(this.markers.length == 2){
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewAskPage(userMarkers: markers)
+          builder: (context) => AddNewAskPage(userMarkers: markers, clear: this.markers.clear)
         )
       );
     } else {
@@ -216,7 +216,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     if(this.markers.length == 1){
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewExpedientPage(driverMarkers: this.markers)
+          builder: (context) => AddNewExpedientPage(driverMarkers: this.markers, clear: this.markers.clear)
         )
       );
     } else {

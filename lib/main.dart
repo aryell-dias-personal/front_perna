@@ -1,5 +1,7 @@
+import 'package:flutter/services.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/pages/mainPage.dart';
+import 'package:perna/pages/noConnectionPage.dart';
 import 'package:perna/services/signIn.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:perna/store/reducers.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
+import 'package:connectivity/connectivity.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
@@ -33,30 +36,70 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final Store<StoreState> store;
-  final SignInService signInService = new SignInService(googleSignIn: googleSignIn);
 
   MyApp({@required this.store});
 
   @override
   Widget build(BuildContext context) {
-    return new StoreProvider<StoreState>(
-        store: store,
-        child:MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: StoreConnector<StoreState, bool>(
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    return _MyApp(store: this.store);
+  }
+}
+
+class _MyApp extends StatefulWidget {  
+  final Store<StoreState> store;
+
+  _MyApp({@required this.store, Key key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState(store: this.store);
+}
+
+class _MyAppState extends State<_MyApp> {
+  final Store<StoreState> store;
+  final SignInService signInService = new SignInService(googleSignIn: googleSignIn);
+  bool isConnected = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult connection){
+      setState(() {
+        isConnected = connection == ConnectivityResult.mobile || connection == ConnectivityResult.wifi;
+      });
+    });
+  }
+
+  _MyAppState({@required this.store});
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreProvider<StoreState>(
+      store: store,
+      child:MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: !isConnected ? 
+        NoConnectionPage() : 
+        StoreConnector<StoreState, bool>(
           converter: (store) {
             return store.state.logedIn;
           },
           builder: (context, logedIn) {
-            return logedIn != null && logedIn ? 
-              StoreConnector<StoreState, String>(
+            if(logedIn == null || !logedIn){
+              return InitialPage(signInService: signInService);
+            } else {
+              return StoreConnector<StoreState, String>(
                 converter: (store) {
                   return store.state.user.email;
                 },
                 builder: (context, email) {
                   return MainPage(onLogout: signInService.logOut, email: email);
                 }
-              ) : InitialPage(signInService: signInService);
+              );
+            }
           }
         ),
         theme: ThemeData(

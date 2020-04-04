@@ -5,8 +5,9 @@ import 'package:perna/widgets/expedientWidget.dart';
 
 class AddNewExpedientPage extends StatelessWidget {
   final Set<Marker> driverMarkers;
+  final Function clear;
 
-  const AddNewExpedientPage({Key key, @required this.driverMarkers}) : super(key: key);
+  const AddNewExpedientPage({Key key, @required this.driverMarkers, @required this.clear}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class AddNewExpedientPage extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
-          ExpedientWidget(driverMarkers: driverMarkers)
+          ExpedientWidget(driverMarkers: driverMarkers, clear: this.clear)
         ] 
       )
     );

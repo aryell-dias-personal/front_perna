@@ -1,6 +1,8 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/cardContainer.dart';
@@ -11,26 +13,29 @@ import 'package:toast/toast.dart';
 
 class AskWidget extends StatelessWidget {
   final Set<Marker> userMarkers;
+  final Function clear;
   
-  AskWidget({@required this.userMarkers});
+  AskWidget({@required this.userMarkers, @required this.clear});
   
   @override
   Widget build(BuildContext context) {
-    return _AskWidget(userMarkers: userMarkers);
+    return _AskWidget(userMarkers: userMarkers, clear: this.clear);
   }
 }
 
 class _AskWidget extends StatefulWidget {
   final Set<Marker> userMarkers;
+  final Function clear;
 
-  _AskWidget({ Key key, @required this.userMarkers}) : super(key: key);
+  _AskWidget({ Key key, @required this.userMarkers, @required this.clear}) : super(key: key);
 
   @override
-  _AskWidgetState createState() => _AskWidgetState(userMarkers: userMarkers);
+  _AskWidgetState createState() => _AskWidgetState(userMarkers: userMarkers, clear: this.clear);
 }
 
 class _AskWidgetState extends State<_AskWidget> {
   String name;
+  bool isLoading = false;
   final Set<Marker> userMarkers;
   double selectedEndTime;
   double selectedStartTime;
@@ -40,6 +45,7 @@ class _AskWidgetState extends State<_AskWidget> {
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
   final Geolocator _geolocator = Geolocator();
+  final Function clear;
 
   String placemarkToString(Placemark placemark){
     return "${placemark.administrativeArea}, ${placemark.subAdministrativeArea}, ${placemark.subLocality}, ${placemark.thoroughfare}, ${placemark.subThoroughfare}";
@@ -60,7 +66,7 @@ class _AskWidgetState extends State<_AskWidget> {
     super.initState();
   }
 
-  _AskWidgetState({@required this.userMarkers});
+  _AskWidgetState({@required this.userMarkers, @required this.clear});
 
   void onSelectedStartTime(DateTime selectedDate) {
       setState((){
@@ -86,16 +92,24 @@ class _AskWidgetState extends State<_AskWidget> {
 
   void addFunction(userMarkers, email) {
     if(userMarkers != null && this.name != null && this.name != "" && userMarkers.length == 2  && selectedStartTime != null && selectedEndTime != null){
+      setState(() {
+        isLoading = true;
+      });
       String origin = "${userMarkers.first.position.latitude}, ${userMarkers.first.position.longitude}";
       String destiny = "${userMarkers.last.position.latitude}, ${userMarkers.last.position.longitude}"; 
       userService.postNewAskedPoint(this.name, origin, destiny, this.selectedStartTime, this.selectedEndTime, email).then((statusCode){
         if(statusCode==200){
+          Navigator.pop(context);
+          this.clear();
           Toast.show(
             "O pedido foi adicionado com sucesso", context, 
             backgroundColor: Colors.greenAccent, 
             duration: 3
           );
         }else{
+          setState(() {
+            isLoading = false;
+          });
           Toast.show(
             "Não foi possivel adicionar o pedido", context, 
             backgroundColor: Colors.redAccent, 
@@ -114,7 +128,9 @@ class _AskWidgetState extends State<_AskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return CardContainer(
+    return isLoading ? Center(
+        child:Loading(indicator: BallPulseIndicator(), size: 100.0)
+      ) : CardContainer(
       alignment: Alignment.bottomCenter,
       height: 540,
       children: <Widget>[

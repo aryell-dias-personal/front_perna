@@ -5,8 +5,9 @@ import 'package:perna/widgets/askWidget.dart';
 
 class AddNewAskPage extends StatelessWidget {
   final Set<Marker> userMarkers;
+  final Function clear;
 
-  const AddNewAskPage({Key key, @required this.userMarkers}) : super(key: key);
+  const AddNewAskPage({Key key, @required this.userMarkers, @required this.clear}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class AddNewAskPage extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
-          AskWidget(userMarkers: userMarkers)
+          AskWidget(userMarkers: userMarkers, clear: this.clear)
         ] 
       )
     );
