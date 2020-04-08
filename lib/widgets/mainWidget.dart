@@ -286,7 +286,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
               onPressed: (){
                 Navigator.push(context, 
                   MaterialPageRoute(
-                    builder: (context) => HistoryPage()
+                    builder: (context) => HistoryPage(email: this.email)
                   )
                 );
               },

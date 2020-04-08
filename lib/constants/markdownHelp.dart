@@ -1,6 +1,4 @@
-// TODO: fazer a tela de histórico
-// TODO: Splash screen
-// TODO: tornar possível identificar a hora do pin na tela inicial e alterar os pins se possível
+// TODO: tornar possível identificar a hora do pin na tela inicial
 
 final String markdownHelp = """
 # Manual da Aplicação

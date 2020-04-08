@@ -16,7 +16,6 @@ class HelpPage extends StatelessWidget {
             controller: controller,
             selectable: true,
             data: markdownHelp
-            
           ),
         )
     );

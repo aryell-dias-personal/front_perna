@@ -3,19 +3,33 @@ import 'package:perna/constants/constants.dart';
 import 'package:http/http.dart';
 
 class UserService {
-  Future<dynamic> postNewAskedPoint(String name, String origin, String destiny, double startAt, double endAt, String email) async {
-    final encoder = JsonEncoder();
-    final body = encoder.convert({
-      "askedPoint":{
-        "origin": origin,
-        "destiny": destiny,
+  final encoder = JsonEncoder();
+  final decoder = JsonDecoder();
+  
+  Future<dynamic> postNewAskedPoint(String name, String origin, String friendlyOrigin, String destiny, String friendlyDestiny, DateTime selectedStartDateTime, DateTime selectedEndDateTime, String email) async {
+    final body = this.encoder.convert({
+      "askedPoint": {
         "name": name,
-        "startAt": startAt,
-        "endAt": endAt
+        "origin": origin,
+        "friendlyOrigin": friendlyOrigin,
+        "destiny": destiny,
+        "friendlyDestiny": friendlyDestiny,
+        "friendlyStartAt": selectedStartDateTime.toString(),
+        "friendlyEndAt": selectedEndDateTime.toString(),
+        "startAt": selectedStartDateTime.millisecondsSinceEpoch/60000,
+        "endAt": selectedEndDateTime.millisecondsSinceEpoch/60000
       },
       "email": email
     });
     Response res = await post("${baseUrl}insertAskedPoint", body: body);
     return res.statusCode;
+  }
+
+  Future<dynamic> getHistory(String email)  async {
+    final body = this.encoder.convert({
+      "email": email
+    });
+    Response res = await post("${baseUrl}getHistory", body: body);
+    return res.statusCode == 200 ? decoder.convert(res.body) : [];
   }
 }

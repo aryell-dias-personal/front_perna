@@ -37,8 +37,6 @@ class _AskWidgetState extends State<_AskWidget> {
   String name;
   bool isLoading = false;
   final Set<Marker> userMarkers;
-  double selectedEndTime;
-  double selectedStartTime;
   DateTime selectedEndDateTime;
   DateTime selectedStartDateTime;
   UserService userService = new UserService();
@@ -71,33 +69,25 @@ class _AskWidgetState extends State<_AskWidget> {
   void onSelectedStartTime(DateTime selectedDate) {
       setState((){
         selectedStartDateTime = selectedDate;
-        if(selectedDate!=null){
-            selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
-        } else{
-            selectedStartTime = null;
-        }
       });
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
       setState((){
         selectedEndDateTime = selectedDate;
-        if(selectedDate!=null){
-            selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
-        } else{
-            selectedEndTime = null;
-        }
       });
   }
 
   void addFunction(userMarkers, email) {
-    if(userMarkers != null && this.name != null && this.name != "" && userMarkers.length == 2  && selectedStartTime != null && selectedEndTime != null){
+    if(userMarkers != null && this.name != null && this.name != "" && userMarkers.length == 2  && this.selectedStartDateTime != null && this.selectedEndDateTime != null){
       setState(() {
         isLoading = true;
       });
       String origin = "${userMarkers.first.position.latitude}, ${userMarkers.first.position.longitude}";
       String destiny = "${userMarkers.last.position.latitude}, ${userMarkers.last.position.longitude}"; 
-      userService.postNewAskedPoint(this.name, origin, destiny, this.selectedStartTime, this.selectedEndTime, email).then((statusCode){
+      String friendlyOrigin = initialController.text;
+      String friendlyDestiny = endControler.text; 
+      userService.postNewAskedPoint(this.name, origin, friendlyOrigin, destiny, friendlyDestiny, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
         if(statusCode==200){
           Navigator.pop(context);
           this.clear();

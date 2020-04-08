@@ -40,8 +40,6 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   final Set<Marker> driverMarkers;
   final Function clear;
   int places = 0; 
-  double selectedEndTime;
-  double selectedStartTime;
   DateTime selectedEndDateTime;
   DateTime selectedStartDateTime;
   DriverService driverService = new DriverService();
@@ -87,32 +85,23 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   void onSelectedStartTime(DateTime selectedDate) {
       setState((){
         selectedStartDateTime = selectedDate;
-        if(selectedDate!=null){
-          selectedStartTime = selectedDate.millisecondsSinceEpoch/60000;
-        } else {
-          selectedStartTime = null;
-        }
       });
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
     setState((){
       selectedEndDateTime = selectedDate;
-      if(selectedDate!=null){
-        selectedEndTime = selectedDate.millisecondsSinceEpoch/60000;
-      } else {
-        selectedEndTime = null;
-      }
     });
   }
 
   void addFunction(garage, email) {
-    if(garage != null && places != 0 && this.name != null && this.name != "" && selectedStartTime != null && selectedEndTime != null){
+    if(garage != null && places != 0 && this.name != null && this.name != "" && this.selectedStartDateTime != null && selectedEndDateTime != null){
       setState(() {
         isLoading = true;
       });
-      String localName = "${garage.position.latitude}, ${garage.position.longitude}"; 
-      driverService.postNewAgent(this.name, localName, places, selectedStartTime, selectedEndTime, email).then((statusCode){
+      String garageLocal = "${garage.position.latitude}, ${garage.position.longitude}"; 
+      String friendlyGarageLocal = garageController.text;
+      driverService.postNewAgent(this.name, garageLocal, friendlyGarageLocal, places, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
         if(statusCode==200){
           Navigator.pop(context);
           this.clear();
