@@ -4,6 +4,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/models/mapsData.dart';
 import 'package:perna/pages/addNewAskPage.dart';
 import 'package:perna/pages/addNewExpedientPage.dart';
+import 'package:perna/pages/historyPage.dart';
 import 'package:perna/services/maps.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
@@ -91,6 +92,14 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         if(mapsData.nextPlace != null)
           setState(() {
             this.nextPlaces.add(Marker(
+              consumeTapEvents: true,
+              onTap: (){
+                Navigator.push(context, 
+                  MaterialPageRoute(
+                    builder: (context) => HistoryPage(email: this.email)
+                  )
+                );
+              },
               markerId: MarkerId(mapsData.nextPlace.toString()),
               icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
               position: mapsData.nextPlace

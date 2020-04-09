@@ -1,5 +1,3 @@
-// TODO: tornar possível identificar a hora do pin na tela inicial
-
 final String markdownHelp = """
 # Manual da Aplicação
 
