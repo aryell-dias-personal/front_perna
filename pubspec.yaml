@@ -28,6 +28,8 @@ dependencies:
   connectivity: ^0.4.2
   loading: ^1.0.2
   app_settings: 3.0.1
+  cloud_firestore: ^0.13.4+2
+  firebase_core: ^0.4.4
   timeline_list: ^0.0.3
 
 dev_dependencies:

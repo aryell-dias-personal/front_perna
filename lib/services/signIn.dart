@@ -17,18 +17,22 @@ class SignInService {
 
   Future<SignInResponse> logIn() async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
-    dynamic userResponse = await this.getUser(user);
-    if (userResponse.statusCode != 200)
-      return await this.logOut();
-    return  SignInResponse.fromJson(decoder.convert(userResponse.body));
+    if(user != null){
+      dynamic userResponse = await this.getUser(user);
+      if (userResponse.statusCode == 200)
+        return  SignInResponse.fromJson(decoder.convert(userResponse.body));
+    }
+    return await this.logOut();
   }
 
   Future<SignInResponse> signIn() async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
-    dynamic userResponse = await this.creatUser(user, true);
-    if (userResponse.statusCode != 200)
-      return await this.logOut();
-    return SignInResponse.fromJson(decoder.convert(userResponse.body));
+    if(user != null){
+      dynamic userResponse = await this.creatUser(user, true);
+      if (userResponse.statusCode == 200)
+        return SignInResponse.fromJson(decoder.convert(userResponse.body));
+    }
+    return await this.logOut();
   }
 
   Future<dynamic> creatUser(GoogleSignInAccount user, bool isProvider) async {

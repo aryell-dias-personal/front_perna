@@ -1,11 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
-import 'package:perna/models/mapsData.dart';
+import 'package:perna/helpers/decoder.dart';
 import 'package:perna/pages/addNewAskPage.dart';
 import 'package:perna/pages/addNewExpedientPage.dart';
 import 'package:perna/pages/historyPage.dart';
-import 'package:perna/services/maps.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/mainWidget.dart';
@@ -13,18 +13,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:location/location.dart';
 import 'dart:async';
-
 import 'package:toast/toast.dart';
 
 class MainPage extends StatelessWidget {
 
   final String email;
   final Function onLogout;
-  MainPage({@required this.email, @required this.onLogout});
+  final Firestore firestore;
+  MainPage({@required this.email, @required this.onLogout, @required this.firestore});
 
   @override
   Widget build(BuildContext context) {
-    return MainPageWidget(onLogout: onLogout, email: email);
+    return MainPageWidget(onLogout: onLogout, email: email, firestore: firestore);
   }
 }
 
@@ -32,10 +32,11 @@ class MainPageWidget extends StatefulWidget {
 
   final String email;
   final Function onLogout;
-  MainPageWidget({@required this.email, @required this.onLogout, Key key}) : super(key: key);
+  final Firestore firestore;
+  MainPageWidget({@required this.email, @required this.onLogout, @required this.firestore, Key key}) : super(key: key);
 
   @override
-  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, email: email);
+  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, email: email, firestore: firestore);
 }
 
 class _MainPageWidgetState extends State<MainPageWidget> {
@@ -51,7 +52,17 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   final String email;
   final Function onLogout;
-  _MainPageWidgetState({@required this.email, @required this.onLogout});
+  final Firestore firestore;
+
+  Map<String, dynamic> agent;
+  StreamSubscription<QuerySnapshot> agentsListener;
+  bool isLoadingAgent = false;
+
+  Map<String, dynamic> askedPoint;
+  StreamSubscription<QuerySnapshot> askedPointsListener;
+  bool isLoadingAskedPoint = false;
+
+  _MainPageWidgetState({@required this.email, @required this.onLogout, @required this.firestore});
 
   putCircles(List<LatLng> points){
     setState(() {
@@ -63,6 +74,37 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         fillColor: Colors.white,
         radius: 0.5
       )).toSet());
+    });
+  }
+
+  StreamSubscription<QuerySnapshot> initAgentListener(){
+    return firestore.collection("agent").where('email', isEqualTo: email)
+      .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
+      .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
+        Map<String, dynamic> agent = agentSnapshot?.documents?.first?.data;
+        if(agent != null && agent.containsKey('route')){
+          List<LatLng> route = agent['route'].map<LatLng>((encodedLatLng)=>decodeLatLng(encodedLatLng)).toList();
+          this.putCircles(route);
+          this.buildRouteCooords(route);
+        }
+        setState(() {
+          this.isLoadingAgent = false;
+        });
+    });
+  }
+
+  StreamSubscription<QuerySnapshot> initAskedPointListener(){
+    return firestore.collection("askedPoint").where('email', isEqualTo: email)
+      .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
+      .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
+        Map<String, dynamic> askedPoint = askedPointSnapshot?.documents?.first?.data;
+        if(askedPoint != null && askedPoint.containsKey('origin')){
+          LatLng origin = decodeLatLng(askedPoint['origin']);
+          this.addNextPlace(origin);
+        }
+        setState(() {
+          this.isLoadingAskedPoint = false;
+        });
     });
   }
 
@@ -83,30 +125,20 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   @override
   void initState() {
     super.initState();
-    MapsService mapsService = MapsService();
-    mapsService.getMapsData(this.email).then((MapsData mapsData){
-      if(mapsData != null){
-        if(mapsData.route != null)
-          this.putCircles(mapsData.route);
-          this.buildRouteCooords(mapsData.route);
-        if(mapsData.nextPlace != null)
-          setState(() {
-            this.nextPlaces.add(Marker(
-              consumeTapEvents: true,
-              onTap: (){
-                Navigator.push(context, 
-                  MaterialPageRoute(
-                    builder: (context) => HistoryPage(email: this.email)
-                  )
-                );
-              },
-              markerId: MarkerId(mapsData.nextPlace.toString()),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-              position: mapsData.nextPlace
-            ));
-          });
-      }
+    setState(() {
+      this.isLoadingAskedPoint = true;
+      this.isLoadingAgent = true;
+      agentsListener = this.initAgentListener();
+      askedPointsListener = this.initAskedPointListener();
     });
+  }
+  
+  @override
+  void dispose() {
+    super.dispose();
+    this.cancel();
+    agentsListener.cancel();
+    askedPointsListener.cancel();
   }
 
   void onMapCreated(GoogleMapController googleMapController) async {
@@ -156,10 +188,22 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    this.cancel();
+  void addNextPlace(LatLng origin){
+    setState(() {
+      this.nextPlaces.add(Marker(
+        consumeTapEvents: true,
+        onTap: (){
+          Navigator.push(context, 
+            MaterialPageRoute(
+              builder: (context) =>  HistoryPage(email: this.email, firestore: this.firestore)
+            )
+          );
+        },
+        markerId: MarkerId(origin.toString()),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+        position: origin
+      ));
+    });
   }
 
   void putMarker(location) {

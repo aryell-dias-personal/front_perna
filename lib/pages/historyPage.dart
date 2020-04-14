@@ -1,44 +1,76 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
-import 'package:perna/services/user.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
 class HistoryPage extends StatefulWidget {
   final String email;
+  final Firestore firestore;
 
-  HistoryPage({@required this.email});
+  HistoryPage({@required this.email, @required this.firestore});
 
   @override
-  _HistoryPageState createState() => _HistoryPageState(email: this.email);
+  _HistoryPageState createState() => _HistoryPageState(email: this.email, firestore: this.firestore);
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  bool isLoading = false;
-  final UserService userService = UserService();
+  final Firestore firestore;
   final String email;
-  List<dynamic> history;
-  List<TimelineModel> historyTiles;
 
-  _HistoryPageState({@required this.email});
+  List<dynamic> agents;
+  StreamSubscription<QuerySnapshot> agentsListener;
+  bool isLoadingAgents = false;
+
+  List<dynamic> askedPoints;
+  StreamSubscription<QuerySnapshot> askedPointsListener;
+  bool isLoadingAskedPoints = false;
+
+  _HistoryPageState({@required this.email, @required this.firestore});
+
+  @override
+  void dispose() {
+    super.dispose();
+    agentsListener.cancel();
+    askedPointsListener.cancel();
+  }
+
+  StreamSubscription<QuerySnapshot> initAgentsListner(){
+    return firestore.collection("agent").where('email', isEqualTo: email)
+      .snapshots().listen((QuerySnapshot agentsSnapshot){
+        setState(() {
+          this.agents = agentsSnapshot.documents.map((agent){
+            return agent.data;
+          }).toList();
+          this.isLoadingAgents = false;
+        });
+    });
+  }
+
+  StreamSubscription<QuerySnapshot> initAskedPointsListener(){
+    return firestore.collection("askedPoint").where('email', isEqualTo: email)
+      .snapshots().listen((QuerySnapshot askedPointsSnapshot){
+        setState(() {
+          this.askedPoints = askedPointsSnapshot.documents.map((askedPoint){
+            return askedPoint.data;
+          }).toList();
+          this.isLoadingAskedPoints = false;
+        });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      isLoading = true;
-    });
-    userService.getHistory(this.email).then((history){
-      setState(() {
-        this.history = history;
-        this.historyTiles = buildHistoryTiles();
-      });
-    }).whenComplete((){
-      setState(() {
-        isLoading = false;
-      });
+      this.isLoadingAskedPoints = true;
+      this.isLoadingAgents = true;
+      agentsListener = this.initAgentsListner();
+      askedPointsListener = this.initAskedPointsListener();
     });
   }
 
@@ -67,9 +99,14 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   List<TimelineModel> buildHistoryTiles() {
-    return this.history?.map<TimelineModel>((operation){
+    List history = this.agents + this.askedPoints;
+    history.sort((first, second){
+      return first['endAt'] - second['endAt'];
+    });
+    return history?.map<TimelineModel>((operation){
       List<Widget> info = [
         SizedBox(height: 40),
+        Text(operation['origin'] != null? "PEDIDO": "EXPEDIENTE"),
         buildRichText("Nome", operation['name']),
         buildRichText("Hora da Partida", parseData(operation["friendlyStartAt"])),
         buildRichText("Hora da Chegada", parseData(operation["friendlyEndAt"]))
@@ -98,11 +135,11 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: isLoading ? Center(
+      body: isLoadingAgents || isLoadingAskedPoints ? Center(
         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
       ) : Timeline(
         position: TimelinePosition.Left,
-        children: this.historyTiles
+        children: this.buildHistoryTiles()
       )
     );
   }

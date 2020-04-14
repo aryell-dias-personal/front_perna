@@ -13,6 +13,8 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:perna/store/reducers.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
@@ -27,8 +29,19 @@ void main() async {
 
   final initialState = await persistor.load();
   
+  final FirebaseApp app = await FirebaseApp.configure(
+    name: 'perna-app',
+    options: const FirebaseOptions(
+      googleAppID: '1:172739913177:android:38f4c6eb4f67cb674b25c8',
+      apiKey: 'AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ',
+      projectID: 'perna-app',
+      gcmSenderID: '172739913177'
+    )
+  );
+  final Firestore firestore = Firestore(app: app);
+
   final store = new Store<StoreState>(
-    reduce, initialState: initialState,
+    reduce, initialState: initialState.copyWith(firestore: firestore),
     middleware: [persistor.createMiddleware()]
   );
   runApp(new MyApp(store: store));
@@ -91,12 +104,15 @@ class _MyAppState extends State<_MyApp> {
             if(logedIn == null || !logedIn){
               return InitialPage(signInService: signInService);
             } else {
-              return StoreConnector<StoreState, String>(
+              return StoreConnector<StoreState, Map<String, dynamic>>(
                 converter: (store) {
-                  return store.state.user.email;
+                  return {
+                    'email': store.state.user.email,
+                    'firestore': store.state.firestore
+                  };
                 },
-                builder: (context, email) {
-                  return MainPage(onLogout: signInService.logOut, email: email);
+                builder: (context, resources) {
+                  return MainPage(onLogout: signInService.logOut, email: resources['email'], firestore: resources['firestore']);
                 }
               );
             }

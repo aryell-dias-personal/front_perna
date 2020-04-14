@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:perna/models/user.dart';
 
 // utilizar o que foi aprendido sobre polylines para mostrar as rotas que seram feitas pelos motoristas (mostrar sempre a rota mais próxima que ainda não terminou)
@@ -5,10 +6,12 @@ import 'package:perna/models/user.dart';
 class StoreState{
   bool logedIn;
   User user;
+  Firestore firestore;
 
   StoreState({
     this.logedIn,
-    this.user
+    this.user,
+    this.firestore
   });
 
   static StoreState fromJson(dynamic json) {
@@ -18,9 +21,10 @@ class StoreState{
     );
   }
 
-  StoreState copyWith({user, logedIn}) => StoreState(
+  StoreState copyWith({user, logedIn, firestore}) => StoreState(
     user: user ?? this.user,
-    logedIn: logedIn ?? this.logedIn
+    logedIn: logedIn ?? this.logedIn,
+    firestore: firestore ?? this.firestore
   );
 
   dynamic toJson(){

@@ -24,12 +24,4 @@ class UserService {
     Response res = await post("${baseUrl}insertAskedPoint", body: body);
     return res.statusCode;
   }
-
-  Future<dynamic> getHistory(String email)  async {
-    final body = this.encoder.convert({
-      "email": email
-    });
-    Response res = await post("${baseUrl}getHistory", body: body);
-    return res.statusCode == 200 ? decoder.convert(res.body) : [];
-  }
 }

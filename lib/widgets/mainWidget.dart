@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
+import 'package:perna/store/state.dart';
+import 'package:perna/widgets/sideMenuButton.dart';
 
 class MainWidget extends StatelessWidget {
   final String photoUrl;
@@ -150,13 +154,13 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     @required this.addNewAsk
   });
 
-    @override
-    void initState() {
-      super.initState();
-      setState(() {
-        this.controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      this.controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +233,15 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
       ),
     );
   }
+
+  String getName(){
+    int end = ' '.allMatches(this.name).length >= 1 ? 2: 1;
+    return this.name.split(' ').sublist(0, end).join(' ');
+  }
+
+  String getEmail(){
+    return this.email.length > 27 ? this.email.substring(0,24)+"..." : this.email;
+  }
   
   Widget menu(context){
     return Padding(
@@ -244,86 +257,47 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
               backgroundImage: NetworkImage(this.photoUrl)
             ),
             SizedBox(height: 5),
-            Text(this.name, style: TextStyle(color: Colors.white, fontSize: 22)),
+            Text(this.getName(), style: TextStyle(color: Colors.white, fontSize: 22)),
             SizedBox(height: 5),
-            Text(this.email, style: TextStyle(color: Colors.white, fontSize: 11)),
+            Text(this.getEmail(), style: TextStyle(color: Colors.white, fontSize: 11)),
             SizedBox(height: 20),
-            FlatButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:<Widget>[
-                  Text("Novo Pedido", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  SizedBox(width: 2),
-                  Icon(Icons.scatter_plot, color: Colors.white, size: 18)
-                ]
-              ),
+            SideMenuButton(
+              text: "Novo Pedido",
               onPressed: this.addNewAsk,
-              color: Colors.transparent,
-              shape: StadiumBorder(),
+              icon: Icons.scatter_plot,
             ),
-            FlatButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:<Widget>[
-                  Text("Novo Expediente", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  SizedBox(width: 2),
-                  Icon(Icons.work, color: Colors.white, size: 18)
-                ]
-              ),
+            SideMenuButton(
+              text: "Novo Expediente",
               onPressed: this.addNewExpedient,
-              color: Colors.transparent,
-              shape: StadiumBorder(),
+              icon: Icons.work,
             ),
-            FlatButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:<Widget>[
-                  Text("Histórico", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  SizedBox(width: 2),
-                  Icon(Icons.timeline, color: Colors.white, size: 18)
-                ]
-              ),
+            SideMenuButton(
+              text: "Histórico",
               onPressed: (){
-                Navigator.push(context, 
-                  MaterialPageRoute(
-                    builder: (context) => HistoryPage(email: this.email)
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => StoreConnector<StoreState, Firestore>(
+                      converter: (store) => store.state.firestore,
+                      builder:  (context, firestore) => HistoryPage(email: this.email, firestore: firestore)
+                    )
                   )
                 );
               },
-              color: Colors.transparent,
-              shape: StadiumBorder(),
+              icon: Icons.timeline,
             ),
-            FlatButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:<Widget>[
-                  Text("Ajuda", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  SizedBox(width: 2),
-                  Icon(Icons.help_outline, color: Colors.white, size: 18)
-                ]
-              ),
+            SideMenuButton(
+              text: "Ajuda",
               onPressed: (){
-                Navigator.push(context, 
-                  MaterialPageRoute(
+                Navigator.push(context, MaterialPageRoute(
                     builder: (context) => HelpPage()
                   )
                 );
               },
-              color: Colors.transparent,
-              shape: StadiumBorder(),
+              icon: Icons.help_outline,
             ),
-            FlatButton(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children:<Widget>[
-                  Text("Deslogar", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  SizedBox(width: 2),
-                  Icon(Icons.exit_to_app, color: Colors.white, size: 18)
-                ]
-              ),
+            SideMenuButton(
+              text: "Deslogar",
               onPressed: this.logout,
-              color: Colors.transparent,
-              shape: StadiumBorder(),
+              icon: Icons.exit_to_app,
             )
           ]
         )
