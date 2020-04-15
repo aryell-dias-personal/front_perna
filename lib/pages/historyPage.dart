@@ -76,6 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   RichText buildRichText(String title, String value) {
     return RichText(
+      overflow: TextOverflow.ellipsis,
       text: TextSpan(
         style: TextStyle(color: Colors.black, fontFamily: "ProductSans"),
         children: <TextSpan>[
@@ -105,7 +106,7 @@ class _HistoryPageState extends State<HistoryPage> {
     });
     return history?.map<TimelineModel>((operation){
       List<Widget> info = [
-        SizedBox(height: 40),
+        SizedBox(height: 20),
         Text(operation['origin'] != null? "PEDIDO": "EXPEDIENTE"),
         buildRichText("Nome", operation['name']),
         buildRichText("Hora da Partida", parseData(operation["friendlyStartAt"])),
@@ -118,6 +119,7 @@ class _HistoryPageState extends State<HistoryPage> {
         buildRichText("Garagem", parsePlace(operation["friendlyGarage"])),
         buildRichText("vagas", operation['places'].toString())
       ]);
+      info.add(SizedBox(height: 20));
       return TimelineModel(
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
