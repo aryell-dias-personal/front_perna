@@ -287,7 +287,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       converter: (store) {
         return {
           'logoutFunction': () {
-            this.onLogout();
+            this.onLogout(user: store.state.user, messagingToken: store.state.messagingToken);
             store.dispatch(Logout());
           },
           'photoUrl':store.state.user?.photoUrl,

@@ -15,17 +15,18 @@ enum SignLogin { sign, login}
 
 class InitialPage extends StatefulWidget {
   final SignInService signInService;
-  InitialPage({@required this.signInService});
+  final String messagingToken;
+  InitialPage({@required this.signInService, @required this.messagingToken});
 
   @override
-  _InitialPageState createState() => _InitialPageState(signInService: signInService);
+  _InitialPageState createState() => _InitialPageState(signInService: signInService, messagingToken: messagingToken);
 }
 
 class _InitialPageState extends State<InitialPage> {
   bool isLoading = false;
-
+  final String messagingToken;
   final SignInService signInService;
-  _InitialPageState({@required this.signInService});
+  _InitialPageState({@required this.signInService, @required this.messagingToken});
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +37,8 @@ class _InitialPageState extends State<InitialPage> {
         StoreConnector<StoreState, Function(SignLogin)>(
           converter: (store) => (SignLogin choice) async {
             SignInResponse signInResponse = choice == SignLogin.sign ? 
-              await signInService.signIn() : 
-              await signInService.logIn();
+              await signInService.signIn(this.messagingToken) : 
+              await signInService.logIn(this.messagingToken);
             User user = signInResponse?.user;
             if(user==null){
               Toast.show(

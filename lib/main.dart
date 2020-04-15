@@ -15,6 +15,7 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
@@ -22,6 +23,10 @@ GoogleSignIn googleSignIn = GoogleSignIn(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final String messagingToken = await firebaseMessaging.getToken();
+
   final persistor = Persistor<StoreState>(
     storage: FlutterStorage(),
     serializer: JsonSerializer<StoreState>(StoreState.fromJson),
@@ -41,7 +46,7 @@ void main() async {
   final Firestore firestore = Firestore(app: app);
 
   final store = new Store<StoreState>(
-    reduce, initialState: initialState.copyWith(firestore: firestore),
+    reduce, initialState: initialState.copyWith(firestore: firestore, messagingToken: messagingToken),
     middleware: [persistor.createMiddleware()]
   );
   runApp(new MyApp(store: store));
@@ -102,7 +107,10 @@ class _MyAppState extends State<_MyApp> {
           },
           builder: (context, logedIn) {
             if(logedIn == null || !logedIn){
-              return InitialPage(signInService: signInService);
+              return StoreConnector<StoreState, String>(
+                converter: (store) => store.state.messagingToken,
+                builder: (context, messagingToken) => InitialPage(signInService: signInService, messagingToken: messagingToken)
+              );
             } else {
               return StoreConnector<StoreState, Map<String, dynamic>>(
                 converter: (store) {
