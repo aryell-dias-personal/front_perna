@@ -22,19 +22,23 @@ class _HistoryPageState extends State<HistoryPage> {
   final Firestore firestore;
   final String email;
 
-  List<dynamic> agents;
+  List agents;
   StreamSubscription<QuerySnapshot> agentsListener;
   bool isLoadingAgents = false;
 
-  List<dynamic> askedPoints;
+  List askedPoints;
   StreamSubscription<QuerySnapshot> askedPointsListener;
   bool isLoadingAskedPoints = false;
+
+  Timer timer;
+  bool passedTime = false;
 
   _HistoryPageState({@required this.email, @required this.firestore});
 
   @override
   void dispose() {
     super.dispose();
+    timer.cancel();
     agentsListener.cancel();
     askedPointsListener.cancel();
   }
@@ -67,6 +71,11 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     setState(() {
+      this.timer = Timer(Duration(seconds: 2), (){
+        setState(() {
+          passedTime = true;
+        });
+      });
       this.isLoadingAskedPoints = true;
       this.isLoadingAgents = true;
       agentsListener = this.initAgentsListner();
@@ -99,12 +108,16 @@ class _HistoryPageState extends State<HistoryPage> {
     return "${placePieces[3]}, ${placePieces[4]}";
   }
 
-  List<TimelineModel> buildHistoryTiles() {
+  List getHistory(){
     List history = this.agents + this.askedPoints;
     history.sort((first, second){
       return first['endAt'] - second['endAt'];
     });
-    return history?.map<TimelineModel>((operation){
+    return history;
+  }
+
+  List<TimelineModel> buildHistoryTiles() {
+    return getHistory().map<TimelineModel>((operation){
       List<Widget> info = [
         SizedBox(height: 20),
         Text(operation['origin'] != null? "PEDIDO": "EXPEDIENTE"),
@@ -130,14 +143,14 @@ class _HistoryPageState extends State<HistoryPage> {
         iconBackground: operation['origin'] != null ? Colors.redAccent : Colors.greenAccent,
         icon: Icon(operation['origin'] != null ? Icons.add_shopping_cart : Icons.directions_bus, color: Colors.white)
       );
-    })?.toList() ?? <TimelineModel>[];
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: isLoadingAgents || isLoadingAskedPoints ? Center(
+      body: isLoadingAgents || isLoadingAskedPoints || !passedTime ? Center(
         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
       ) : Timeline(
         position: TimelinePosition.Left,

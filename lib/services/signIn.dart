@@ -22,9 +22,9 @@ class SignInService {
   Future<SignInResponse> logIn(String messagingToken) async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
-      dynamic userResponse = await this.getUser(user, messagingToken);
-      if (userResponse.statusCode == 200)
-        return  SignInResponse.fromJson(decoder.convert(userResponse.body));
+      SignInResponse signInResponse = await this.getUser(user, messagingToken);
+      if (signInResponse != null)
+        return signInResponse;
     }
     return await this.logOut();
   }
@@ -32,14 +32,14 @@ class SignInService {
   Future<SignInResponse> signIn(String messagingToken) async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
-      dynamic userResponse = await this.creatUser(user, messagingToken, true);
-      if (userResponse.statusCode == 200)
-        return SignInResponse.fromJson(decoder.convert(userResponse.body));
+      SignInResponse signInResponse = await this.creatUser(user, messagingToken, true);
+      if (signInResponse != null)
+        return signInResponse;
     }
     return await this.logOut();
   }
 
-  Future<dynamic> creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
+  Future<SignInResponse> creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
     final body = encoder.convert({
       'email': user?.email,
       'isProvider': isProvider,
@@ -47,22 +47,25 @@ class SignInService {
       'name': user?.displayName,
       'messagingTokens': [ messagingToken ]
     });
-    return await post("${baseUrl}insertUser", body: body);
+    Response res = await post("${baseUrl}insertUser", body: body);
+    return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
   }
 
-  Future<dynamic> getUser(GoogleSignInAccount user, String messagingToken) async {
+  Future<SignInResponse> getUser(GoogleSignInAccount user, String messagingToken) async {
     final body = encoder.convert({
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    return await post("${baseUrl}getUser", body: body);
+    Response res = await post("${baseUrl}getUser", body: body);
+    return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
   }
 
-  Future<dynamic> logoutService(User user, String messagingToken) async {
+  Future<SignInResponse> logoutService(User user, String messagingToken) async {
     final body = encoder.convert({
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    return await post("${baseUrl}logout", body: body);
+    Response res = await post("${baseUrl}logout", body: body);
+    return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
   }
 }

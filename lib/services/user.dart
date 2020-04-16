@@ -6,7 +6,7 @@ class UserService {
   final encoder = JsonEncoder();
   final decoder = JsonDecoder();
   
-  Future<dynamic> postNewAskedPoint(String name, String origin, String friendlyOrigin, String destiny, String friendlyDestiny, DateTime selectedStartDateTime, DateTime selectedEndDateTime, String email) async {
+  Future<int> postNewAskedPoint(String name, String origin, String friendlyOrigin, String destiny, String friendlyDestiny, DateTime selectedStartDateTime, DateTime selectedEndDateTime, String email) async {
     final body = this.encoder.convert({
       "askedPoint": {
         "name": name,

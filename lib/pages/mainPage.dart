@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
-import 'package:perna/helpers/decoder.dart';
+import 'package:perna/models/agent.dart';
+import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/addNewAskPage.dart';
 import 'package:perna/pages/addNewExpedientPage.dart';
 import 'package:perna/pages/historyPage.dart';
@@ -54,11 +55,9 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   final Function onLogout;
   final Firestore firestore;
 
-  Map<String, dynamic> agent;
   StreamSubscription<QuerySnapshot> agentsListener;
   bool isLoadingAgent = false;
 
-  Map<String, dynamic> askedPoint;
   StreamSubscription<QuerySnapshot> askedPointsListener;
   bool isLoadingAskedPoint = false;
 
@@ -81,11 +80,12 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return firestore.collection("agent").where('email', isEqualTo: email)
       .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
       .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
-        Map<String, dynamic> agent = agentSnapshot?.documents?.first?.data;
-        if(agent != null && agent.containsKey('route')){
-          List<LatLng> route = agent['route'].map<LatLng>((encodedLatLng)=>decodeLatLng(encodedLatLng)).toList();
-          this.putCircles(route);
-          this.buildRouteCooords(route);
+        if(agentSnapshot.documents.isNotEmpty){
+          Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
+          if(agent.route != null){
+            this.putCircles(agent.route);
+            this.buildRouteCooords(agent.route);
+          }
         }
         setState(() {
           this.isLoadingAgent = false;
@@ -97,10 +97,10 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return firestore.collection("askedPoint").where('email', isEqualTo: email)
       .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
       .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
-        Map<String, dynamic> askedPoint = askedPointSnapshot?.documents?.first?.data;
-        if(askedPoint != null && askedPoint.containsKey('origin')){
-          LatLng origin = decodeLatLng(askedPoint['origin']);
-          this.addNextPlace(origin);
+        if(askedPointSnapshot.documents.isNotEmpty){
+          AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
+          if(askedPoint.origin != null)
+            this.addNextPlace(askedPoint.origin);
         }
         setState(() {
           this.isLoadingAskedPoint = false;
