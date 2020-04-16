@@ -78,6 +78,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   StreamSubscription<QuerySnapshot> initAgentListener(){
     return firestore.collection("agent").where('email', isEqualTo: email)
+      .where('route', isNull: false)
       .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
       .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
         if(agentSnapshot.documents.isNotEmpty){
