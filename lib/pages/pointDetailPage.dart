@@ -1,14 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
+import 'package:perna/pages/historyPage.dart';
+import 'package:perna/store/state.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 
 class PointDetailPage extends StatelessWidget {
   final AskedPoint askedPoint;
   final Agent agent;
+  final bool isHome;
 
-  const PointDetailPage({this.askedPoint, this.agent});
+  const PointDetailPage({this.askedPoint, this.agent, this.isHome=false});
 
   List<Widget> buildInfo() {
     assert(this.agent != null || this.askedPoint != null);
@@ -102,21 +107,53 @@ class PointDetailPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            decoration: _getDecoration(),
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: buildInfo(),
-              ),
+        padding: EdgeInsets.fromLTRB(20,30,20,20),
+        child: Stack(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topLeft,
+              child: FlatButton(
+                onPressed: (){
+                  if(this.isHome){
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => StoreConnector<StoreState, StoreState>(
+                          converter: (store) => store.state,
+                          builder:  (context, state) => HistoryPage(email: state.user.email, firestore: state.firestore)
+                        )
+                      )
+                    );
+                  }else{
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                }, 
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(!this.isHome?Icons.home:Icons.timeline, color: Theme.of(context).iconTheme.color,),
+                    SizedBox(width: 2),
+                    Text(!this.isHome?"Ir para o mapa":"Ir para histórico", style: Theme.of(context).textTheme.body1)
+                  ],
+                ),
+                color: Colors.white,
+                shape: StadiumBorder(),
+              )
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                decoration: _getDecoration(),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: buildInfo(),
+                  ),
+                )
+              )
             )
-          )
+          ],
         )
       )
     );

@@ -195,7 +195,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(
-              builder: (context) => PointDetailPage(askedPoint: askedPoint)
+              builder: (context) => PointDetailPage(askedPoint: askedPoint, isHome: true)
             )
           );
         },
