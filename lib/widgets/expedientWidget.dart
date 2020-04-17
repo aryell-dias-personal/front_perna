@@ -144,12 +144,11 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
               "Novo Expediente",
               style: TextStyle(
                 fontWeight: FontWeight.bold, 
-                color: Theme.of(context).primaryColor,
                 fontSize: 30.0
               )
             ),
             SizedBox(width: 5),
-            Icon(Icons.work, color: Theme.of(context).primaryColor, size: 30)
+            Icon(Icons.work, size: 30)
           ],
         ),
         TextField(

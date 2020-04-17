@@ -127,6 +127,12 @@ class _MyAppState extends State<_MyApp> {
           }
         ),
         theme: ThemeData(
+          textTheme: TextTheme(
+            body1: TextStyle(color: Color(0xFF1c4966))
+          ),
+          iconTheme: IconThemeData(
+            color: Color(0xFF1c4966)
+          ),
           primaryColor: Color(0xFF1c4966),
           accentColor: Color(0x881c4966),
           fontFamily: "ProductSans"

@@ -130,12 +130,11 @@ class _AskWidgetState extends State<_AskWidget> {
               "Novo Pedido",
               style: TextStyle(
                 fontWeight: FontWeight.bold, 
-                color: Theme.of(context).primaryColor,
                 fontSize: 30.0
               )
             ),
             SizedBox(width: 5),
-            Icon(Icons.scatter_plot, color: Theme.of(context).primaryColor, size: 30)
+            Icon(Icons.scatter_plot, size: 30)
           ],
         ),
         TextField(

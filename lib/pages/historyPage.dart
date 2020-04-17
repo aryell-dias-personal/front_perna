@@ -1,10 +1,13 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/models/agent.dart';
+import 'package:perna/models/askedPoint.dart';
+import 'package:perna/pages/pointDetailPage.dart';
+import 'package:perna/widgets/titledValueWidget.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
 
@@ -116,28 +119,54 @@ class _HistoryPageState extends State<HistoryPage> {
     return history;
   }
 
+  List<Widget> buildInfo(operation) {
+    assert(operation['origin'] != null || operation['garage'] != null);
+    return operation['origin'] != null ? buildAskedPoint(AskedPoint.fromJson(operation)) : buildAgent(Agent.fromJson(operation));
+  }
+
+  List<Widget> buildAskedPoint(AskedPoint askedPoint) {
+    return <Widget>[
+      SizedBox(height: 20),
+      TitledValueWidget(title: "Nome", value: askedPoint.name),
+      TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.friendlyStartAt)),
+      TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.friendlyEndAt)),
+      TitledValueWidget(title: "Local da Partida", value: parsePlace(askedPoint.friendlyOrigin)),
+      TitledValueWidget(title: "Local da Chegada", value: parsePlace(askedPoint.friendlyDestiny)),
+      SizedBox(height: 20)
+    ];
+  }
+
+  List<Widget> buildAgent(Agent agent) {
+    return <Widget>[
+      SizedBox(height: 20),
+      TitledValueWidget(title: "Nome", value: agent.name),
+      TitledValueWidget(title: "Hora da Partida", value: parseData(agent.friendlyStartAt)),
+      TitledValueWidget(title: "Hora da Chegada", value: parseData(agent.friendlyEndAt)),
+      TitledValueWidget(title: "Garagem", value: parsePlace(agent.friendlyGarage)),
+      TitledValueWidget(title: "Vagas", value: agent.places.toString()),
+      SizedBox(height: 20)
+    ];
+  }
+
   List<TimelineModel> buildHistoryTiles() {
     return getHistory().map<TimelineModel>((operation){
-      List<Widget> info = [
-        SizedBox(height: 20),
-        Text(operation['origin'] != null? "PEDIDO": "EXPEDIENTE"),
-        buildRichText("Nome", operation['name']),
-        buildRichText("Hora da Partida", parseData(operation["friendlyStartAt"])),
-        buildRichText("Hora da Chegada", parseData(operation["friendlyEndAt"]))
-      ];
-      info.addAll( operation['origin'] != null ? [ 
-        buildRichText("Local da Partida", parsePlace(operation["friendlyOrigin"])),
-        buildRichText("Local da Chegada", parsePlace(operation["friendlyDestiny"]))
-      ] : [
-        buildRichText("Garagem", parsePlace(operation["friendlyGarage"])),
-        buildRichText("vagas", operation['places'].toString())
-      ]);
-      info.add(SizedBox(height: 20));
       return TimelineModel(
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: info
+        FlatButton(
+          onPressed: (){
+            Navigator.push(context, 
+              MaterialPageRoute(
+                builder: (context) => operation['origin'] != null?
+                  PointDetailPage(askedPoint: AskedPoint.fromJson(operation)):
+                  PointDetailPage(agent: Agent.fromJson(operation))
+                )
+            );
+          }, 
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: buildInfo(operation)
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20)))
         ),
         position: TimelineItemPosition.right,
         iconBackground: operation['origin'] != null ? Colors.redAccent : Colors.greenAccent,

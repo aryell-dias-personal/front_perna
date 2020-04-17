@@ -6,7 +6,7 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/addNewAskPage.dart';
 import 'package:perna/pages/addNewExpedientPage.dart';
-import 'package:perna/pages/historyPage.dart';
+import 'package:perna/pages/pointDetailPage.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/mainWidget.dart';
@@ -78,7 +78,6 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   StreamSubscription<QuerySnapshot> initAgentListener(){
     return firestore.collection("agent").where('email', isEqualTo: email)
-      .where('route', isNull: false)
       .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
       .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
         if(agentSnapshot.documents.isNotEmpty){
@@ -101,7 +100,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         if(askedPointSnapshot.documents.isNotEmpty){
           AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
           if(askedPoint.origin != null)
-            this.addNextPlace(askedPoint.origin);
+            this.addNextPlace(askedPoint);
         }
         setState(() {
           this.isLoadingAskedPoint = false;
@@ -189,20 +188,20 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
   }
 
-  void addNextPlace(LatLng origin){
+  void addNextPlace(AskedPoint askedPoint){
     setState(() {
       this.nextPlaces.add(Marker(
         consumeTapEvents: true,
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(
-              builder: (context) =>  HistoryPage(email: this.email, firestore: this.firestore)
+              builder: (context) => PointDetailPage(askedPoint: askedPoint)
             )
           );
         },
-        markerId: MarkerId(origin.toString()),
+        markerId: MarkerId(askedPoint.origin.toString()),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-        position: origin
+        position: askedPoint.origin
       ));
     });
   }
