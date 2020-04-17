@@ -9,18 +9,22 @@ class TitledValueWidget extends StatelessWidget {
 
   const TitledValueWidget({@required this.title, @required this.value, this.titleSize=14, this.valueSize=20});
 
+  bool _isEmptyValue(){
+    return RegExp(r"^ *$").hasMatch(this.value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RichText(
+    return !this._isEmptyValue() ? RichText(
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
         style: TextStyle(color: Theme.of(context).textTheme.body1.color, fontFamily: "ProductSans"),
-        children: <TextSpan>[
+        children:  <TextSpan>[
           TextSpan(text: "$title:", style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold) ),
           TextSpan(text: " $value", style: TextStyle(fontSize: valueSize)),
         ]
-      )
+      ) 
       , maxLines: 1
-    );
+    ) : SizedBox();
   }
 }
