@@ -8,13 +8,11 @@ class DriverService {
     final body = encoder.convert({
       "agent": { 
         "garage": garage,
+        "friendlyGarage": friendlyGarage,
         "places": places,
         "name": name,
-        "friendlyGarage": friendlyGarage,
-        "friendlyStartAt": selectedStartDateTime.toString(),
-        "friendlyEndAt": selectedEndDateTime.toString(),
-        "startAt": selectedStartDateTime.millisecondsSinceEpoch/60000,
-        "endAt": selectedEndDateTime.millisecondsSinceEpoch/60000
+        "askedStartAt": selectedStartDateTime.millisecondsSinceEpoch/1000,
+        "askedEndAt": selectedEndDateTime.millisecondsSinceEpoch/1000
       },
       "email": email
     });

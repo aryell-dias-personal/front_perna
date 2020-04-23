@@ -1,19 +1,29 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
+import 'package:perna/models/point.dart';
 
 class Agent {
   LatLng garage;
-  List<LatLng> route;
+  String friendlyGarage;
+  List<Point> route;
   int places;
-  int endAt;
-  int startAt;
+  DateTime askedEndAt;
+  DateTime askedStartAt;
   String name;
   String email;
-  String friendlyGarage;
-  String friendlyStartAt;
-  String friendlyEndAt;
+  List<String> askedPointIds;
 
-  Agent({this.garage, this.places, this.name, this.route, this.friendlyGarage, this.friendlyStartAt, this.friendlyEndAt, this.startAt, this.endAt, this.email});
+  Agent({
+    this.garage, 
+    this.friendlyGarage, 
+    this.places, 
+    this.name, 
+    this.route, 
+    this.askedStartAt, 
+    this.askedEndAt, 
+    this.email,
+    this.askedPointIds
+  });
   
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson == null)
@@ -21,27 +31,25 @@ class Agent {
     return Agent(
       garage: decodeLatLng(parsedJson['garage']),
       places: parsedJson['places'],
-      name: parsedJson['name'],
-      route: parsedJson['route']?.map<LatLng>((encodedLatLng)=>decodeLatLng(encodedLatLng))?.toList(),
       friendlyGarage: parsedJson['friendlyGarage'],
-      friendlyStartAt: parsedJson['friendlyStartAt'],
-      friendlyEndAt: parsedJson['friendlyEndAt'],
-      startAt: parsedJson['startAt'],
-      endAt: parsedJson['endAt'],
-      email: parsedJson['email']
+      name: parsedJson['name'],
+      route: parsedJson['route']?.map<Point>((point)=>Point.fromJson(point))?.toList(),
+      askedStartAt: DateTime.fromMillisecondsSinceEpoch(parsedJson['askedStartAt'].round()*1000),
+      askedEndAt: DateTime.fromMillisecondsSinceEpoch(parsedJson['askedEndAt'].round()*1000),
+      email: parsedJson['email'],
+      askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null
     );
   }
 
   dynamic toJson() => {
     "garage": garage.toString(),
     "places": places,
-    "name": name,
-    "route": route.map<String>((LatLng latLng)=>latLng.toString()).toList(),
     "friendlyGarage": friendlyGarage,
-    "friendlyStartAt": friendlyStartAt,
-    "friendlyEndAt": friendlyEndAt,
-    "startAt": startAt,
-    "endAt": endAt,
-    "email": email
+    "name": name,
+    "route": route.map<String>((Point point)=>point.toJson()).toList(),
+    "askedStartAt": askedStartAt.millisecondsSinceEpoch/1000,
+    "askedEndAt": askedEndAt.millisecondsSinceEpoch/1000,
+    "email": email,
+    "askedPointIds": askedPointIds
   };
 }

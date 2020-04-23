@@ -21,15 +21,19 @@ class PointDetailPage extends StatelessWidget {
 
   List<Widget> buildAskedPoint() {
     return <Widget>[
+      Text("DETALHES DO PEDIDO", style: TextStyle(color: Color(0xFF1c4966))),
       TitledValueWidget(titleSize: 30, title: "Nome", valueSize: 30, value: this.askedPoint.name),
-      getDateInfoWidget(this.askedPoint.friendlyStartAt, "Hora da Partida"),
-      getDateInfoWidget(this.askedPoint.friendlyEndAt, "Hora da Chegada"),
+      getDateInfoWidget(this.askedPoint.askedStartAt.toString(), "Deseja Partir"),
+      getDateInfoWidget(this.askedPoint.askedEndAt.toString(), "Deseja Chegar"),
+      getDateInfoWidget(this.askedPoint.actualStartAt?.toString(), "Hora do Embarque"),
+      getDateInfoWidget(this.askedPoint.actualEndAt?.toString(), "Hora do Desembarque"),
       getLocalInfoWidget(this.askedPoint.friendlyOrigin, "Local da Partida"),
       getLocalInfoWidget(this.askedPoint.friendlyDestiny, "Local da Chegada"),
     ];
   }
 
   Widget getDateInfoWidget(String date, String name){
+    if(date==null) return SizedBox();
     List<String> datePieces = date.split(" ");
     List<String> dayPieces = datePieces.first.split('-');
     return Column(
@@ -78,9 +82,10 @@ class PointDetailPage extends StatelessWidget {
 
   List<Widget> buildAgent() {
     return <Widget>[
+      Text("DETALHES DO EXPEDIENTE", style: TextStyle(color: Color(0xFF1c4966))),
       TitledValueWidget(titleSize: 30, title: "Nome", valueSize: 30, value: this.agent.name),
-      getDateInfoWidget(this.agent.friendlyStartAt, "Hora da Partida"),
-      getDateInfoWidget(this.agent.friendlyEndAt, "Hora da Chegada"),
+      getDateInfoWidget(this.agent.askedStartAt.toString(), "Inicio do Expediente"),
+      getDateInfoWidget(this.agent.askedEndAt.toString(), "Fim do Expediente"),
       getLocalInfoWidget(this.agent.friendlyGarage, "Local da Garagem"),
       TitledValueWidget(titleSize: 30, title: "Vagas", valueSize: 30, value: this.agent.places.toString())
     ];

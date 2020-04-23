@@ -78,13 +78,15 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   StreamSubscription<QuerySnapshot> initAgentListener(){
     return firestore.collection("agent").where('email', isEqualTo: email)
-      .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
-      .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
+      .where('processed', isEqualTo: true)
+      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
+      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
         if(agentSnapshot.documents.isNotEmpty){
           Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
           if(agent.route != null){
-            this.putCircles(agent.route);
-            this.buildRouteCooords(agent.route);
+            List<LatLng> route = agent.route.map<LatLng>((point)=>point.local).toList();
+            this.putCircles(route);
+            this.buildRouteCooords(route);
           }
         }
         setState(() {
@@ -95,8 +97,9 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   StreamSubscription<QuerySnapshot> initAskedPointListener(){
     return firestore.collection("askedPoint").where('email', isEqualTo: email)
-      .where('endAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/60000)
-      .orderBy('endAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
+      .where('processed', isEqualTo: true)
+      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
+      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
         if(askedPointSnapshot.documents.isNotEmpty){
           AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
           if(askedPoint.origin != null)

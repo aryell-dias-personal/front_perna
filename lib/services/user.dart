@@ -14,10 +14,8 @@ class UserService {
         "friendlyOrigin": friendlyOrigin,
         "destiny": destiny,
         "friendlyDestiny": friendlyDestiny,
-        "friendlyStartAt": selectedStartDateTime.toString(),
-        "friendlyEndAt": selectedEndDateTime.toString(),
-        "startAt": selectedStartDateTime.millisecondsSinceEpoch/60000,
-        "endAt": selectedEndDateTime.millisecondsSinceEpoch/60000
+        "askedStartAt": selectedStartDateTime.millisecondsSinceEpoch/1000,
+        "askedEndAt": selectedEndDateTime.millisecondsSinceEpoch/1000
       },
       "email": email
     });

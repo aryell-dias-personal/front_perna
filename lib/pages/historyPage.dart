@@ -114,7 +114,7 @@ class _HistoryPageState extends State<HistoryPage> {
   List getHistory(){
     List history = this.agents + this.askedPoints;
     history.sort((first, second){
-      return first['endAt'] - second['endAt'];
+      return first['askedEndAt'] - second['askedEndAt'];
     });
     return history;
   }
@@ -127,9 +127,10 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAskedPoint(AskedPoint askedPoint) {
     return <Widget>[
       SizedBox(height: 20),
+      Text("PEDIDO", style: Theme.of(context).textTheme.body1),
       TitledValueWidget(title: "Nome", value: askedPoint.name),
-      TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.friendlyStartAt)),
-      TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.friendlyEndAt)),
+      TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.askedStartAt.toString())),
+      TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.askedEndAt.toString())),
       TitledValueWidget(title: "Local da Partida", value: parsePlace(askedPoint.friendlyOrigin)),
       TitledValueWidget(title: "Local da Chegada", value: parsePlace(askedPoint.friendlyDestiny)),
       SizedBox(height: 20)
@@ -139,9 +140,10 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAgent(Agent agent) {
     return <Widget>[
       SizedBox(height: 20),
+      Text("EXPEDIENTE", style: Theme.of(context).textTheme.body1),
       TitledValueWidget(title: "Nome", value: agent.name),
-      TitledValueWidget(title: "Hora da Partida", value: parseData(agent.friendlyStartAt)),
-      TitledValueWidget(title: "Hora da Chegada", value: parseData(agent.friendlyEndAt)),
+      TitledValueWidget(title: "Inicio do Expediente", value: parseData(agent.askedStartAt.toString())),
+      TitledValueWidget(title: "Fim do Expediente", value: parseData(agent.askedEndAt.toString())),
       TitledValueWidget(title: "Garagem", value: parsePlace(agent.friendlyGarage)),
       TitledValueWidget(title: "Vagas", value: agent.places.toString()),
       SizedBox(height: 20)
