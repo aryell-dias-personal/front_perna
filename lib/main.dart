@@ -49,7 +49,7 @@ Future onMessage(Map<String, dynamic> message) async {
         androidPlatformChannelSpecifics, null);
       print("notificação marcada para: $date");
       await flutterLocalNotificationsPlugin.schedule(
-        1, "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
+        0, "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
         payload: 'map', androidAllowWhileIdle: true
       );
     }
@@ -58,16 +58,19 @@ Future onMessage(Map<String, dynamic> message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
-  InitializationSettings initializationSettings = InitializationSettings(
-      initializationSettingsAndroid, null);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-    onSelectNotification: (String payload) async {
-      if (payload != null) {
-        print('notification payload: $payload');
-      }
-    }
+
+  AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
+  InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
+  AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel(
+    updateDotAndRouteChannelId,updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
   );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    onSelectNotification: (String payload) async { print(payload); }
+  );
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      .createNotificationChannel(androidNotificationChannel);
 
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   firebaseMessaging.configure(
