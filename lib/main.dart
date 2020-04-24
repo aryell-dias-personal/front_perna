@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/constants/notification.dart';
 import 'package:perna/pages/mainPage.dart';
 import 'package:perna/pages/noConnectionPage.dart';
 import 'package:perna/services/signIn.dart';
@@ -17,14 +19,64 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
+Future onMessage(Map<String, dynamic> message) async {
+  print("on message $message");
+  AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
+  );
+  NotificationDetails platformChannelSpecifics = NotificationDetails(
+    androidPlatformChannelSpecifics, null);
+  await flutterLocalNotificationsPlugin.show(
+    0, message["notification"]["title"], message["notification"]["body"], platformChannelSpecifics,
+    payload: 'map'
+  );
+  if(message.keys.contains("data")){
+    print("data: ${message['data']}");
+    if(message['data']['time'] != null && message['data']['type'] != null){
+      int time = message['data']['time'].round();
+      String content = message['data']['type'] == "EXPEDIENT" ? " expediente": "a viajem";
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
+      AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
+      );
+      NotificationDetails platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, null);
+      print("notificação marcada para: $date");
+      await flutterLocalNotificationsPlugin.schedule(
+        1, "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
+        payload: 'map', androidAllowWhileIdle: true
+      );
+    }
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
+  InitializationSettings initializationSettings = InitializationSettings(
+      initializationSettingsAndroid, null);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    onSelectNotification: (String payload) async {
+      if (payload != null) {
+        print('notification payload: $payload');
+      }
+    }
+  );
 
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  firebaseMessaging.configure(
+    onMessage: onMessage,
+    onBackgroundMessage: onMessage, //TODO: [ADM] not working 😢
+    onLaunch: (Map<String, dynamic> message) async {},
+    onResume: (Map<String, dynamic> message) async {}
+  );
+
   final String messagingToken = await firebaseMessaging.getToken();
 
   final persistor = Persistor<StoreState>(
