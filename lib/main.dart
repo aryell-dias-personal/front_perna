@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:perna/constants/constants.dart';
@@ -25,21 +28,12 @@ GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
-Future onMessage(Map<String, dynamic> message) async {
-  print("on message $message");
-  AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
-  );
-  NotificationDetails platformChannelSpecifics = NotificationDetails(
-    androidPlatformChannelSpecifics, null);
-  await flutterLocalNotificationsPlugin.show(
-    0, message["notification"]["title"], message["notification"]["body"], platformChannelSpecifics,
-    payload: 'map'
-  );
+Future scheduleMessage(Map<String, dynamic> message) async {
   if(message.keys.contains("data")){
     print("data: ${message['data']}");
     if(message['data']['time'] != null && message['data']['type'] != null){
-      int time = message['data']['time'].round();
+      Random rand = Random();
+      int time = double.parse(message['data']['time']).round();
       String content = message['data']['type'] == expedientType ? " expediente": "a viajem";
       DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
       AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -49,11 +43,26 @@ Future onMessage(Map<String, dynamic> message) async {
         androidPlatformChannelSpecifics, null);
       print("notificação marcada para: $date");
       await flutterLocalNotificationsPlugin.schedule(
-        0, "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
-        payload: 'map', androidAllowWhileIdle: true
+        rand.nextInt(1000), "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
+        payload: 'remember', androidAllowWhileIdle: true
       );
     }
   }
+}
+
+Future onMessage(Map<String, dynamic> message) async {
+  JsonEncoder enc = JsonEncoder();
+  Random rand = Random();
+  print("on message $message");
+  AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
+  );
+  NotificationDetails platformChannelSpecifics = NotificationDetails(
+    androidPlatformChannelSpecifics, null);
+  await flutterLocalNotificationsPlugin.show(
+    rand.nextInt(1000), message["notification"]["title"], message["notification"]["body"], platformChannelSpecifics,
+    payload: enc.convert(message)
+  );
 }
 
 void main() async {
@@ -63,19 +72,21 @@ void main() async {
   InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-    onSelectNotification: (String payload) async { print(payload); }
+    onSelectNotification: (String payload) async { 
+      if(payload != "remember"){
+        JsonDecoder dec = JsonDecoder();
+        Map<String, dynamic> message = dec.convert(payload); 
+        await scheduleMessage(message);
+      }
+    }
   );
 
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   firebaseMessaging.configure(
     onMessage: onMessage,
     onBackgroundMessage: onMessage, 
-    onLaunch: (Map<String, dynamic> message) async {
-      print("onLaunch");
-    },
-    onResume: (Map<String, dynamic> message) async {
-      print("onResume");
-    }
+    onLaunch: scheduleMessage,
+    onResume: scheduleMessage
   );
 
   final String messagingToken = await firebaseMessaging.getToken();
