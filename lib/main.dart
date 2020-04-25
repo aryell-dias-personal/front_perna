@@ -40,7 +40,7 @@ Future onMessage(Map<String, dynamic> message) async {
     print("data: ${message['data']}");
     if(message['data']['time'] != null && message['data']['type'] != null){
       int time = message['data']['time'].round();
-      String content = message['data']['type'] == "EXPEDIENT" ? " expediente": "a viajem";
+      String content = message['data']['type'] == expedientType ? " expediente": "a viajem";
       DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
       AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
         remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
@@ -61,23 +61,21 @@ void main() async {
 
   AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
   InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
-  AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel(
-    updateDotAndRouteChannelId,updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
-  );
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
     onSelectNotification: (String payload) async { print(payload); }
   );
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      .createNotificationChannel(androidNotificationChannel);
 
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   firebaseMessaging.configure(
     onMessage: onMessage,
-    onBackgroundMessage: onMessage, //TODO: [ADM] not working 😢
-    onLaunch: (Map<String, dynamic> message) async {},
-    onResume: (Map<String, dynamic> message) async {}
+    onBackgroundMessage: onMessage, 
+    onLaunch: (Map<String, dynamic> message) async {
+      print("onLaunch");
+    },
+    onResume: (Map<String, dynamic> message) async {
+      print("onResume");
+    }
   );
 
   final String messagingToken = await firebaseMessaging.getToken();
