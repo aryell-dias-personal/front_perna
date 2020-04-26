@@ -13,10 +13,12 @@ class AddNewExpedientPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Stack(
-        children: <Widget>[
-          ExpedientWidget(driverMarkers: driverMarkers, clear: this.clear)
-        ] 
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            ExpedientWidget(driverMarkers: driverMarkers, clear: this.clear)
+          ] 
+        )
       )
     );
   }

@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 
 class CardContainer extends StatelessWidget {
   final List<Widget> children;
-  final double height;
   final Alignment alignment;
 
-  CardContainer({@required this.children, @required this.height, @required this.alignment});
+  CardContainer({@required this.children, @required this.alignment});
 
   BoxDecoration _getDecoration(){
     return new BoxDecoration(
@@ -30,13 +29,18 @@ class CardContainer extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
         child: Container(
-          height: height,
           decoration: _getDecoration(),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-              children: children
+            child:  SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: children.fold<List<Widget>>(<Widget>[], (List<Widget> acc, dynamic curr){
+                  if(children.last == curr) return acc + [curr];
+                  acc.addAll([curr, SizedBox(height: 18)]);
+                  return acc;
+                }).toList()
+              )
             )
           )
         )

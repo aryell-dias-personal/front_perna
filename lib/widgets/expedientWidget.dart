@@ -36,6 +36,7 @@ class _ExpedientWidget extends StatefulWidget {
 
 class _ExpedientWidgetState extends State<_ExpedientWidget> {
   String name;
+  String driverEmail;
   bool isLoading = false;
   final Set<Marker> driverMarkers;
   final Function clear;
@@ -95,39 +96,31 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   }
 
   void addFunction(garage, email) {
-    if(garage != null && places != 0 && this.name != null && this.name != "" && this.selectedStartDateTime != null && selectedEndDateTime != null){
-      setState(() {
-        isLoading = true;
-      });
-      String garageLocal = "${garage.position.latitude}, ${garage.position.longitude}"; 
-      String friendlyGarageLocal = garageController.text;
-      driverService.postNewAgent(this.name, garageLocal, friendlyGarageLocal, places, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
-        if(statusCode==200){
-          Navigator.pop(context);
-          this.clear();
-          Toast.show(
-            "O expediente foi adicionado com sucesso", context, 
-            backgroundColor: Colors.greenAccent, 
-            duration: 3
-          );
-        }else{
-          setState(() {
-            isLoading = false;
-          });
-          Toast.show(
-            "Não foi possivel adicionar o expediente", context, 
-            backgroundColor: Colors.redAccent, 
-            duration: 3
-          );
-        } 
-      });
-    } else {
-      Toast.show(
-        "preencha todos os campos", context, 
-        backgroundColor: Colors.redAccent, 
-        duration: 3
-      );
-    }
+    setState(() {
+      isLoading = true;
+    });
+    String garageLocal = "${garage.position.latitude}, ${garage.position.longitude}"; 
+    String friendlyGarageLocal = garageController.text;
+    driverService.postNewAgent(this.name, garageLocal, friendlyGarageLocal, places, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
+      if(statusCode==200){
+        Navigator.pop(context);
+        this.clear();
+        Toast.show(
+          "O expediente foi adicionado com sucesso", context, 
+          backgroundColor: Colors.greenAccent, 
+          duration: 3
+        );
+      }else{
+        setState(() {
+          isLoading = false;
+        });
+        Toast.show(
+          "Não foi possivel adicionar o expediente", context, 
+          backgroundColor: Colors.redAccent, 
+          duration: 3
+        );
+      } 
+    });
   }
 
   @override
@@ -136,7 +129,6 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
         child:Loading(indicator: BallPulseIndicator(), size: 100.0)
       ) : CardContainer(
       alignment: Alignment.bottomCenter,
-      height: 540,
       children: <Widget>[
         Row(
           children:<Widget>[
@@ -158,6 +150,15 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           ),
           onChanged: (text){
             this.name = text;
+          }
+        ),
+        TextField(
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Email do motorista",
+          ),
+          onChanged: (text){
+            this.driverEmail = text;
           }
         ),
         TimePicker(
@@ -193,7 +194,19 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           },
           builder: (context, email){
             return RaisedButton(
-              onPressed: (){addFunction(this.driverMarkers.first, email);},
+              onPressed: (){
+                if(this.driverEmail == null || this.driverEmail == "" || this.driverMarkers.first == null || places == 0 || this.name == null || this.name == "" || this.selectedStartDateTime == null || selectedEndDateTime == null){
+                  Toast.show(
+                    "preencha todos os campos", context, 
+                    backgroundColor: Colors.redAccent, 
+                    duration: 3
+                  );
+                } else if(this.driverEmail == email){
+                  addFunction(this.driverMarkers.first, email);
+                } else {
+                  // pede pro cara que possui esse email
+                }
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children:<Widget>[

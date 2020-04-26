@@ -13,10 +13,12 @@ class AddNewAskPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Stack(
-        children: <Widget>[
-          AskWidget(userMarkers: userMarkers, clear: this.clear)
-        ] 
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            AskWidget(userMarkers: userMarkers, clear: this.clear)
+          ] 
+        )
       )
     );
   }

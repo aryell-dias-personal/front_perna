@@ -122,7 +122,6 @@ class _AskWidgetState extends State<_AskWidget> {
         child:Loading(indicator: BallPulseIndicator(), size: 100.0)
       ) : CardContainer(
       alignment: Alignment.bottomCenter,
-      height: 540,
       children: <Widget>[
         Row(
           children:<Widget>[
