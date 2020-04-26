@@ -169,68 +169,73 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     screemWidth = size.width;
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Stack(
-        children: <Widget>[
-          menu(context),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 200),
-            top: 0,
-            bottom: 0,
-            left: !isCollapsed ? screemWidth/2 : 0,
-            right: !isCollapsed ? -screemWidth/2 : 0,
-            child: Material(
-              clipBehavior: Clip.antiAlias,
-              borderRadius: BorderRadius.all(Radius.circular(40)),
-              elevation: 8,
-              child: Stack(
-                children: <Widget>[
-                  GoogleMap(
-                    onTap: this.onTap,
-                    buildingsEnabled: true,
-                    circles: this.circles,
-                    mapType: MapType.normal, 
-                    onLongPress: this.putMarker,
-                    polylines: this.polyline,
-                    markers: this.markers.union(this.nextPlaces),
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(-8.05428, -34.8813),
-                      zoom: 20,
-                    ),
-                    onMapCreated: this.onMapCreated,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 15, bottom: 15, right: 15),
-                    child: AnimatedAlign(
-                      duration: Duration(milliseconds: 200),
-                      alignment: isCollapsed? Alignment.bottomRight : Alignment.bottomLeft,
-                      child: Container(
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.white,
-                          child: AnimatedIcon(
-                            size: 30,
-                            icon: AnimatedIcons.menu_home,
-                            color: Theme.of(context).primaryColor,
-                            progress: this.controller
-                          ),
-                          onPressed: (){
-                            setState(() {
-                              isCollapsed = !isCollapsed;
-                              isCollapsed ? controller.reverse() : controller.forward();
-                            });
-                          },
+      body: new ConstrainedBox(
+        constraints: new BoxConstraints(
+          maxHeight: screemHeight
+        ),
+        child: Stack(
+            children: <Widget>[
+              menu(context),
+              AnimatedPositioned(
+                duration: Duration(milliseconds: 200),
+                top: 0,
+                bottom: 0,
+                left: !isCollapsed ? screemWidth/2 : 0,
+                right: !isCollapsed ? -screemWidth/2 : 0,
+                child: Material(
+                  clipBehavior: Clip.antiAlias,
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  elevation: 8,
+                  child: Stack(
+                    children: <Widget>[
+                      GoogleMap(
+                        onTap: this.onTap,
+                        buildingsEnabled: true,
+                        circles: this.circles,
+                        mapType: MapType.normal, 
+                        onLongPress: this.putMarker,
+                        polylines: this.polyline,
+                        markers: this.markers.union(this.nextPlaces),
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: false,
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(-8.05428, -34.8813),
+                          zoom: 20,
                         ),
-                        padding: const EdgeInsets.all(1.0)
+                        onMapCreated: this.onMapCreated,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15, bottom: 15, right: 15),
+                        child: AnimatedAlign(
+                          duration: Duration(milliseconds: 200),
+                          alignment: isCollapsed? Alignment.bottomRight : Alignment.bottomLeft,
+                          child: Container(
+                            child: FloatingActionButton(
+                              backgroundColor: Colors.white,
+                              child: AnimatedIcon(
+                                size: 30,
+                                icon: AnimatedIcons.menu_home,
+                                color: Theme.of(context).primaryColor,
+                                progress: this.controller
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  isCollapsed = !isCollapsed;
+                                  isCollapsed ? controller.reverse() : controller.forward();
+                                });
+                              },
+                            ),
+                            padding: const EdgeInsets.all(1.0)
+                          )
+                        ),
                       )
-                    ),
+                    ]
                   )
-                ]
+                ) 
               )
-            ) 
+            ],
           )
-        ],
-      ),
+      )
     );
   }
 
