@@ -1,20 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 
-class PointDetailPage extends StatelessWidget {
+class PointDetailPage extends StatefulWidget {
   final AskedPoint askedPoint;
   final Agent agent;
   final bool isHome;
-  final Function accept;
-  final Function deny;
+  final Future<Null> Function() accept;
+  final Future<Null> Function() deny;
 
   const PointDetailPage({this.askedPoint, this.agent, this.accept, this.deny, this.isHome=false});
+  
+  @override
+  _PointDetailPageState createState() => _PointDetailPageState(
+    askedPoint: this.askedPoint, 
+    agent: this.agent, 
+    accept: this.accept, 
+    deny: this.deny, 
+    isHome: this.isHome
+  );
+}
+
+class _PointDetailPageState extends State<PointDetailPage> {
+  final AskedPoint askedPoint;
+  final Agent agent;
+  final bool isHome;
+  final Future<Null> Function() accept;
+  final Future<Null> Function() deny;
+  bool isLoading = false;
+
+  _PointDetailPageState({this.askedPoint, this.agent, this.accept, this.deny, this.isHome=false});
 
   List<Widget> buildInfo() {
     assert(this.agent != null || this.askedPoint != null);
@@ -29,7 +51,16 @@ class PointDetailPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           RaisedButton(
-            onPressed: this.accept,
+            onPressed: (){
+              setState(() {
+                isLoading=true; 
+              });
+              this.accept().then((_){
+                setState(() {
+                  isLoading=false;
+                });
+              });
+            },
             child: Text("Aceitar", style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white
@@ -38,7 +69,16 @@ class PointDetailPage extends StatelessWidget {
             shape: StadiumBorder()
           ),
           RaisedButton(
-            onPressed: deny,
+            onPressed: (){
+              setState(() {
+                isLoading=true; 
+              });
+              this.deny().then((_){
+                setState(() {
+                  isLoading=false;
+                });
+              });
+            },
             child: Text("Negar", style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).primaryColor
@@ -142,7 +182,9 @@ class PointDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Padding(
+      body: isLoading ? Center(
+        child: Loading(indicator: BallPulseIndicator(), size: 100.0)
+      ) : Padding(
         padding: EdgeInsets.fromLTRB(20,30,20,20),
         child: Stack(
           children: <Widget>[

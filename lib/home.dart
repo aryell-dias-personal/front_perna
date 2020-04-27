@@ -57,13 +57,14 @@ class _HomeState extends State<Home> {
   bool isConnected = true;
 
   Future askNewAgentHandler(Map<String, dynamic> data) async {
+    print("data: $data");
     NavigatorState navigatorState = Navigator.of(context);
     Agent agent = Agent.fromJson(JsonDecoder().convert(data['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
         builder: (context) => PointDetailPage(agent: agent, isHome: true, 
-          accept: (){ answerNewAgentHandler(agent, data["fromEmail"], agent.email, true); },
-          deny: (){ answerNewAgentHandler(agent, data["fromEmail"], agent.email, false); }
+          accept: () async { await answerNewAgentHandler(agent, data["fromEmail"], agent.email, true); },
+          deny: () async { await answerNewAgentHandler(agent, data["fromEmail"], agent.email, false); }
         )
       )
     );
@@ -118,12 +119,11 @@ class _HomeState extends State<Home> {
   
   Future onLaunch(Map<String, dynamic> message) async {
     if(message.keys.contains("data")){
-      Map<String, dynamic> data = message['data'];
-      print("data: $data");
-      if(data['time'] != null && data['type'] != null){
-        await scheduleMessage(data);
-      } else if(data['agent'] != null && data['fromEmail'] != null){
-        await askNewAgentHandler(data);
+      print("data: ${message['data']}");
+      if(message['data']['time'] != null && message['data']['type'] != null){
+        await scheduleMessage(message['data']);
+      } else if(message['data']['agent'] != null && message['data']['fromEmail'] != null){
+        await askNewAgentHandler(message['data']);
       }
     }
   }
