@@ -25,6 +25,12 @@ class Agent {
     this.askedPointIds
   });
   
+  static bool invalidArgs(LatLng garage, String friendlyGarage, int places, String name, DateTime askedStartAt, DateTime askedEndAt, String email){
+    return email == null || email == "" || garage == null || places == 0
+      || name == null || name == "" || friendlyGarage == null || friendlyGarage == "" 
+      || askedStartAt == null || askedEndAt == null;
+  }
+
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson == null)
       return null;
@@ -42,11 +48,11 @@ class Agent {
   }
 
   dynamic toJson() => {
-    "garage": garage.toString(),
+    "garage": "${garage.latitude}, ${garage.longitude}",
     "places": places,
     "friendlyGarage": friendlyGarage,
     "name": name,
-    "route": route.map<String>((Point point)=>point.toJson()).toList(),
+    "route": route != null ? route.map<String>((Point point)=>point.toJson()).toList(): null,
     "askedStartAt": askedStartAt.millisecondsSinceEpoch/1000,
     "askedEndAt": askedEndAt.millisecondsSinceEpoch/1000,
     "email": email,

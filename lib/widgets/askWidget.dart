@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/models/askedPoint.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/cardContainer.dart';
@@ -37,8 +38,8 @@ class _AskWidgetState extends State<_AskWidget> {
   String name;
   bool isLoading = false;
   final Set<Marker> userMarkers;
-  DateTime selectedEndDateTime;
-  DateTime selectedStartDateTime;
+  DateTime askedEndAt;
+  DateTime askedStartAt;
   UserService userService = new UserService();
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
@@ -68,52 +69,41 @@ class _AskWidgetState extends State<_AskWidget> {
 
   void onSelectedStartTime(DateTime selectedDate) {
       setState((){
-        selectedStartDateTime = selectedDate;
+        askedStartAt = selectedDate;
       });
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
       setState((){
-        selectedEndDateTime = selectedDate;
+        askedEndAt = selectedDate;
       });
   }
 
-  void addFunction(userMarkers, email) {
-    if(userMarkers != null && this.name != null && this.name != "" && userMarkers.length == 2  && this.selectedStartDateTime != null && this.selectedEndDateTime != null){
-      setState(() {
-        isLoading = true;
-      });
-      String origin = "${userMarkers.first.position.latitude}, ${userMarkers.first.position.longitude}";
-      String destiny = "${userMarkers.last.position.latitude}, ${userMarkers.last.position.longitude}"; 
-      String friendlyOrigin = initialController.text;
-      String friendlyDestiny = endControler.text; 
-      userService.postNewAskedPoint(this.name, origin, friendlyOrigin, destiny, friendlyDestiny, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
-        if(statusCode==200){
-          Navigator.pop(context);
-          this.clear();
-          Toast.show(
-            "O pedido foi adicionado com sucesso", context, 
-            backgroundColor: Colors.greenAccent, 
-            duration: 3
-          );
-        }else{
-          setState(() {
-            isLoading = false;
-          });
-          Toast.show(
-            "Não foi possivel adicionar o pedido", context, 
-            backgroundColor: Colors.redAccent, 
-            duration: 3
-          );
-        }
-      });
-    } else {
-      Toast.show(
-        "preencha todos os campos", context, 
-        backgroundColor: Colors.redAccent, 
-        duration: 3
-      );
-    }
+  void addFunction(AskedPoint askedPoint) {
+
+    setState(() {
+      isLoading = true;
+    });
+    userService.postNewAskedPoint(askedPoint).then((statusCode){
+      if(statusCode==200){
+        Navigator.pop(context);
+        this.clear();
+        Toast.show(
+          "O pedido foi adicionado com sucesso", context, 
+          backgroundColor: Colors.greenAccent, 
+          duration: 3
+        );
+      }else{
+        setState(() {
+          isLoading = false;
+        });
+        Toast.show(
+          "Não foi possivel adicionar o pedido", context, 
+          backgroundColor: Colors.redAccent, 
+          duration: 3
+        );
+      }
+    });
   }
 
   @override
@@ -148,12 +138,12 @@ class _AskWidgetState extends State<_AskWidget> {
         TimePicker(
           labelText: "Hora da Partida", 
           onSelectedTime: onSelectedStartTime, 
-          lastdateTime: selectedEndDateTime
+          lastdateTime: askedEndAt
         ),
         TimePicker(
           labelText: "Hora da Chegada", 
           onSelectedTime: onSelectedEndTime, 
-          firstDateTime: selectedStartDateTime
+          firstDateTime: askedStartAt
         ),
         TextField(
           readOnly: true,
@@ -177,7 +167,25 @@ class _AskWidgetState extends State<_AskWidget> {
           },
           builder: (context, email){
             return RaisedButton(
-              onPressed: (){addFunction(this.userMarkers, email);},
+              onPressed: (){
+                if(AskedPoint.invalidArgs(
+                  this.userMarkers.first.position, this.userMarkers.last.position, 
+                  this.initialController.text, this.endControler.text, this.name, 
+                  this.askedStartAt, this.askedEndAt, email)){
+                  Toast.show(
+                    "preencha todos os campos", context, 
+                    backgroundColor: Colors.redAccent, 
+                    duration: 3
+                  );
+                } else{
+                  AskedPoint askedPoint = AskedPoint(
+                    askedEndAt: this.askedEndAt, askedStartAt: this.askedStartAt, name: this.name,
+                    destiny: this.userMarkers.last.position, origin: this.userMarkers.first.position,
+                    email: email, friendlyOrigin: this.initialController.text, friendlyDestiny: this.endControler.text
+                  );
+                  addFunction(askedPoint);
+                }
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children:<Widget>[

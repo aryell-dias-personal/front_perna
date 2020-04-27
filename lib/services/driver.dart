@@ -1,22 +1,32 @@
 import 'dart:convert';
 import 'package:perna/constants/constants.dart';
 import 'package:http/http.dart';
+import 'package:perna/models/agent.dart';
 
 class DriverService {
-  Future<int> postNewAgent(String name, String garage, String friendlyGarage, int places, DateTime selectedStartDateTime, DateTime selectedEndDateTime, String email) async {
-    final encoder = JsonEncoder();
+  final encoder = JsonEncoder();
+
+  Future<int> postNewAgent(Agent agent) async {
+    Response res = await post("${baseUrl}insertAgent", body:  encoder.convert(agent.toJson()));
+    return res.statusCode;
+  }
+
+  Future<int> answerNewAgent(String fromEmail, String toEmail, bool accepted) async {
     final body = encoder.convert({
-      "agent": { 
-        "garage": garage,
-        "friendlyGarage": friendlyGarage,
-        "places": places,
-        "name": name,
-        "askedStartAt": selectedStartDateTime.millisecondsSinceEpoch/1000,
-        "askedEndAt": selectedEndDateTime.millisecondsSinceEpoch/1000
-      },
-      "email": email
+      "fromEmail": fromEmail,
+      "toEmail": toEmail,
+      "accepted": accepted
     });
-    Response res = await post("${baseUrl}insertAgent", body: body);
+    Response res = await post("${baseUrl}answerNewAgent", body: body);
+    return res.statusCode;
+  }
+
+  Future<int> askNewAgent(Agent agent, String fromEmail) async {
+    final body = encoder.convert({
+      "agent": agent.toJson(),
+      "fromEmail": fromEmail
+    });
+    Response res = await post("${baseUrl}askNewAgent", body: body);
     return res.statusCode;
   }
 }

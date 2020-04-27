@@ -11,12 +11,44 @@ class PointDetailPage extends StatelessWidget {
   final AskedPoint askedPoint;
   final Agent agent;
   final bool isHome;
+  final Function accept;
+  final Function deny;
 
-  const PointDetailPage({this.askedPoint, this.agent, this.isHome=false});
+  const PointDetailPage({this.askedPoint, this.agent, this.accept, this.deny, this.isHome=false});
 
   List<Widget> buildInfo() {
     assert(this.agent != null || this.askedPoint != null);
     return this.agent!=null? buildAgent(): buildAskedPoint();
+  }
+
+  List<Widget> actionButtons(BuildContext context){
+    return this.accept==null || this.deny == null? []: [
+      SizedBox(height: 10),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          RaisedButton(
+            onPressed: this.accept,
+            child: Text("Aceitar", style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white
+            )),
+            color: Theme.of(context).primaryColor,
+            shape: StadiumBorder()
+          ),
+          RaisedButton(
+            onPressed: deny,
+            child: Text("Negar", style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor
+            )),
+            color: Colors.white,
+            shape: StadiumBorder(),
+          )
+        ],
+      )
+    ];
   }
 
   List<Widget> buildAskedPoint() {
@@ -152,7 +184,7 @@ class PointDetailPage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildInfo(),
+                    children: buildInfo() + actionButtons(context),
                   ),
                 )
               )

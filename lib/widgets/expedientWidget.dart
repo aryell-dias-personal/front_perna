@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/models/agent.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/cardContainer.dart';
@@ -41,8 +42,8 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   final Set<Marker> driverMarkers;
   final Function clear;
   int places = 0; 
-  DateTime selectedEndDateTime;
-  DateTime selectedStartDateTime;
+  DateTime askedEndAt;
+  DateTime askedStartAt;
   DriverService driverService = new DriverService();
   TextEditingController garageController = TextEditingController();
   TextEditingController numberControler = new TextEditingController();
@@ -85,23 +86,46 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
 
   void onSelectedStartTime(DateTime selectedDate) {
       setState((){
-        selectedStartDateTime = selectedDate;
+        askedStartAt = selectedDate;
       });
   }
 
   void onSelectedEndTime(DateTime selectedDate) {
     setState((){
-      selectedEndDateTime = selectedDate;
+      askedEndAt = selectedDate;
     });
   }
 
-  void addFunction(garage, email) {
+  void askNewAgend(agent, fromEmail) async {
     setState(() {
       isLoading = true;
     });
-    String garageLocal = "${garage.position.latitude}, ${garage.position.longitude}"; 
-    String friendlyGarageLocal = garageController.text;
-    driverService.postNewAgent(this.name, garageLocal, friendlyGarageLocal, places, this.selectedStartDateTime, this.selectedEndDateTime, email).then((statusCode){
+    int statusCode = await driverService.askNewAgent(agent, fromEmail);
+    if(statusCode == 200){
+      Navigator.pop(context);
+      this.clear();
+      Toast.show(
+        "O pedido de expediente foi feito com sucesso", context, 
+        backgroundColor: Colors.greenAccent, 
+        duration: 3
+      );
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      Toast.show(
+        "Não foi possível fazer o pedido", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
+    }
+  }
+
+  void addFunction(Agent agent) {
+    setState(() {
+      isLoading = true;
+    });
+    driverService.postNewAgent(agent).then((statusCode){
       if(statusCode==200){
         Navigator.pop(context);
         this.clear();
@@ -164,12 +188,12 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
         TimePicker(
           labelText: 'Início do expediente', 
           onSelectedTime: onSelectedStartTime, 
-          lastdateTime: selectedEndDateTime
+          lastdateTime: askedEndAt
         ),
         TimePicker(
           labelText: 'Fim do expediente', 
           onSelectedTime: onSelectedEndTime, 
-          firstDateTime: selectedStartDateTime
+          firstDateTime: askedStartAt
         ),
         TextField(
           onTap: _showDialog,
@@ -195,17 +219,29 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
           builder: (context, email){
             return RaisedButton(
               onPressed: (){
-                if(this.driverEmail == null || this.driverEmail == "" || this.driverMarkers.first == null || places == 0 || this.name == null || this.name == "" || this.selectedStartDateTime == null || selectedEndDateTime == null){
+                if(Agent.invalidArgs(
+                  this.driverMarkers.first.position, 
+                  this.garageController.text, this.places, 
+                  this.name, this.askedStartAt, this.askedEndAt, email)){
                   Toast.show(
                     "preencha todos os campos", context, 
                     backgroundColor: Colors.redAccent, 
                     duration: 3
                   );
-                } else if(this.driverEmail == email){
-                  addFunction(this.driverMarkers.first, email);
-                } else {
-                  // pede pro cara que possui esse email
-                }
+                } else{
+                  Agent agent = Agent(
+                    askedEndAt: this.askedEndAt, 
+                    askedStartAt: this.askedStartAt,
+                    email: this.driverEmail, friendlyGarage: this.garageController.text,
+                    garage: this.driverMarkers.first.position, name: this.name, 
+                    places: this.places
+                  );
+                  if(this.driverEmail == email){
+                    addFunction(agent);
+                  } else {
+                    askNewAgend(agent, email);
+                  }
+                } 
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,

@@ -28,6 +28,12 @@ class AskedPoint {
     this.agentId
   });
 
+  static bool invalidArgs(LatLng origin, LatLng destiny, String friendlyOrigin, String friendlyDestiny, String name, DateTime askedStartAt, DateTime askedEndAt, String email){
+    return name == null || name == "" || origin == null || destiny == null
+      || friendlyOrigin == null || friendlyOrigin == "" || friendlyDestiny == null || friendlyDestiny == ""  
+      || askedStartAt == null || askedEndAt == null;
+  }
+
   factory AskedPoint.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson == null)
       return null;
@@ -49,8 +55,8 @@ class AskedPoint {
   dynamic toJson() => {
     "name": name,
     "email": email,
-    "origin": origin.toString(),
-    "destiny": destiny.toString(),
+    "origin": "${origin.latitude}, ${origin.longitude}",
+    "destiny": "${destiny.latitude}, ${destiny.longitude}",
     "friendlyOrigin": friendlyOrigin,
     "friendlyDestiny": friendlyDestiny,
     "askedStartAt": askedStartAt.millisecondsSinceEpoch/1000,
