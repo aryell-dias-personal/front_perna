@@ -56,15 +56,14 @@ class _HomeState extends State<Home> {
   final DriverService driverService = DriverService();
   bool isConnected = true;
 
-  Future askNewAgentHandler(Map<String, dynamic> data) async {
-    print("data: $data");
+  Future askNewAgentHandler(Map<String, dynamic> message) async {
     NavigatorState navigatorState = Navigator.of(context);
-    Agent agent = Agent.fromJson(JsonDecoder().convert(data['agent']));
+    Agent agent = Agent.fromJson(JsonDecoder().convert(message['data']['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
         builder: (context) => PointDetailPage(agent: agent, isHome: true, 
-          accept: () async { await answerNewAgentHandler(agent, data["fromEmail"], agent.email, true); },
-          deny: () async { await answerNewAgentHandler(agent, data["fromEmail"], agent.email, false); }
+          accept: () async { await answerNewAgentHandler(agent, message['data']["fromEmail"], agent.email, true); },
+          deny: () async { await answerNewAgentHandler(agent, message['data']["fromEmail"], agent.email, false); }
         )
       )
     );
@@ -100,10 +99,10 @@ class _HomeState extends State<Home> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  Future scheduleMessage(Map<String, dynamic> data) async {
+  Future scheduleMessage(Map<String, dynamic> message) async {
     Random rand = Random();
-    int time = double.parse(data['time']).round();
-    String content = data['type'] == expedientType ? " expediente": "a viajem";
+    int time = double.parse(message['data']['time']).round();
+    String content = message['data']['type'] == expedientType ? " expediente": "a viajem";
     DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
@@ -121,9 +120,9 @@ class _HomeState extends State<Home> {
     if(message.keys.contains("data")){
       print("data: ${message['data']}");
       if(message['data']['time'] != null && message['data']['type'] != null){
-        await scheduleMessage(message['data']);
+        await scheduleMessage(message);
       } else if(message['data']['agent'] != null && message['data']['fromEmail'] != null){
-        await askNewAgentHandler(message['data']);
+        await askNewAgentHandler(message);
       }
     }
   }
