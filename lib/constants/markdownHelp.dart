@@ -5,19 +5,19 @@ Este aplicativo tem como intenção facilitar a locomoção dos usuários de tra
 
 ## Marcadores do mapa
 
-|Cor do Marcador                        |Significado                          |
+|Icone do Marcador                      |Significado                          |
 |---------------------------------------|-------------------------------------|
-|Verde                                  |Partida ou Garagem                   |
-|Vermelho                               |Chegada                              |
-|Amarela                                |Ponto de atenção                     |
+|Parada de ônibus                       |Partida ou Garagem                   |
+|Bandeira Vermelha                      |Chegada                              |
+|Sino amarelo                           |Ponto de atenção                     |
 
 ## Como fazer um novo pedido?
 
-Selecione um ponto de `Partida` e de `Chegada` no mapa, pressionando no local do mapa até que apareçam os marcadores verde e após o vermelho, conforme a tabela acima. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Pedido`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
+Selecione um ponto de `Partida` e de `Chegada` no mapa, pressionando no local do mapa até que apareçam a parada de ônibus e após a bandeira vermelha, conforme a tabela acima. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Pedido`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
 
 ## Como criar um novo expediente?
 
-Selecione um ponto onde será a `Garagem` no mapa, pressionando no local do mapa até que apareça o marcador verde. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Expediente`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
+Selecione um ponto onde será a `Garagem` no mapa, pressionando no local do mapa até que apareça uma parada de ônibus. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Expediente`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
 
 ## Como centralizar o mapa para o local onde estou?
 

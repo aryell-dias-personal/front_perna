@@ -4,8 +4,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
+import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
+import 'package:android_intent/android_intent.dart';
 
 class MainWidget extends StatelessWidget {
   final String photoUrl;
@@ -17,6 +19,7 @@ class MainWidget extends StatelessWidget {
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
+  final List<LatLng> points;
   final Set<Marker> markers;
   final Function cancelselection;
   final Set<Circle> circles;
@@ -32,13 +35,14 @@ class MainWidget extends StatelessWidget {
     @required this.onTap,
     @required this.putMarker,
     @required this.onMapCreated,
-    @required this.polyline,
+    @required this.polyline, 
     @required this.nextPlaces,
     @required this.markers,
-    @required this.circles,
+    this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
-    @required this.addNewAsk
+    @required this.addNewAsk,
+    @required this.points
   }) : super(key: key);
   
   @override
@@ -52,6 +56,7 @@ class MainWidget extends StatelessWidget {
       putMarker: this.putMarker,
       onMapCreated: this.onMapCreated,
       polyline: this.polyline,
+      points: this.points,
       markers: this.markers,
       circles: this.circles,
       cancelselection: this.cancelselection,
@@ -72,6 +77,7 @@ class _MainWidget extends StatefulWidget {
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
+  final List<LatLng> points;
   final Set<Marker> markers;
   final Function cancelselection;
   final Set<Circle> circles;
@@ -87,13 +93,14 @@ class _MainWidget extends StatefulWidget {
     @required this.onTap,
     @required this.putMarker,
     @required this.onMapCreated,
-    @required this.polyline,
+    @required this.polyline, 
     @required this.markers,
-    @required this.circles,
+    this.circles,
     @required this.nextPlaces,
     @required this.cancelselection,
     @required this.addNewExpedient, 
-    @required this.addNewAsk
+    @required this.addNewAsk,
+    @required this.points
   }) : super(key: key);
 
   @override
@@ -107,6 +114,7 @@ class _MainWidget extends StatefulWidget {
       putMarker: this.putMarker,
       onMapCreated: this.onMapCreated,
       polyline: this.polyline,
+      points: this.points,
       markers: this.markers,
       circles: this.circles,
       cancelselection: this.cancelselection,
@@ -126,6 +134,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   final Function putMarker;
   final Function onMapCreated;
   final Set<Polyline> polyline;
+  final List<LatLng> points;
   final Set<Marker> markers;
   final Set<Marker> nextPlaces;
   final Set<Circle> circles;
@@ -146,12 +155,13 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     @required this.putMarker,
     @required this.nextPlaces,
     @required this.onMapCreated,
-    @required this.polyline,
+    @required this.polyline, 
     @required this.markers,
-    @required this.circles,
+    this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
-    @required this.addNewAsk
+    @required this.addNewAsk,
+    @required this.points
   });
 
   @override
@@ -160,6 +170,33 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     setState(() {
       this.controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
     });
+  }
+
+  openSideMenu(){
+    setState(() {
+      isCollapsed =! isCollapsed;
+      isCollapsed ? controller.reverse() : controller.forward();
+    });
+  }
+
+  navigate(){
+    String origin = "${this.points.first.latitude},${this.points.first.longitude}";
+    List<LatLng> latLngWayPoints = this.points.sublist(1,this.points.length-1);
+    String waypoints = latLngWayPoints.fold<String>("",(String acc, LatLng curr){
+      String currLocation = "${curr.latitude},${curr.longitude}";
+      if(curr == latLngWayPoints.first){
+        return "$currLocation";
+      }
+      return "$acc|$currLocation";
+    });
+    String destiny = "${this.points.last.latitude},${this.points.last.longitude}";
+    final AndroidIntent intent = new AndroidIntent(
+      action: 'action_view',
+      data: Uri.encodeFull(
+        "https://www.google.com/maps/dir/?api=1&origin=$origin&destination=$destiny&waypoints=$waypoints&travelmode=driving&dir_action=navigate"),
+      package: 'com.google.android.apps.maps'
+    );
+    intent.launch();
   }
 
   @override
@@ -174,67 +211,68 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
           maxHeight: screemHeight
         ),
         child: Stack(
-            children: <Widget>[
-              menu(context),
-              AnimatedPositioned(
-                duration: Duration(milliseconds: 200),
-                top: 0,
-                bottom: 0,
-                left: !isCollapsed ? screemWidth/2 : 0,
-                right: !isCollapsed ? -screemWidth/2 : 0,
-                child: Material(
-                  clipBehavior: Clip.antiAlias,
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  elevation: 8,
-                  child: Stack(
-                    children: <Widget>[
-                      GoogleMap(
-                        onTap: this.onTap,
-                        buildingsEnabled: true,
-                        circles: this.circles,
-                        mapType: MapType.normal, 
-                        onLongPress: this.putMarker,
-                        polylines: this.polyline,
-                        markers: this.markers.union(this.nextPlaces),
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: false,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(-8.05428, -34.8813),
-                          zoom: 20,
-                        ),
-                        onMapCreated: this.onMapCreated,
+          children: <Widget>[
+            menu(context),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 200),
+              top: 0,
+              bottom: 0,
+              left: !isCollapsed ? screemWidth/2 : 0,
+              right: !isCollapsed ? -screemWidth/2 : 0,
+              child: Material(
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.all(Radius.circular(40)),
+                elevation: 8,
+                child: Stack(
+                  children: <Widget>[
+                    GoogleMap(
+                      onTap: this.onTap,
+                      buildingsEnabled: true,
+                      circles: this.circles,
+                      mapType: MapType.normal, 
+
+                      onLongPress: this.putMarker,
+                      polylines: this.polyline,
+                      markers: this.markers.union(this.nextPlaces),
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(-8.05428, -34.8813),
+                        zoom: 20,
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 15, bottom: 15, right: 15),
-                        child: AnimatedAlign(
-                          duration: Duration(milliseconds: 200),
-                          alignment: isCollapsed? Alignment.bottomRight : Alignment.bottomLeft,
-                          child: Container(
-                            child: FloatingActionButton(
-                              backgroundColor: Colors.white,
-                              child: AnimatedIcon(
-                                size: 30,
-                                icon: AnimatedIcons.menu_home,
-                                color: Theme.of(context).primaryColor,
-                                progress: this.controller
-                              ),
-                              onPressed: (){
-                                setState(() {
-                                  isCollapsed = !isCollapsed;
-                                  isCollapsed ? controller.reverse() : controller.forward();
-                                });
-                              },
-                            ),
-                            padding: const EdgeInsets.all(1.0)
-                          )
-                        ),
-                      )
-                    ]
-                  )
-                ) 
-              )
-            ],
-          )
+                      onMapCreated: this.onMapCreated,
+                    ),
+                    FloatingAnimatedButton(
+                      heroTag: "1",
+                      bottom: 15,
+                      color: Colors.white,
+                      icon: AnimatedIcon(
+                        size: 30,
+                        icon: AnimatedIcons.menu_home,
+                        color: Theme.of(context).primaryColor,
+                        progress: this.controller
+                      ),
+                      isCollapsed: this.isCollapsed,
+                      onPressed: this.openSideMenu,
+                    )
+                  ] + (this.points==null || this.points.length <= 1 ? [] : [
+                    FloatingAnimatedButton(
+                      heroTag: "2",
+                      bottom: 90,
+                      color: Theme.of(context).primaryColor,
+                      icon: Icon(
+                        Icons.navigation, size: 30,
+                        color: Colors.white,
+                      ),
+                      isCollapsed: this.isCollapsed,
+                      onPressed: this.navigate,
+                    )
+                  ])
+                )
+              ) 
+            )
+          ],
+        )
       )
     );
   }

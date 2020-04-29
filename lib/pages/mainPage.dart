@@ -45,9 +45,9 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   Set<Marker> nextPlaces = Set();
   LocationData currentLocation;
   Set<Marker> markers = Set();
-  Set<Circle> circles = Set();
   Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
+  List<LatLng> points = [];
   Completer<GoogleMapController> mapsController = Completer();
   GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
@@ -63,19 +63,6 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   _MainPageWidgetState({@required this.email, @required this.onLogout, @required this.firestore});
 
-  putCircles(List<LatLng> points){
-    setState(() {
-      circles.addAll(points.map((point) => Circle(
-        strokeWidth: 1,
-        strokeColor: Colors.grey,
-        circleId: CircleId(point.toString()),
-        center: point,
-        fillColor: Colors.white,
-        radius: 0.5
-      )).toSet());
-    });
-  }
-
   StreamSubscription<QuerySnapshot> initAgentListener(){
     return firestore.collection("agent").where('email', isEqualTo: email)
       .where('processed', isEqualTo: true)
@@ -85,7 +72,9 @@ class _MainPageWidgetState extends State<MainPageWidget> {
           Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
           if(agent.route != null){
             List<LatLng> route = agent.route.map<LatLng>((point)=>point.local).toList();
-            this.putCircles(route);
+            setState(() {
+              this.points.addAll(route);
+            });
             this.buildRouteCooords(route);
           }
         }
@@ -154,7 +143,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
           geodesic: true,
           jointType: JointType.round,
           polylineId: PolylineId(routeCooords.toString()), visible: true,
-          points: routeCooords.length >1 ? routeCooords: routeCooords, width: 3, color: Theme.of(context).primaryColor,
+          points: routeCooords.length >1 ? routeCooords: routeCooords, width: 6, color: Theme.of(context).primaryColor,
           startCap: Cap.roundCap, endCap: Cap.buttCap
         ));
         this.cancel = location.onLocationChanged().listen((LocationData currentLocation) {
@@ -192,9 +181,10 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   }
 
   void addNextPlace(AskedPoint askedPoint){
-    setState(() {
+    setState(() async {
       this.nextPlaces.add(Marker(
         consumeTapEvents: true,
+        infoWindow: InfoWindow(title: "Você terá que estar aqui"),
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(
@@ -203,36 +193,39 @@ class _MainPageWidgetState extends State<MainPageWidget> {
           );
         },
         markerId: MarkerId(askedPoint.origin.toString()),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+        icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+         'icons/bell_small.png'
+        ),
         position: askedPoint.origin
       ));
     });
   }
 
-  void putMarker(location) {
+  void putMarker(location) async {
     if(markers.length< 2){
-      setState(() {
-        this.markers.add(Marker(
-          markerId: MarkerId(location.toString()),
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            this.markers.length == 0 ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed
-          ),
-          consumeTapEvents: true,
-          onTap: (){
-            setState(() {
-              this.markers.removeWhere((marker){
-                return marker.markerId.value == location.toString();
-              });
-              if(this.markers.length == 1){
-                LatLng postion = this.markers.first.position;
-                this.markers.clear();
-                putMarker(postion);
-              }
+      Marker marker = Marker(
+        markerId: MarkerId(location.toString()),
+        icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+         'icons/${this.markers.length == 0 ? "bus_small.png": "red-flag_small.png"}'
+        ),
+        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada"),
+        consumeTapEvents: true,
+        onTap: (){
+          setState(() {
+            this.markers.removeWhere((marker){
+              return marker.markerId.value == location.toString();
             });
-          }, 
-          position: location
-        ));
+            if(this.markers.length == 1){
+              LatLng postion = this.markers.first.position;
+              this.markers.clear();
+              putMarker(postion);
+            }
+          });
+        }, 
+        position: location
+      );
+      setState(() {
+        this.markers.add(marker);
       });
     } else {
       Toast.show(
@@ -300,7 +293,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       },
       builder: (context, resources) {
         return MainWidget(
-          circles: this.circles,
+          points: this.points, //.sublist(0, this.points.length),
           nextPlaces: this.nextPlaces,
           addNewAsk: this.addNewAsk,
           addNewExpedient: this.addNewExpedient,

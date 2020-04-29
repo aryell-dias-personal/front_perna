@@ -33,6 +33,7 @@ dependencies:
   timeline_list: ^0.0.3
   firebase_messaging: ^6.0.13  
   flutter_local_notifications: ^1.4.1
+  android_intent: ^0.3.7+1
 
 dev_dependencies:
   flutter_test:
@@ -40,6 +41,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets: 
+    - icons/
   fonts:
     - family: ProductSans
       fonts:
