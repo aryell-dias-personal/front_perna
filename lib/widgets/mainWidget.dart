@@ -341,7 +341,9 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
             SideMenuButton(
               text: "Pagamento",
               onPressed: (){
-                Toast.show("Eita, você esbarrou em algo que ainda não foi implementado 😳", context);
+                Toast.show(
+                  "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                  context, backgroundColor: Colors.pinkAccent, duration: 3);
                 // cadastro de cartões de credito de forma segura, talvez uso do GPAY
               },
               icon: Icons.credit_card,
