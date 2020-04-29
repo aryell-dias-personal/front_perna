@@ -8,6 +8,7 @@ import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
 import 'package:android_intent/android_intent.dart';
+import 'package:toast/toast.dart';
 
 class MainWidget extends StatelessWidget {
   final String photoUrl;
@@ -336,6 +337,14 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                 );
               },
               icon: Icons.help_outline,
+            ),
+            SideMenuButton(
+              text: "Pagamento",
+              onPressed: (){
+                Toast.show("Eita, você esbarrou em algo que ainda não foi implementado 😳", context);
+                // cadastro de cartões de credito de forma segura, talvez uso do GPAY
+              },
+              icon: Icons.credit_card,
             ),
             SideMenuButton(
               text: "Deslogar",
