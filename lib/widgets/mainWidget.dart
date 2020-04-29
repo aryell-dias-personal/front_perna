@@ -231,7 +231,6 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                       buildingsEnabled: true,
                       circles: this.circles,
                       mapType: MapType.normal, 
-
                       onLongPress: this.putMarker,
                       polylines: this.polyline,
                       markers: this.markers.union(this.nextPlaces),

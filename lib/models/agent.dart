@@ -11,6 +11,7 @@ class Agent {
   DateTime askedStartAt;
   String name;
   String email;
+  String fromEmail;
   List<String> askedPointIds;
 
   Agent({
@@ -22,6 +23,7 @@ class Agent {
     this.askedStartAt, 
     this.askedEndAt, 
     this.email,
+    this.fromEmail,
     this.askedPointIds
   });
   
@@ -43,6 +45,7 @@ class Agent {
       askedStartAt: DateTime.fromMillisecondsSinceEpoch(parsedJson['askedStartAt'].round()*1000),
       askedEndAt: DateTime.fromMillisecondsSinceEpoch(parsedJson['askedEndAt'].round()*1000),
       email: parsedJson['email'],
+      fromEmail: parsedJson['fromEmail'],
       askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null
     );
   }
@@ -56,6 +59,7 @@ class Agent {
     "askedStartAt": askedStartAt.millisecondsSinceEpoch/1000,
     "askedEndAt": askedEndAt.millisecondsSinceEpoch/1000,
     "email": email,
+    "fromEmail": fromEmail,
     "askedPointIds": askedPointIds
   };
 }

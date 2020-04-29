@@ -152,6 +152,18 @@ class _PointDetailPageState extends State<PointDetailPage> {
     );
   }
 
+  Widget getAskedBy(String fromEmail){
+    if(fromEmail == null) return SizedBox();
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text("Pedido por", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+        TitledValueWidget(titleSize: 20, title: "Email", valueSize: 20, value: fromEmail)
+      ],
+    );
+  }
+
   List<Widget> buildAgent() {
     return <Widget>[
       Text("DETALHES DO EXPEDIENTE", style: TextStyle(color: Color(0xFF1c4966))),
@@ -159,6 +171,7 @@ class _PointDetailPageState extends State<PointDetailPage> {
       getDateInfoWidget(this.agent.askedStartAt.toString(), "Inicio do Expediente"),
       getDateInfoWidget(this.agent.askedEndAt.toString(), "Fim do Expediente"),
       getLocalInfoWidget(this.agent.friendlyGarage, "Local da Garagem"),
+      getAskedBy(agent.fromEmail),
       TitledValueWidget(titleSize: 30, title: "Vagas", valueSize: 30, value: this.agent.places.toString())
     ];
   }

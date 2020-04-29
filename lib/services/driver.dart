@@ -7,7 +7,7 @@ class DriverService {
   final encoder = JsonEncoder();
 
   Future<int> postNewAgent(Agent agent) async {
-    Response res = await post("${baseUrl}insertAgent", body:  encoder.convert(agent.toJson()));
+    Response res = await post("${baseUrl}insertAgent", body: encoder.convert(agent.toJson()));
     return res.statusCode;
   }
 
@@ -21,12 +21,8 @@ class DriverService {
     return res.statusCode;
   }
 
-  Future<int> askNewAgent(Agent agent, String fromEmail) async {
-    final body = encoder.convert({
-      "agent": agent.toJson(),
-      "fromEmail": fromEmail
-    });
-    Response res = await post("${baseUrl}askNewAgent", body: body);
+  Future<int> askNewAgent(Agent agent) async {
+    Response res = await post("${baseUrl}askNewAgent", body: encoder.convert(agent.toJson()));
     return res.statusCode;
   }
 }

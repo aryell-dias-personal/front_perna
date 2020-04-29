@@ -96,11 +96,11 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
     });
   }
 
-  void askNewAgend(agent, fromEmail) async {
+  void askNewAgend(agent) async {
     setState(() {
       isLoading = true;
     });
-    int statusCode = await driverService.askNewAgent(agent, fromEmail);
+    int statusCode = await driverService.askNewAgent(agent);
     if(statusCode == 200){
       Navigator.pop(context);
       this.clear();
@@ -234,12 +234,12 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
                     askedStartAt: this.askedStartAt,
                     email: this.driverEmail, friendlyGarage: this.garageController.text,
                     garage: this.driverMarkers.first.position, name: this.name, 
-                    places: this.places
+                    places: this.places, fromEmail: this.driverEmail != email? email : null
                   );
                   if(this.driverEmail == email){
                     addFunction(agent);
                   } else {
-                    askNewAgend(agent, email);
+                    askNewAgend(agent);
                   }
                 } 
               },

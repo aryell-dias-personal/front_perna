@@ -62,36 +62,36 @@ class _HomeState extends State<Home> {
     await navigatorState.push( 
       MaterialPageRoute(
         builder: (context) => PointDetailPage(agent: agent, isHome: true, 
-          accept: () async { await answerNewAgentHandler(agent, message['data']["fromEmail"], agent.email, true); },
-          deny: () async { await answerNewAgentHandler(agent, message['data']["fromEmail"], agent.email, false); }
+          accept: () async { await answerNewAgentHandler(agent, true); },
+          deny: () async { await answerNewAgentHandler(agent, false); }
         )
       )
     );
   }
 
-  Future answerNewAgentHandler(Agent agent, String fromEmail, String toEmail, bool accepted) async {
+  Future answerNewAgentHandler(Agent agent, bool accepted) async {
     if(accepted){
       int statusCodeNewAgent = await driverService.postNewAgent(agent);
       if(statusCodeNewAgent !=200){
         Toast.show(
-          "Não foi possivel aceitar o pedido de $fromEmail no momento", context, 
+          "Não foi possivel aceitar o pedido de ${agent.fromEmail} no momento", context, 
           backgroundColor: Colors.redAccent, 
           duration: 3
         );
         return;
       }
     }
-    int statusCodeAnswer = await driverService.answerNewAgent(fromEmail, toEmail, accepted);
+    int statusCodeAnswer = await driverService.answerNewAgent(agent.fromEmail, agent.email, accepted);
     if(statusCodeAnswer == 200){
       String answer = accepted? "aceitou": "negou";
       Toast.show(
-        "Você $answer o pedido feito por $fromEmail", context, 
+        "Você $answer o pedido feito por ${agent.fromEmail}", context, 
         backgroundColor: Colors.greenAccent, 
         duration: 3
       );
     } else {
       Toast.show(
-        "Não foi possivel responder $fromEmail no momento", context, 
+        "Não foi possivel responder ${agent.fromEmail} no momento", context, 
         backgroundColor: Colors.redAccent, 
         duration: 3
       );
@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
       print("data: ${message['data']}");
       if(message['data']['time'] != null && message['data']['type'] != null){
         await scheduleMessage(message);
-      } else if(message['data']['agent'] != null && message['data']['fromEmail'] != null){
+      } else if(message['data']['agent'] != null){
         await askNewAgentHandler(message);
       }
     }

@@ -180,8 +180,11 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
   }
 
-  void addNextPlace(AskedPoint askedPoint){
-    setState(() async {
+  void addNextPlace(AskedPoint askedPoint) async {
+    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+      'icons/bell_small.png'
+    );
+    setState(() {
       this.nextPlaces.add(Marker(
         consumeTapEvents: true,
         infoWindow: InfoWindow(title: "Você terá que estar aqui"),
@@ -193,9 +196,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
           );
         },
         markerId: MarkerId(askedPoint.origin.toString()),
-        icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
-         'icons/bell_small.png'
-        ),
+        icon: bitmapDescriptor,
         position: askedPoint.origin
       ));
     });
