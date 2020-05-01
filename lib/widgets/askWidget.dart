@@ -1,5 +1,4 @@
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
@@ -43,24 +42,13 @@ class _AskWidgetState extends State<_AskWidget> {
   UserService userService = new UserService();
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
-  final Geolocator _geolocator = Geolocator();
   final Function clear;
-
-  String placemarkToString(Placemark placemark){
-    return "${placemark.administrativeArea}, ${placemark.subAdministrativeArea}, ${placemark.subLocality}, ${placemark.thoroughfare}, ${placemark.subThoroughfare}";
-  }
 
   @override
   void initState() {
     setState(() {
-      _geolocator.placemarkFromCoordinates(userMarkers.first.position.latitude, userMarkers.first.position.longitude).then((placeMarkers){
-        Placemark placemark = placeMarkers.first;
-        initialController.text = this.placemarkToString(placemark);
-      });
-      _geolocator.placemarkFromCoordinates(userMarkers.last.position.latitude, userMarkers.last.position.longitude).then((placeMarkers){
-        Placemark placemark = placeMarkers.first;
-        endControler.text = this.placemarkToString(placemark);
-      });
+      initialController.text = this.userMarkers.first.infoWindow.snippet;
+      endControler.text = this.userMarkers.last.infoWindow.snippet;
     });
     super.initState();
   }

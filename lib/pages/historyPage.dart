@@ -108,13 +108,16 @@ class _HistoryPageState extends State<HistoryPage> {
 
   String parsePlace(String place){
     List<String> placePieces = place.split(',');
-    return "${placePieces[3]}, ${placePieces[4]}";
+    if(placePieces.length > 4){
+      return "${placePieces[3]}, ${placePieces[4]}";
+    } 
+    return place;
   }
 
   List getHistory(){
     List history = this.agents + this.askedPoints;
     history.sort((first, second){
-      return first['askedEndAt'] - second['askedEndAt'];
+      return -(first['askedEndAt'] - second['askedEndAt']);
     });
     return history;
   }

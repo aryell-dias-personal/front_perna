@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
@@ -49,6 +50,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   List<LatLng> routeCooords = [];
   List<LatLng> points = [];
   Completer<GoogleMapController> mapsController = Completer();
+  final Geolocator _geolocator = Geolocator();
   GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
   final String email;
@@ -156,6 +158,14 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     }
   }
 
+  void centralizeLatLng(LatLng latLng) async {
+    final GoogleMapController controller = await this.mapsController.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: latLng,
+      zoom: 20,
+    )));
+  }
+
   void centralize(LocationData locationData) async {
     if(locationData != null){
       final GoogleMapController controller = await this.mapsController.future;
@@ -202,14 +212,30 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     });
   }
 
+  String placemarkToString(Placemark placemark){
+    List<String> info = [
+      placemark.administrativeArea, 
+      placemark.subAdministrativeArea, 
+      placemark.subLocality, placemark.thoroughfare, 
+      placemark.subThoroughfare
+    ];
+    String result = info.fold("", (String acc, String curr){
+      if(curr.trim() == "") return acc;
+      return "$acc$curr, ";
+    });
+    return result.substring(0, result.length-2);
+  }
+
   void putMarker(location) async {
+    List<Placemark> placeMarkers = await _geolocator.placemarkFromCoordinates(location.latitude, location.longitude);
+    Placemark placemark = placeMarkers.first;
     if(markers.length< 2){
       Marker marker = Marker(
         markerId: MarkerId(location.toString()),
         icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
          'icons/${this.markers.length == 0 ? "bus_small.png": "red-flag_small.png"}'
         ),
-        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada"),
+        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", snippet: placemarkToString(placemark)),
         consumeTapEvents: true,
         onTap: (){
           setState(() {
@@ -294,7 +320,8 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       },
       builder: (context, resources) {
         return MainWidget(
-          points: this.points, //.sublist(0, this.points.length),
+          points: this.points,
+          centralize: this.centralizeLatLng,
           nextPlaces: this.nextPlaces,
           addNewAsk: this.addNewAsk,
           addNewExpedient: this.addNewExpedient,

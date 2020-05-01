@@ -142,13 +142,16 @@ class _PointDetailPageState extends State<PointDetailPage> {
               onPressed: (){} 
             )
           ]
-        ),
+        )
+      ] + (localPieces.length > 4 ?[
         TitledValueWidget(titleSize: 20, title: "Estado", valueSize: 20, value: localPieces.first),
         TitledValueWidget(titleSize: 20, title: "Bairro", valueSize: 20, value: localPieces[2]),
         TitledValueWidget(titleSize: 20, title: "Cidade", valueSize: 20, value: localPieces[1]),
         TitledValueWidget(titleSize: 20, title: "Rua", valueSize: 20, value: localPieces[3]),
         TitledValueWidget(titleSize: 20, title: "Número", valueSize: 20, value: localPieces.last),
-      ],
+      ]: [
+        TitledValueWidget(titleSize: 20, title: "Descrição", valueSize: 20, value: localPieces.first),
+      ]),
     );
   }
 

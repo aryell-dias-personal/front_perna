@@ -1,5 +1,4 @@
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
@@ -47,21 +46,13 @@ class _ExpedientWidgetState extends State<_ExpedientWidget> {
   DriverService driverService = new DriverService();
   TextEditingController garageController = TextEditingController();
   TextEditingController numberControler = new TextEditingController();
-  final Geolocator _geolocator = Geolocator();
 
   _ExpedientWidgetState({@required this.driverMarkers, @required this.clear});
-
-  String placemarkToString(Placemark placemark){
-    return "${placemark.administrativeArea}, ${placemark.subAdministrativeArea}, ${placemark.subLocality}, ${placemark.thoroughfare}, ${placemark.subThoroughfare}";
-  }
 
   @override
   void initState() {
     setState(() {
-      _geolocator.placemarkFromCoordinates(driverMarkers.last.position.latitude, driverMarkers.last.position.longitude).then((placeMarkers){
-        Placemark placemark = placeMarkers.first;
-        garageController.text = placemarkToString(placemark);
-      });
+      garageController.text = this.driverMarkers.first.infoWindow.snippet;
     });
     super.initState();
   }

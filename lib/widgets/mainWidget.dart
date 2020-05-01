@@ -6,6 +6,7 @@ import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/store/state.dart';
+import 'package:perna/widgets/searchLocation.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
 import 'package:android_intent/android_intent.dart';
 import 'package:toast/toast.dart';
@@ -26,6 +27,7 @@ class MainWidget extends StatelessWidget {
   final Set<Circle> circles;
   final Function addNewAsk;
   final Function addNewExpedient;
+  final Function centralize;
 
   const MainWidget({
     Key key, 
@@ -42,6 +44,7 @@ class MainWidget extends StatelessWidget {
     this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
+    @required this.centralize, 
     @required this.addNewAsk,
     @required this.points
   }) : super(key: key);
@@ -60,6 +63,7 @@ class MainWidget extends StatelessWidget {
       points: this.points,
       markers: this.markers,
       circles: this.circles,
+      centralize: this.centralize,
       cancelselection: this.cancelselection,
       addNewExpedient: this.addNewExpedient,
       addNewAsk: this.addNewAsk,
@@ -84,6 +88,7 @@ class _MainWidget extends StatefulWidget {
   final Set<Circle> circles;
   final Function addNewAsk;
   final Function addNewExpedient;
+  final Function centralize;
 
   const _MainWidget({
     Key key, 
@@ -100,6 +105,7 @@ class _MainWidget extends StatefulWidget {
     @required this.nextPlaces,
     @required this.cancelselection,
     @required this.addNewExpedient, 
+    @required this.centralize, 
     @required this.addNewAsk,
     @required this.points
   }) : super(key: key);
@@ -118,6 +124,7 @@ class _MainWidget extends StatefulWidget {
       points: this.points,
       markers: this.markers,
       circles: this.circles,
+      centralize: this.centralize,
       cancelselection: this.cancelselection,
       addNewExpedient: this.addNewExpedient, 
       addNewAsk: this.addNewAsk,
@@ -142,6 +149,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   final Function cancelselection;
   final Function addNewAsk;
   final Function addNewExpedient;
+  final Function centralize;
 
   bool isCollapsed = true;
   double screemWidth, screemHeight;
@@ -161,6 +169,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
+    @required this.centralize, 
     @required this.addNewAsk,
     @required this.points
   });
@@ -200,6 +209,39 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     intent.launch();
   }
 
+  Future addMarkerWithSearch(location, String description, int type) async {
+    LatLng position = LatLng(location.lat, location.lng);
+    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+      type == 0 ? 'icons/bus_small.png' : 'icons/red-flag_small.png'
+    );
+    setState(() {
+      this.markers.removeWhere((marker){
+          return  marker.infoWindow.title == (type == 0 ? "Partida ou garagem" : "Chegada") ;
+      });
+      this.markers.add(
+        Marker(markerId: MarkerId(position.toString()),
+          icon: bitmapDescriptor,
+          infoWindow: InfoWindow(title: type == 0 ? "Partida ou garagem": "Chegada", snippet: description),
+          consumeTapEvents: true,
+          onTap: (){
+            setState(() {
+              this.markers.removeWhere((marker){
+                return marker.markerId.value == position.toString();
+              });
+              if(this.markers.length == 1){
+                LatLng postion = this.markers.first.position;
+                this.markers.clear();
+                putMarker(postion);
+              }
+            });
+          }, 
+          position: position
+        )
+      );
+      this.centralize(position);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -229,7 +271,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                     GoogleMap(
                       onTap: this.onTap,
                       buildingsEnabled: true,
-                      circles: this.circles,
+                      circles: this.circles, 
                       mapType: MapType.normal, 
                       onLongPress: this.putMarker,
                       polylines: this.polyline,
@@ -241,6 +283,15 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                         zoom: 20,
                       ),
                       onMapCreated: this.onMapCreated,
+                    ),
+                    SearchLocation(
+                      markers: this.markers,
+                      onStartPlaceSelected: (location, description) async {
+                        await addMarkerWithSearch(location, description, 0);
+                      },
+                      onEndPlaceSelected: (location, description) async {
+                        await addMarkerWithSearch(location, description, 1);
+                      }
                     ),
                     FloatingAnimatedButton(
                       heroTag: "1",
