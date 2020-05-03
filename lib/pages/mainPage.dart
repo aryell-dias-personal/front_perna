@@ -5,9 +5,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
-import 'package:perna/pages/addNewAskPage.dart';
-import 'package:perna/pages/addNewExpedientPage.dart';
-import 'package:perna/pages/pointDetailPage.dart';
+import 'package:perna/pages/adkedPointPage.dart';
+import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/mainWidget.dart';
@@ -201,7 +200,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(
-              builder: (context) => PointDetailPage(askedPoint: askedPoint, isHome: true)
+              builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
             )
           );
         },
@@ -274,9 +273,15 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   void addNewAsk() {
     if(this.markers.length == 2){
+      AskedPoint askedPoint = AskedPoint(
+        friendlyOrigin: markers.first.infoWindow.snippet,
+        friendlyDestiny: markers.last.infoWindow.snippet,
+        origin: markers.first.position,
+        destiny: markers.last.position
+      );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewAskPage(userMarkers: markers, clear: this.markers.clear)
+          builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear)
         )
       );
     } else {
@@ -290,9 +295,13 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   void addNewExpedient(){
     if(this.markers.length == 1){
+      Agent agent = Agent(
+        friendlyGarage: markers.first.infoWindow.snippet,
+        garage: markers.first.position
+      );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AddNewExpedientPage(driverMarkers: this.markers, clear: this.markers.clear)
+          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: (){})
         )
       );
     } else {

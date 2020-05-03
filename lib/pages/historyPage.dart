@@ -6,7 +6,8 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
-import 'package:perna/pages/pointDetailPage.dart';
+import 'package:perna/pages/adkedPointPage.dart';
+import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
@@ -131,7 +132,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return <Widget>[
       SizedBox(height: 20),
       Text("PEDIDO", style: Theme.of(context).textTheme.body1),
-      TitledValueWidget(title: "Nome", value: askedPoint.name),
+      TitledValueWidget(title: "Nome", value: askedPoint.name ?? "NO_NAME"),
       TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.askedStartAt.toString())),
       TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.askedEndAt.toString())),
       TitledValueWidget(title: "Local da Partida", value: parsePlace(askedPoint.friendlyOrigin)),
@@ -161,8 +162,8 @@ class _HistoryPageState extends State<HistoryPage> {
             Navigator.push(context, 
               MaterialPageRoute(
                 builder: (context) => operation['origin'] != null?
-                  PointDetailPage(askedPoint: AskedPoint.fromJson(operation)):
-                  PointDetailPage(agent: Agent.fromJson(operation))
+                  AskedPointPage(askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
+                  ExpedientPage(agent: Agent.fromJson(operation), readOnly: true, clear: (){})
                 )
             );
           }, 

@@ -50,6 +50,19 @@ class Agent {
     );
   }
 
+  Agent copyWith({garage, friendlyGarage, places, name, route, askedStartAt, askedEndAt, email, fromEmail, askedPointIds}) => Agent(
+    garage: garage ?? this.garage,
+    friendlyGarage: friendlyGarage ?? this.friendlyGarage,
+    places: places ?? this.places,
+    name: name ?? this.name,
+    route: route ?? this.route,
+    askedStartAt: askedStartAt ?? this.askedStartAt,
+    askedEndAt: askedEndAt ?? this.askedEndAt,
+    email: email ?? this.email,
+    fromEmail: fromEmail ?? this.fromEmail,
+    askedPointIds: askedPointIds ?? this.askedPointIds
+  );
+
   dynamic toJson() => {
     "garage": "${garage.latitude}, ${garage.longitude}",
     "places": places,

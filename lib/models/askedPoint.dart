@@ -52,6 +52,20 @@ class AskedPoint {
     );
   }
 
+  AskedPoint copyWith({name, email, origin, destiny, friendlyOrigin, friendlyDestiny, askedStartAt, askedEndAt, actualStartAt, actualEndAt, agentId}) => AskedPoint(
+    name: name ?? this.name,
+    email: email ?? this.email,
+    origin: origin ?? this.origin,
+    destiny: destiny ?? this.destiny,
+    friendlyOrigin: friendlyOrigin ?? this.friendlyOrigin,
+    friendlyDestiny: friendlyDestiny ?? this.friendlyDestiny,
+    askedStartAt: askedStartAt ?? this.askedStartAt,
+    askedEndAt: askedEndAt ?? this.askedEndAt,
+    actualStartAt: actualStartAt ?? this.actualStartAt,
+    actualEndAt: actualEndAt ?? this.actualEndAt,
+    agentId: agentId ?? this.agentId
+  );
+
   dynamic toJson() => {
     "name": name,
     "email": email,

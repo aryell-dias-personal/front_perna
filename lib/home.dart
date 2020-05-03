@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:perna/constants/notification.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/signIn.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/pages/mainPage.dart';
 import 'package:perna/pages/noConnectionPage.dart';
-import 'package:perna/pages/pointDetailPage.dart';
 import 'package:perna/pages/initialPage.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
@@ -61,7 +61,7 @@ class _HomeState extends State<Home> {
     Agent agent = Agent.fromJson(JsonDecoder().convert(message['data']['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
-        builder: (context) => PointDetailPage(agent: agent, isHome: true, 
+        builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){},
           accept: () async { await answerNewAgentHandler(agent, true); },
           deny: () async { await answerNewAgentHandler(agent, false); }
         )
@@ -168,7 +168,7 @@ class _HomeState extends State<Home> {
         return {
           'logedIn': store.state.logedIn,
           'messagingToken': store.state.messagingToken,
-          'email': store.state.user.email,
+          'email': store.state.user?.email,
           'firestore': store.state.firestore
         };
       },
