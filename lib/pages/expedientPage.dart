@@ -222,7 +222,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         textInputAction: TextInputAction.next,
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Digite um nome para seu expediente';
+                            return 'Digite um email para o motorista';
                           }
                           return null;
                         },
