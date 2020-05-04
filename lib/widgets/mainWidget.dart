@@ -1,15 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:perna/pages/helpPage.dart';
-import 'package:perna/pages/historyPage.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
-import 'package:perna/store/state.dart';
+import 'package:perna/widgets/sideMenu.dart';
 import 'package:perna/widgets/searchLocation.dart';
-import 'package:perna/widgets/sideMenuButton.dart';
 import 'package:android_intent/android_intent.dart';
-import 'package:toast/toast.dart';
 
 class MainWidget extends StatelessWidget {
   final String photoUrl;
@@ -336,86 +330,21 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
             left: !isOpen ? -screemWidth/1.7 : 0,
             right: !isOpen ? screemWidth : screemWidth/1.7,
             child: Material(
+              color: Colors.white,
               clipBehavior: Clip.antiAlias,
-              borderRadius: BorderRadius.only(bottomRight: Radius.circular(40), topRight: Radius.circular(40)),
+              borderRadius: BorderRadius.only(bottomRight: Radius.circular(30), topRight: Radius.circular(30)),
               elevation: 8,
-              child: menu(context)
+              child: SideMenu(
+                email: this.email, 
+                name: this.name, 
+                logout: this.logout, 
+                photoUrl: this.photoUrl,
+                textColor: Theme.of(context).primaryColor
+              )
             ) 
           )
         ],
       )
-    );
-  }
-
-  String getName(){
-    int end = ' '.allMatches(this.name).length >= 1 ? 2: 1;
-    return this.name.split(' ').sublist(0, end).join(' ');
-  }
-
-  String getEmail(){
-    return this.email.length > 27 ? this.email.substring(0,24)+"..." : this.email;
-  }
-  
-  Widget menu(context){
-    return Padding(
-      padding: const EdgeInsets.only(left: 6.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.transparent,
-              backgroundImage: NetworkImage(this.photoUrl)
-            ),
-            SizedBox(height: 5),
-            Text(this.getName(), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 22)),
-            SizedBox(height: 5),
-            Text(this.getEmail(), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 11)),
-            SizedBox(height: 20),
-            SideMenuButton(
-              text: "Histórico",
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => StoreConnector<StoreState, Firestore>(
-                      converter: (store) => store.state.firestore,
-                      builder:  (context, firestore) => HistoryPage(email: this.email, firestore: firestore)
-                    )
-                  )
-                );
-              },
-              icon: Icons.timeline,
-            ),
-            SideMenuButton(
-              text: "Ajuda",
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => HelpPage()
-                  )
-                );
-              },
-              icon: Icons.help_outline,
-            ),
-            SideMenuButton(
-              text: "Pagamento",
-              onPressed: (){
-                Toast.show(
-                  "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
-                  context, backgroundColor: Colors.pinkAccent, duration: 3);
-                // cadastro de cartões de credito de forma segura, talvez uso do GPAY
-              },
-              icon: Icons.credit_card,
-            ),
-            SideMenuButton(
-              text: "Deslogar",
-              onPressed: this.logout,
-              icon: Icons.exit_to_app,
-            )
-          ]
-        )
-      ),
     );
   }
 }

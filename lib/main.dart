@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color mainColor = Color(0xFF1c4966);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -61,13 +62,13 @@ class MyApp extends StatelessWidget {
         home: Home(firebaseMessaging: this.firebaseMessaging),
         theme: ThemeData(
           textTheme: TextTheme(
-            body1: TextStyle(color: Color(0xFF1c4966))
+            body1: TextStyle(color: mainColor)
           ),
           iconTheme: IconThemeData(
-            color: Color(0xFF1c4966)
+            color: mainColor
           ),
-          primaryColor: Color(0xFF1c4966),
-          accentColor: Color(0x881c4966),
+          primaryColor: mainColor,
+          accentColor: mainColor.withAlpha(66),
           fontFamily: "ProductSans"
         )
       )

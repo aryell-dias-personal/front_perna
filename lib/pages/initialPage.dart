@@ -31,9 +31,9 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Colors.white,
       body: Center(
-        child: isLoading ? Loading(indicator: BallPulseIndicator(), size: 100.0) : 
+        child: isLoading ? Loading(indicator: BallPulseIndicator(), color: Theme.of(context).primaryColor, size: 100.0) : 
         StoreConnector<StoreState, Function(SignLogin)>(
           converter: (store) => (SignLogin choice) async {
             SignInResponse signInResponse = choice == SignLogin.sign ? 
@@ -56,19 +56,18 @@ class _InitialPageState extends State<InitialPage> {
               AvatarGlow(
                 endRadius: 90,
                 duration: Duration(seconds: 2),
-                glowColor: Colors.white24,
+                glowColor: Colors.grey,
                 repeat: true,
-                repeatPauseDuration: Duration(seconds: 2),
+                repeatPauseDuration: Duration(seconds: 0),
                 startDelay: Duration(seconds: 1),
                 child: Material(
-                  elevation: 8.0,
+                  elevation: 0.0,
                   shape: CircleBorder(),
+                  color: Colors.transparent,
                   child: CircleAvatar(
-                    backgroundColor: Colors.grey[100],
-                    child: FlutterLogo(
-                      size: 60.0,
-                    ),
-                    radius: 50.0,
+                    backgroundColor: Colors.transparent,
+                    backgroundImage: AssetImage("assets/ic_launcher.png"),
+                    radius: 60.0,
                   )
                 ),
               ),
@@ -80,7 +79,7 @@ class _InitialPageState extends State<InitialPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 40.0,
-                  color: Color(0xFFFFFFFF)
+                  color: Theme.of(context).primaryColor
                 ),
               ),
               Text(
@@ -88,7 +87,7 @@ class _InitialPageState extends State<InitialPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 35.0,
-                  color: Color(0xFFFFFFFF)
+                  color: Theme.of(context).primaryColor
                 ),
               ),
               SizedBox(

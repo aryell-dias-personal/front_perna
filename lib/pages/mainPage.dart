@@ -121,8 +121,8 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     setState(() {
       this.isLoadingAskedPoint = true;
       this.isLoadingAgent = true;
-      agentsListener = this.initAgentListener();
-      askedPointsListener = this.initAskedPointListener();
+      this.agentsListener = this.initAgentListener();
+      this.askedPointsListener = this.initAskedPointListener();
     });
   }
   

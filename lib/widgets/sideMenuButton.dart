@@ -5,8 +5,9 @@ class SideMenuButton extends StatelessWidget {
   final Function onPressed;
   final String text;
   final IconData icon;
+  final Color textColor;
   
-  SideMenuButton({@required this.text, @required this.onPressed, @required this.icon});
+  SideMenuButton({@required this.text, @required this.onPressed, @required this.icon, @required this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +15,9 @@ class SideMenuButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children:<Widget>[
-          Text(this.text, style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)),
+          Text(this.text, style: TextStyle(color: textColor, fontSize: 18)),
           SizedBox(width: 2),
-          Icon(icon, color: Theme.of(context).primaryColor, size: 18)
+          Icon(icon, color: textColor, size: 18)
         ]
       ),
       onPressed: this.onPressed,

@@ -13,11 +13,11 @@ Este aplicativo tem como intenção facilitar a locomoção dos usuários de tra
 
 ## Como fazer um novo pedido?
 
-Selecione um ponto de `Partida` e de `Chegada` no mapa, pressionando no local do mapa até que apareçam a parada de ônibus e após a bandeira vermelha, conforme a tabela acima. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Pedido`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
+Selecione um ponto de `Partida` e de `Chegada` no mapa, pressionando no local do mapa até que apareçam a parada de ônibus e após a bandeira vermelha ou preenchendo os campos de pesquisa referentes a partida e destino, conforme a tabela acima. Em seguida pressione o botão flutuante verde que aparecerá `Adicionar Pedido`. Na tela que será mostrada preencha o formulário e pressione `adicionar`.
 
 ## Como criar um novo expediente?
 
-Selecione um ponto onde será a `Garagem` no mapa, pressionando no local do mapa até que apareça uma parada de ônibus. Em seguida abra a gaveta lateral apertando no botão flutuante e selecione `Novo Expediente`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
+Selecione um ponto onde será a `Garagem` no mapa, pressionando no local do mapa até que apareça uma parada de ônibus ou preencha apénas ao campo de pesquisa referente a partida. Em seguida pressione o botão flutuante verde que aparecerá `Adicionar Expediente`. Na tela que aparecerá preencha o formulário e pressione `adicionar`.
 
 ## Como centralizar o mapa para o local onde estou?
 
@@ -30,5 +30,13 @@ Basta tocar no marcador que se deseja remover do mapa, com exceção dos `Pontos
 ## Quando devo fazer meus pedidos?
 
 Os pedidos devem ser feitos com no minimo um dia de antecedência, para que todos os pedidos sejam organizados da melhor forma para todos os envolvidos (motoristas e passageiros).
+
+## Como iniciar uma rota?
+
+Quando você possuir uma rota calculada pelo perna ela aparecerá no seu mapa com um botão flutante `Navegar`, você poderá pressioná-lo para iniciar a rota indicada.
+
+## Como posso ver meu histórico de pedidos e expedientes?
+
+Basta abrir o menu e clicar no item `Histórico` ele lhe levará para uma tela indicando todas as operações (pedidos e expedientes) feitas por você no app.
 
 """;
