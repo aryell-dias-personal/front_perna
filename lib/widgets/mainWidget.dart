@@ -184,6 +184,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   }
 
   navigate(){
+    if(this.isOpen) openSideMenu();
     String origin = "${this.points.first.latitude},${this.points.first.longitude}";
     List<LatLng> latLngWayPoints = this.points.sublist(1,this.points.length-1);
     String waypoints = latLngWayPoints.fold<String>("",(String acc, LatLng curr){
@@ -288,6 +289,9 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                   if(this.isOpen) openSideMenu();
                   this.putMarker(position);
                 },
+                onCameraMove: (location){
+                  if(this.isOpen) openSideMenu();
+                },
                 polylines: this.polyline,
                 markers: this.markers.union(this.nextPlaces),
                 myLocationEnabled: true,
@@ -299,6 +303,9 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                 onMapCreated: this.onMapCreated,
               ),
               SearchLocation(
+                preExecute: (){
+                  if(this.isOpen) openSideMenu();
+                },
                 markers: this.markers,
                 onStartPlaceSelected: (location, description) async {
                   await addMarkerWithSearch(location, description, 0);

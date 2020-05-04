@@ -299,7 +299,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: (){})
+          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear)
         )
       );
     } else {

@@ -6,18 +6,28 @@ import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 
 class SearchLocation extends StatefulWidget {
+  final Function() preExecute;
   final Future Function(Location, String) onStartPlaceSelected;
   final Future Function(Location, String) onEndPlaceSelected;
   final Set<Marker> markers;
 
-  const SearchLocation({Key key, @required this.onStartPlaceSelected, @required this.onEndPlaceSelected, @required this.markers}) : super(key: key);
+  const SearchLocation({
+    Key key, @required this.onStartPlaceSelected, 
+    @required this.onEndPlaceSelected, @required this.markers, 
+    @required this.preExecute
+  }) : super(key: key);
 
   @override
-  _SearchLocationState createState() => _SearchLocationState(onStartPlaceSelected: this.onStartPlaceSelected, onEndPlaceSelected: this.onEndPlaceSelected, markers: this.markers);
+  _SearchLocationState createState() => _SearchLocationState(
+    onStartPlaceSelected: this.onStartPlaceSelected, 
+    onEndPlaceSelected: this.onEndPlaceSelected, 
+    markers: this.markers, preExecute: this.preExecute
+  );
 }
 
 class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin {
   bool showSecond = false;
+  final Function() preExecute;
   final Future Function(Location, String) onStartPlaceSelected;
   final Future Function(Location, String) onEndPlaceSelected;
   final Set<Marker> markers;
@@ -27,9 +37,15 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   GoogleMapsPlaces _places = new GoogleMapsPlaces(apiKey:"AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ");
 
-  _SearchLocationState({@required this.onStartPlaceSelected, @required this.onEndPlaceSelected, @required this.markers});
+  _SearchLocationState({
+    @required this.onStartPlaceSelected, 
+    @required this.onEndPlaceSelected, 
+    @required this.markers, 
+    @required this.preExecute
+  });
 
   void execute(String hint, int type) async {
+    this.preExecute();
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
       apiKey: "AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ",
@@ -111,8 +127,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
                         suffixIcon: Icon(Icons.flag),
-                        contentPadding:
-                            EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                        contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
                         hintText: "Digite o nome do seu local de destino"
                       ),
                       autofocus: false,
@@ -129,6 +144,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   padding: EdgeInsets.symmetric(horizontal: 5),
                   child: FlatButton(
                     onPressed: endControler.text != ""? null: (){
+                      this.preExecute();
                       setState(() {
                         this.showSecond = !this.showSecond;
                       });
