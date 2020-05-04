@@ -127,7 +127,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       SizedBox(height: 26),
                       FormTimePicker(
                         initialValue: this.askedPoint.askedStartAt,
-                        icon: Icons.calendar_today,
+                        icon: Icons.insert_invitation,
                         labelText: "Deseja Embarcar",
                         onChanged: (text){
                           this.askedStartAt = text;
@@ -146,7 +146,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         },
                         action: TextInputAction.done,
                         labelText: "Deseja Desembarcar",
-                        icon: Icons.calendar_today,
+                        icon: Icons.insert_invitation,
                         readOnly: this.readOnly,
                         onSubmit: (text){
                           onPressed(email);
@@ -159,14 +159,14 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         readOnly: true,
                         initialValue: this.askedPoint.actualStartAt,
                         labelText: "Hora da partida",
-                        icon: Icons.calendar_today
+                        icon: Icons.insert_invitation
                       ),
                       SizedBox(height: 26),
                       FormTimePicker(
                         readOnly: true,
                         initialValue: this.askedPoint.actualEndAt,
                         labelText: "Hora da chegada",
-                        icon: Icons.calendar_today
+                        icon: Icons.insert_invitation
                       ),
                       SizedBox(height: 26)
                     ]: []) + [

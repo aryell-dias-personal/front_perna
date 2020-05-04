@@ -251,7 +251,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         },
                         action: TextInputAction.next,
                         labelText: "Início do expediente",
-                        icon: Icons.calendar_today,
+                        icon: Icons.insert_invitation,
                         readOnly: this.readOnly,
                         onSubmit: (text){
                           FocusScope.of(context).nextFocus();
@@ -261,7 +261,7 @@ class _ExpedientState extends State<ExpedientPage> {
                       SizedBox(height: 26),
                       FormTimePicker(
                         initialValue: this.agent.askedEndAt,
-                        icon: Icons.calendar_today,
+                        icon: Icons.insert_invitation,
                         labelText: "Fim do expediente",
                         onChanged: (text){
                           this.askedEndAt = text;
