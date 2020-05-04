@@ -91,7 +91,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       Row(
                         children:<Widget>[
                           Text(
-                            "Novo Pedido",
+                            "${this.readOnly?"":"Novo "}Pedido",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,  
                               fontSize: 30.0

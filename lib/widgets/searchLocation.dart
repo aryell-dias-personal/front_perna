@@ -40,16 +40,17 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
         Component(Component.country, "br")
       ]
     );
-    PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
-    Location location = placesDetailsResponse.result.geometry.location;
-    if(type == 0){
-      await onStartPlaceSelected(location, prediction.description);
-      this.initialController.text = prediction.description;
-    }else{
-      await onEndPlaceSelected(location, prediction.description);
-      this.endControler.text = prediction.description;
+    if(prediction!=null){
+      PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
+      Location location = placesDetailsResponse.result.geometry.location;
+      if(type == 0){
+        await onStartPlaceSelected(location, prediction.description);
+        this.initialController.text = prediction.description;
+      }else{
+        await onEndPlaceSelected(location, prediction.description);
+        this.endControler.text = prediction.description;
+      }
     }
-
   }
 
   @override
@@ -101,7 +102,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   curve: Curves.linear,
                   duration: Duration(milliseconds: 200),
                   child: Container(
-                    child: showSecond? TextField(
+                    child: showSecond || endControler.text != ""? TextField(
                       controller: endControler,
                       decoration:  new InputDecoration(
                         border: InputBorder.none,
@@ -124,22 +125,34 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                     ): SizedBox()
                   )
                 ),
-                FlatButton(
-                  onPressed: (){
-                    setState(() {
-                      this.showSecond = !this.showSecond;
-                    });
-                  },
-                  shape: StadiumBorder(),
-                  color: Colors.transparent,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(showSecond? "Ocultar destino":"Mostrar destino", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)),
-                      SizedBox(width: 2),
-                      Icon(showSecond?Icons.remove:Icons.add, color: Theme.of(context).primaryColor, size: 18)
-                    ],
-                  ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: FlatButton(
+                    onPressed: endControler.text != ""? null: (){
+                      setState(() {
+                        this.showSecond = !this.showSecond;
+                      });
+                    },
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                    color: Colors.transparent,
+                    child:  Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(showSecond || endControler.text != ""? "Ocultar destino":"Mostrar destino", 
+                          style: TextStyle(
+                            color: endControler.text != ""? Colors.grey :Theme.of(context).primaryColor, 
+                            fontSize: 18
+                          )
+                        ),
+                        SizedBox(width: 2),
+                        Icon(showSecond || endControler.text != ""?Icons.remove:Icons.add, 
+                          color: endControler.text != ""? Colors.grey :Theme.of(context).primaryColor, 
+                          size: 18
+                        )
+                      ],
+                    ),
+                  )
                 )
               ]
             ),

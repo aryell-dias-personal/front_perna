@@ -151,7 +151,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   final Function addNewExpedient;
   final Function centralize;
 
-  bool isCollapsed = true;
+  bool isOpen = false;
   double screemWidth, screemHeight;
   AnimationController controller;
 
@@ -184,8 +184,8 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
 
   openSideMenu(){
     setState(() {
-      isCollapsed =! isCollapsed;
-      isCollapsed ? controller.reverse() : controller.forward();
+      isOpen =! isOpen;
+      isOpen ? controller.forward() : controller.reverse();
     });
   }
 
@@ -210,6 +210,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
   }
 
   Future addMarkerWithSearch(location, String description, int type) async {
+    if(this.isOpen) openSideMenu();
     LatLng position = LatLng(location.lat, location.lng);
     BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
       type == 0 ? 'icons/bus_small.png' : 'icons/red-flag_small.png'
@@ -242,88 +243,106 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     });
   }
 
+  FloatingAnimatedButton getFloatingAnimatedButton(){
+    Color color = Colors.white;
+    Widget icon = AnimatedIcon(
+      size: 30, icon: AnimatedIcons.menu_home,
+      color: Theme.of(context).primaryColor,
+      progress: this.controller
+    );
+    String description = "Abrir Menu";
+    Function() onPressed =  this.openSideMenu;
+    if(this.markers.length != 0){
+      color = Colors.greenAccent;
+      if(this.markers.length == 1){
+        icon = Icon(Icons.work, color: Colors.white);
+        description = "Adicionar Expediente";
+        onPressed = this.addNewExpedient;
+      }else{
+        icon = Icon(Icons.scatter_plot, color: Colors.white);
+        description = "Adicionar Pedido";
+        onPressed = this.addNewAsk;
+      }
+    }
+    return FloatingAnimatedButton(
+      heroTag: "2",
+      bottom: 15,
+      color: color,
+      child: icon,
+      description: description,
+      onPressed: onPressed,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     screemHeight = size.height;
     screemWidth = size.width;
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      body: new ConstrainedBox(
-        constraints: new BoxConstraints(
-          maxHeight: screemHeight
-        ),
-        child: Stack(
-          children: <Widget>[
-            menu(context),
-            AnimatedPositioned(
-              duration: Duration(milliseconds: 200),
-              top: 0,
-              bottom: 0,
-              left: !isCollapsed ? screemWidth/2 : 0,
-              right: !isCollapsed ? -screemWidth/2 : 0,
-              child: Material(
-                clipBehavior: Clip.antiAlias,
-                borderRadius: BorderRadius.all(Radius.circular(40)),
-                elevation: 8,
-                child: Stack(
-                  children: <Widget>[
-                    GoogleMap(
-                      onTap: this.onTap,
-                      buildingsEnabled: true,
-                      circles: this.circles, 
-                      mapType: MapType.normal, 
-                      onLongPress: this.putMarker,
-                      polylines: this.polyline,
-                      markers: this.markers.union(this.nextPlaces),
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: false,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(-8.05428, -34.8813),
-                        zoom: 20,
-                      ),
-                      onMapCreated: this.onMapCreated,
-                    ),
-                    SearchLocation(
-                      markers: this.markers,
-                      onStartPlaceSelected: (location, description) async {
-                        await addMarkerWithSearch(location, description, 0);
-                      },
-                      onEndPlaceSelected: (location, description) async {
-                        await addMarkerWithSearch(location, description, 1);
-                      }
-                    ),
-                    FloatingAnimatedButton(
-                      heroTag: "1",
-                      bottom: 15,
-                      color: Colors.white,
-                      icon: AnimatedIcon(
-                        size: 30,
-                        icon: AnimatedIcons.menu_home,
-                        color: Theme.of(context).primaryColor,
-                        progress: this.controller
-                      ),
-                      isCollapsed: this.isCollapsed,
-                      onPressed: this.openSideMenu,
-                    )
-                  ] + (this.points==null || this.points.length <= 1 ? [] : [
-                    FloatingAnimatedButton(
-                      heroTag: "2",
-                      bottom: 90,
-                      color: Theme.of(context).primaryColor,
-                      icon: Icon(
-                        Icons.navigation, size: 30,
-                        color: Colors.white,
-                      ),
-                      isCollapsed: this.isCollapsed,
-                      onPressed: this.navigate,
-                    )
-                  ])
-                )
-              ) 
-            )
-          ],
-        )
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: <Widget>[
+          Stack(
+            children: <Widget>[
+              GoogleMap(
+                onTap: this.onTap,
+                buildingsEnabled: true,
+                circles: this.circles, 
+                mapType: MapType.normal, 
+                onLongPress: (position){
+                  if(this.isOpen) openSideMenu();
+                  this.putMarker(position);
+                },
+                polylines: this.polyline,
+                markers: this.markers.union(this.nextPlaces),
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(-8.05428, -34.8813),
+                  zoom: 20,
+                ),
+                onMapCreated: this.onMapCreated,
+              ),
+              SearchLocation(
+                markers: this.markers,
+                onStartPlaceSelected: (location, description) async {
+                  await addMarkerWithSearch(location, description, 0);
+                },
+                onEndPlaceSelected: (location, description) async {
+                  await addMarkerWithSearch(location, description, 1);
+                }
+              )
+            ]  + (this.points==null || this.points.length <= 1 ? [] : [
+              FloatingAnimatedButton(
+                heroTag: "1",
+                bottom: 90,
+                color: Theme.of(context).primaryColor,
+                child: Icon(
+                  Icons.navigation, size: 30,
+                  color: Colors.white,
+                ),
+                description: "Navegar",
+                onPressed: this.navigate,
+              )
+            ]) + [
+              this.getFloatingAnimatedButton()
+            ]
+          ),
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 200),
+            top: 0,
+            bottom: 0,
+            left: !isOpen ? -screemWidth/1.7 : 0,
+            right: !isOpen ? screemWidth : screemWidth/1.7,
+            child: Material(
+              clipBehavior: Clip.antiAlias,
+              borderRadius: BorderRadius.only(bottomRight: Radius.circular(40), topRight: Radius.circular(40)),
+              elevation: 8,
+              child: menu(context)
+            ) 
+          )
+        ],
       )
     );
   }
@@ -343,6 +362,7 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
       child: Align(
         alignment: Alignment.centerLeft,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             CircleAvatar(
@@ -351,20 +371,10 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
               backgroundImage: NetworkImage(this.photoUrl)
             ),
             SizedBox(height: 5),
-            Text(this.getName(), style: TextStyle(color: Colors.white, fontSize: 22)),
+            Text(this.getName(), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 22)),
             SizedBox(height: 5),
-            Text(this.getEmail(), style: TextStyle(color: Colors.white, fontSize: 11)),
+            Text(this.getEmail(), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 11)),
             SizedBox(height: 20),
-            SideMenuButton(
-              text: "Novo Pedido",
-              onPressed: this.addNewAsk,
-              icon: Icons.scatter_plot,
-            ),
-            SideMenuButton(
-              text: "Novo Expediente",
-              onPressed: this.addNewExpedient,
-              icon: Icons.work,
-            ),
             SideMenuButton(
               text: "Histórico",
               onPressed: (){

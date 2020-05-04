@@ -48,7 +48,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   Set<Polyline> polyline = Set();
   List<LatLng> routeCooords = [];
   List<LatLng> points = [];
-  Completer<GoogleMapController> mapsController = Completer();
+  GoogleMapController mapsController;
   final Geolocator _geolocator = Geolocator();
   GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
@@ -139,7 +139,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     bool enabled = await requestLocation(location);
     if (enabled) {  
       setState(() {
-        this.mapsController.complete(googleMapController);
+        this.mapsController = googleMapController;
         this.polyline.add(Polyline(
           geodesic: true,
           jointType: JointType.round,
@@ -158,8 +158,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   }
 
   void centralizeLatLng(LatLng latLng) async {
-    final GoogleMapController controller = await this.mapsController.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+    this.mapsController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
       target: latLng,
       zoom: 20,
     )));
@@ -167,8 +166,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   void centralize(LocationData locationData) async {
     if(locationData != null){
-      final GoogleMapController controller = await this.mapsController.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      this.mapsController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: LatLng(locationData.latitude, locationData.longitude),
         zoom: 20,
       )));

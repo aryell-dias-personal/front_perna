@@ -173,7 +173,7 @@ class _ExpedientState extends State<ExpedientPage> {
                       Row(
                         children:<Widget>[
                           Text(
-                            "Novo Expediente",
+                            "${this.readOnly?"":"Novo "}Expediente",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,  
                               fontSize: 30.0

@@ -14,9 +14,9 @@ class SideMenuButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children:<Widget>[
-          Text(this.text, style: TextStyle(color: Colors.white, fontSize: 18)),
+          Text(this.text, style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)),
           SizedBox(width: 2),
-          Icon(icon, color: Colors.white, size: 18)
+          Icon(icon, color: Theme.of(context).primaryColor, size: 18)
         ]
       ),
       onPressed: this.onPressed,
