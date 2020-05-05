@@ -35,7 +35,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
 
   _AskedPointPageState({@required this.readOnly, @required this.askedPoint, @required this.clear});
 
-  void onPressed(String email){
+  void _onPressed(String email){
     if(_formKey.currentState.validate()){
       setState(() {
         isLoading = true;
@@ -149,7 +149,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         icon: Icons.insert_invitation,
                         readOnly: this.readOnly,
                         onSubmit: (text){
-                          onPressed(email);
+                          _onPressed(email);
                         },
                         validatorMessage: 'Digite uma hora que deseja desembarcar',
                       ),
@@ -176,11 +176,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Local da partida",
-                          suffixIcon: IconButton(
-                            splashColor: Colors.transparent,
-                            icon:Icon(Icons.pin_drop),
-                            onPressed: (){},
-                          )
+                          suffixIcon: Icon(Icons.pin_drop)
                         ), 
                         validator: (value) {
                           if (value.isEmpty) {
@@ -196,11 +192,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Local da chegada",
-                          suffixIcon: IconButton(
-                            splashColor: Colors.transparent,
-                            icon:Icon(Icons.flag),
-                            onPressed: (){},
-                          )
+                          suffixIcon: Icon(Icons.flag)
                         ), 
                         validator: (value) {
                           if (value.isEmpty) {
@@ -212,7 +204,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       SizedBox(height: 26),
                       RaisedButton(
                         onPressed: this.readOnly? null : (){
-                          onPressed(email);
+                          _onPressed(email);
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,

@@ -1,24 +1,29 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:perna/widgets/AnimatedSideMenu.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
+import 'package:perna/widgets/myGoogleMap.dart';
+import 'package:perna/widgets/reactiveFloatingButton.dart';
 import 'package:perna/widgets/sideMenu.dart';
 import 'package:perna/widgets/searchLocation.dart';
 import 'package:android_intent/android_intent.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 
-class MainWidget extends StatelessWidget {
-  final String photoUrl;
+class MainWidget extends StatefulWidget {
   final String name;
   final String email;
-  final Function logout;
+  final String photoUrl;
+  final Set<Marker> markers;
   final Set<Marker> nextPlaces;
+  final Set<Polyline> polyline;
+  final List<LatLng> points;
+  final Firestore firestore;
+  final Function logout;
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
-  final Set<Polyline> polyline;
-  final List<LatLng> points;
-  final Set<Marker> markers;
   final Function cancelselection;
-  final Set<Circle> circles;
   final Function addNewAsk;
   final Function addNewExpedient;
   final Function centralize;
@@ -26,67 +31,7 @@ class MainWidget extends StatelessWidget {
   const MainWidget({
     Key key, 
     @required this.photoUrl, 
-    @required this.name,
-    @required this.email, 
-    @required this.logout,
-    @required this.onTap,
-    @required this.putMarker,
-    @required this.onMapCreated,
-    @required this.polyline, 
-    @required this.nextPlaces,
-    @required this.markers,
-    this.circles,
-    @required this.cancelselection,
-    @required this.addNewExpedient, 
-    @required this.centralize, 
-    @required this.addNewAsk,
-    @required this.points
-  }) : super(key: key);
-  
-  @override
-  Widget build(BuildContext context) {
-    return _MainWidget(
-      photoUrl: this.photoUrl, 
-      email: this.email, 
-      name: this.name, 
-      logout: this.logout,
-      onTap: this.onTap,
-      putMarker: this.putMarker,
-      onMapCreated: this.onMapCreated,
-      polyline: this.polyline,
-      points: this.points,
-      markers: this.markers,
-      circles: this.circles,
-      centralize: this.centralize,
-      cancelselection: this.cancelselection,
-      addNewExpedient: this.addNewExpedient,
-      addNewAsk: this.addNewAsk,
-      nextPlaces: this.nextPlaces
-    );
-  }
-}
-
-class _MainWidget extends StatefulWidget {
-  final String name;
-  final String email;
-  final Function logout;
-  final String photoUrl;
-  final Set<Marker> nextPlaces;
-  final Function onTap;
-  final Function putMarker;
-  final Function onMapCreated;
-  final Set<Polyline> polyline;
-  final List<LatLng> points;
-  final Set<Marker> markers;
-  final Function cancelselection;
-  final Set<Circle> circles;
-  final Function addNewAsk;
-  final Function addNewExpedient;
-  final Function centralize;
-
-  const _MainWidget({
-    Key key, 
-    @required this.photoUrl, 
+    @required this.firestore, 
     @required this.name,
     @required this.email, 
     @required this.logout,
@@ -95,7 +40,6 @@ class _MainWidget extends StatefulWidget {
     @required this.onMapCreated,
     @required this.polyline, 
     @required this.markers,
-    this.circles,
     @required this.nextPlaces,
     @required this.cancelselection,
     @required this.addNewExpedient, 
@@ -107,6 +51,7 @@ class _MainWidget extends StatefulWidget {
   @override
   _MainWidgetState createState() {
     return _MainWidgetState(
+      firestore: this.firestore,
       photoUrl: this.photoUrl, 
       email: this.email, 
       name: this.name, 
@@ -117,7 +62,6 @@ class _MainWidget extends StatefulWidget {
       polyline: this.polyline,
       points: this.points,
       markers: this.markers,
-      circles: this.circles,
       centralize: this.centralize,
       cancelselection: this.cancelselection,
       addNewExpedient: this.addNewExpedient, 
@@ -127,30 +71,31 @@ class _MainWidget extends StatefulWidget {
   }
 }
 
-class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderStateMixin {
+class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin {
   final String name;
   final String email;
-  final Function logout;
   final String photoUrl;
+  final Set<Polyline> polyline;
+  final Set<Marker> markers;
+  final Set<Marker> nextPlaces;
+  final List<LatLng> points;
+  final Firestore firestore;
+  final Function logout;
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
-  final Set<Polyline> polyline;
-  final List<LatLng> points;
-  final Set<Marker> markers;
-  final Set<Marker> nextPlaces;
-  final Set<Circle> circles;
   final Function cancelselection;
   final Function addNewAsk;
   final Function addNewExpedient;
   final Function centralize;
+  final Geoflutterfire geo = Geoflutterfire();
 
   bool isOpen = false;
-  double screemWidth, screemHeight;
   AnimationController controller;
 
   _MainWidgetState({
     @required this.photoUrl, 
+    @required this.firestore, 
     @required this.name,
     @required this.email, 
     @required this.logout,
@@ -160,7 +105,6 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     @required this.onMapCreated,
     @required this.polyline, 
     @required this.markers,
-    this.circles,
     @required this.cancelselection,
     @required this.addNewExpedient, 
     @required this.centralize, 
@@ -176,15 +120,23 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     });
   }
 
-  openSideMenu(){
+  // void _addGeoPoint(LatLng latLng) {
+  //   GeoFirePoint geoFirePoint = geo.point(latitude: latLng.latitude, longitude: latLng.longitude);
+  //   this.firestore.collection('locations')
+  //       .add({'name': 'random name', 'position': geoFirePoint.data}).then((_) {
+  //     print('added ${geoFirePoint.hash} successfully');
+  //   });
+  // }
+
+  _openSideMenu(){
     setState(() {
       isOpen =! isOpen;
       isOpen ? controller.forward() : controller.reverse();
     });
   }
 
-  navigate(){
-    if(this.isOpen) openSideMenu();
+  _navigate(){
+    if(this.isOpen) _openSideMenu();
     String origin = "${this.points.first.latitude},${this.points.first.longitude}";
     List<LatLng> latLngWayPoints = this.points.sublist(1,this.points.length-1);
     String waypoints = latLngWayPoints.fold<String>("",(String acc, LatLng curr){
@@ -204,8 +156,8 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     intent.launch();
   }
 
-  Future addMarkerWithSearch(location, String description, int type) async {
-    if(this.isOpen) openSideMenu();
+  Future _addMarkerWithSearch(location, String description, int type) async {
+    if(this.isOpen) _openSideMenu();
     LatLng position = LatLng(location.lat, location.lng);
     BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
       type == 0 ? 'icons/bus_small.png' : 'icons/red-flag_small.png'
@@ -238,80 +190,30 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
     });
   }
 
-  FloatingAnimatedButton getFloatingAnimatedButton(){
-    Color color = Colors.white;
-    Widget icon = AnimatedIcon(
-      size: 30, icon: AnimatedIcons.menu_home,
-      color: Theme.of(context).primaryColor,
-      progress: this.controller
-    );
-    String description = "Abrir Menu";
-    Function() onPressed =  this.openSideMenu;
-    if(this.markers.length != 0){
-      color = Colors.greenAccent;
-      if(this.markers.length == 1){
-        icon = Icon(Icons.work, color: Colors.white);
-        description = "Adicionar Expediente";
-        onPressed = this.addNewExpedient;
-      }else{
-        icon = Icon(Icons.scatter_plot, color: Colors.white);
-        description = "Adicionar Pedido";
-        onPressed = this.addNewAsk;
-      }
-    }
-    return FloatingAnimatedButton(
-      heroTag: "2",
-      bottom: 15,
-      color: color,
-      child: icon,
-      description: description,
-      onPressed: onPressed,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    screemHeight = size.height;
-    screemWidth = size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: <Widget>[
           Stack(
             children: <Widget>[
-              GoogleMap(
+              MyGoogleMap(
                 onTap: this.onTap,
-                buildingsEnabled: true,
-                circles: this.circles, 
-                mapType: MapType.normal, 
-                onLongPress: (position){
-                  if(this.isOpen) openSideMenu();
-                  this.putMarker(position);
-                },
-                onCameraMove: (location){
-                  if(this.isOpen) openSideMenu();
-                },
-                polylines: this.polyline,
-                markers: this.markers.union(this.nextPlaces),
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(-8.05428, -34.8813),
-                  zoom: 20,
-                ),
+                polyline:this.polyline,
+                onLongPress: this.putMarker,
                 onMapCreated: this.onMapCreated,
+                markers: this.markers.union(this.nextPlaces),
+                preExecute: (){ if(this.isOpen) _openSideMenu(); },
               ),
               SearchLocation(
-                preExecute: (){
-                  if(this.isOpen) openSideMenu();
-                },
+                preExecute: (){ if(this.isOpen) _openSideMenu(); },
                 markers: this.markers,
                 onStartPlaceSelected: (location, description) async {
-                  await addMarkerWithSearch(location, description, 0);
+                  await _addMarkerWithSearch(location, description, 0);
                 },
                 onEndPlaceSelected: (location, description) async {
-                  await addMarkerWithSearch(location, description, 1);
+                  await _addMarkerWithSearch(location, description, 1);
                 }
               )
             ]  + (this.points==null || this.points.length <= 1 ? [] : [
@@ -324,31 +226,27 @@ class _MainWidgetState extends State<_MainWidget> with SingleTickerProviderState
                   color: Colors.white,
                 ),
                 description: "Navegar",
-                onPressed: this.navigate,
+                onPressed: this._navigate,
               )
             ]) + [
-              this.getFloatingAnimatedButton()
+              ReactiveFloatingButton(
+                controller:this.controller,
+                defaultFunction:this._openSideMenu,
+                length:this.markers.length,
+                addNewExpedient:this.addNewExpedient,
+                addNewAsk:this.addNewAsk
+              )
             ]
           ),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 200),
-            top: 0,
-            bottom: 0,
-            left: !isOpen ? -screemWidth/1.7 : 0,
-            right: !isOpen ? screemWidth : screemWidth/1.7,
-            child: Material(
-              color: Colors.white,
-              clipBehavior: Clip.antiAlias,
-              borderRadius: BorderRadius.only(bottomRight: Radius.circular(30), topRight: Radius.circular(30)),
-              elevation: 8,
-              child: SideMenu(
-                email: this.email, 
-                name: this.name, 
-                logout: this.logout, 
-                photoUrl: this.photoUrl,
-                textColor: Theme.of(context).primaryColor
-              )
-            ) 
+          AnimatedSideMenu(
+            isOpen: this.isOpen,
+            sideMenu: SideMenu(
+              email: this.email, 
+              name: this.name, 
+              logout: this.logout, 
+              photoUrl: this.photoUrl,
+              textColor: Theme.of(context).primaryColor
+            )
           )
         ],
       )

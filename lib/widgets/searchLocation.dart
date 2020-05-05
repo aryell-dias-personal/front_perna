@@ -44,7 +44,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     @required this.preExecute
   });
 
-  void execute(String hint, int type) async {
+  void _execute(String hint, int type) async {
     this.preExecute();
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
@@ -110,7 +110,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   readOnly: true,
                   showCursor: false,
                   onTap: () {
-                    this.execute("Digite o nome do seu local de partida", 0);
+                    this._execute("Digite o nome do seu local de partida", 0);
                   }
                 ),
                 AnimatedSize(
@@ -135,7 +135,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       readOnly: true,
                       showCursor: false,
                       onTap: () {
-                        this.execute("Digite o nome do seu local de destino", 1);
+                        this._execute("Digite o nome do seu local de destino", 1);
                       }
                     ): SizedBox()
                   )

@@ -34,9 +34,9 @@ class SideMenu extends StatelessWidget {
               backgroundImage: NetworkImage(this.photoUrl)
             ),
             SizedBox(height: 10),
-            Text(this.getName(), style: TextStyle(color: this.textColor, fontSize: 22)),
+            Text(this._getName(), style: TextStyle(color: this.textColor, fontSize: 22)),
             SizedBox(height: 5),
-            Text(this.getEmail(), style: TextStyle(color: this.textColor, fontSize: 11)),
+            Text(this._getEmail(), style: TextStyle(color: this.textColor, fontSize: 11)),
             SizedBox(height: 20),
             SideMenuButton(
               textColor: textColor,
@@ -87,12 +87,12 @@ class SideMenu extends StatelessWidget {
   }
 
   
-  String getName(){
+  String _getName(){
     int end = ' '.allMatches(this.name).length >= 1 ? 2: 1;
     return this.name.split(' ').sublist(0, end).join(' ');
   }
 
-  String getEmail(){
+  String _getEmail(){
     return this.email.length > 27 ? this.email.substring(0,24)+"..." : this.email;
   }
 }

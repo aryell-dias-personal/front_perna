@@ -7,6 +7,7 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
+import 'package:perna/widgets/actionButtons.dart';
 import 'package:perna/widgets/formTimePicker.dart';
 import 'package:toast/toast.dart';
 
@@ -41,7 +42,7 @@ class _ExpedientState extends State<ExpedientPage> {
 
   _ExpedientState({@required this.readOnly, @required this.agent, @required this.clear, this.accept, this.deny});
 
-  void askNewAgend(agent) async {
+  void _askNewAgend(agent) async {
     int statusCode = await driverService.askNewAgent(agent);
     if(statusCode == 200){
       Navigator.pop(context);
@@ -63,7 +64,7 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  void onPressed(String email, String fromEmail){
+  void _onPressed(String email, String fromEmail){
     if(_formKey.currentState.validate()){
       setState(() {
         isLoading = true;
@@ -77,7 +78,7 @@ class _ExpedientState extends State<ExpedientPage> {
         places: int.parse(this.places)
       );
       if(fromEmail != email) {
-        this.askNewAgend(agent);
+        this._askNewAgend(agent);
       } else {
         driverService.postNewAgent(agent).then((statusCode){
           if(statusCode==200){
@@ -103,50 +104,23 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  List<Widget> actionButtons(BuildContext context){
+  void _acceptOrDenny(accept){
+    setState(() {
+      isLoading=true; 
+    });
+    (accept? this.accept(): this.deny).then((_){
+      setState(() {
+        isLoading=false;
+      });
+    });
+  }
+
+  List<Widget> _getActionButtons(BuildContext context){
     return this.accept==null || this.deny == null? []: [
       SizedBox(height: 10),
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          RaisedButton(
-            onPressed: (){
-              setState(() {
-                isLoading=true; 
-              });
-              this.accept().then((_){
-                setState(() {
-                  isLoading=false;
-                });
-              });
-            },
-            child: Text("Aceitar", style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-            )),
-            color: Theme.of(context).primaryColor,
-            shape: StadiumBorder()
-          ),
-          RaisedButton(
-            onPressed: (){
-              setState(() {
-                isLoading=true; 
-              });
-              this.deny().then((_){
-                setState(() {
-                  isLoading=false;
-                });
-              });
-            },
-            child: Text("Negar", style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor
-            )),
-            color: Colors.white,
-            shape: StadiumBorder(),
-          )
-        ],
+      ActionButtons(
+        accept: (){ _acceptOrDenny(true); },
+        deny: (){ _acceptOrDenny(false); }
       )
     ];
   }
@@ -188,7 +162,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         readOnly: this.readOnly,
                         initialValue: this.agent.name ?? "",
                         onChanged: (text){
-                            this.name = text;
+                          this.name = text;
                         },
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -293,7 +267,7 @@ class _ExpedientState extends State<ExpedientPage> {
                           return null;
                         },
                         onFieldSubmitted: (text){
-                          onPressed(this.email, fromEmail);
+                          this._onPressed(this.email, fromEmail);
                         },
                       ),
                       SizedBox(height: 26),
@@ -303,11 +277,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: "Garagem",
-                          suffixIcon: IconButton(
-                            splashColor: Colors.transparent,
-                            icon:Icon(Icons.pin_drop),
-                            onPressed: (){},
-                          )
+                          suffixIcon: Icon(Icons.pin_drop)
                         ), 
                         validator: (value) {
                           if (value.isEmpty) {
@@ -317,10 +287,10 @@ class _ExpedientState extends State<ExpedientPage> {
                         }
                       ),
                       SizedBox(height: 26)
-                    ] + ( this.accept != null && this.deny != null && this.readOnly ? this.actionButtons(context) : [
+                    ] + ( this.accept != null && this.deny != null && this.readOnly ? this._getActionButtons(context) : [
                       RaisedButton(
                         onPressed: this.readOnly? null : (){
-                          onPressed(this.email, fromEmail);
+                          this._onPressed(this.email, fromEmail);
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,

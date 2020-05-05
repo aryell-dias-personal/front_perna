@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:perna/constants/constants.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/adkedPointPage.dart';
@@ -64,65 +63,14 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   _MainPageWidgetState({@required this.email, @required this.onLogout, @required this.firestore});
 
-  StreamSubscription<QuerySnapshot> initAgentListener(){
-    return firestore.collection("agent").where('email', isEqualTo: email)
-      .where('processed', isEqualTo: true)
-      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
-      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
-        if(agentSnapshot.documents.isNotEmpty){
-          Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
-          if(agent.route != null){
-            List<LatLng> route = agent.route.map<LatLng>((point)=>point.local).toList();
-            setState(() {
-              this.points.addAll(route);
-            });
-            this.buildRouteCooords(route);
-          }
-        }
-        setState(() {
-          this.isLoadingAgent = false;
-        });
-    });
-  }
-
-  StreamSubscription<QuerySnapshot> initAskedPointListener(){
-    return firestore.collection("askedPoint").where('email', isEqualTo: email)
-      .where('processed', isEqualTo: true)
-      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
-      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
-        if(askedPointSnapshot.documents.isNotEmpty){
-          AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
-          if(askedPoint.origin != null)
-            this.addNextPlace(askedPoint);
-        }
-        setState(() {
-          this.isLoadingAskedPoint = false;
-        });
-    });
-  }
-
-  buildRouteCooords(List<LatLng> points) async {
-    if(points.length >= 2){
-      List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
-        destination: points[1],
-        origin: points.first,
-        mode:  RouteMode.driving
-      );
-      setState(() {
-        this.routeCooords.addAll(coords);
-      });
-      await this.buildRouteCooords(points.sublist(1));
-    }
-  }  
-
   @override
   void initState() {
     super.initState();
     setState(() {
       this.isLoadingAskedPoint = true;
       this.isLoadingAgent = true;
-      this.agentsListener = this.initAgentListener();
-      this.askedPointsListener = this.initAskedPointListener();
+      this.agentsListener = this._initAgentListener();
+      this.askedPointsListener = this._initAskedPointListener();
     });
   }
   
@@ -136,7 +84,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   void onMapCreated(GoogleMapController googleMapController) async {
     Location location = Location();
-    bool enabled = await requestLocation(location);
+    bool enabled = await _requestLocation(location);
     if (enabled) {  
       setState(() {
         this.mapsController = googleMapController;
@@ -173,56 +121,6 @@ class _MainPageWidgetState extends State<MainPageWidget> {
     }
   }
 
-  Future<bool> requestLocation(location) async {
-    bool _serviceEnabled;
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-    }
-    PermissionStatus _permissionGranted;
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.DENIED) {
-      _permissionGranted = await location.requestPermission();
-    }
-    return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
-  }
-
-  void addNextPlace(AskedPoint askedPoint) async {
-    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
-      'icons/bell_small.png'
-    );
-    setState(() {
-      this.nextPlaces.add(Marker(
-        consumeTapEvents: true,
-        infoWindow: InfoWindow(title: "Você terá que estar aqui"),
-        onTap: (){
-          Navigator.push(context, 
-            MaterialPageRoute(
-              builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
-            )
-          );
-        },
-        markerId: MarkerId(askedPoint.origin.toString()),
-        icon: bitmapDescriptor,
-        position: askedPoint.origin
-      ));
-    });
-  }
-
-  String placemarkToString(Placemark placemark){
-    List<String> info = [
-      placemark.administrativeArea, 
-      placemark.subAdministrativeArea, 
-      placemark.subLocality, placemark.thoroughfare, 
-      placemark.subThoroughfare
-    ];
-    String result = info.fold("", (String acc, String curr){
-      if(curr.trim() == "") return acc;
-      return "$acc$curr, ";
-    });
-    return result.substring(0, result.length-2);
-  }
-
   void putMarker(location) async {
     List<Placemark> placeMarkers = await _geolocator.placemarkFromCoordinates(location.latitude, location.longitude);
     Placemark placemark = placeMarkers.first;
@@ -232,7 +130,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
          'icons/${this.markers.length == 0 ? "bus_small.png": "red-flag_small.png"}'
         ),
-        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", snippet: placemarkToString(placemark)),
+        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", snippet: _placemarkToString(placemark)),
         consumeTapEvents: true,
         onTap: (){
           setState(() {
@@ -258,15 +156,6 @@ class _MainPageWidgetState extends State<MainPageWidget> {
         duration: 3
       );
     }
-  }
-
-  List<PopupMenuEntry<MenuOption>> menuBuilder(BuildContext context) {
-    return <PopupMenuEntry<MenuOption>>[
-      const PopupMenuItem<MenuOption>(
-          value: MenuOption.clear, child: Text('Limpar Mapa')),
-      const PopupMenuItem<MenuOption>(
-          value: MenuOption.logout, child: Text('Deslogar'))
-    ];
   }
 
   void addNewAsk() {
@@ -327,6 +216,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       },
       builder: (context, resources) {
         return MainWidget(
+          firestore: this.firestore,
           points: this.points,
           centralize: this.centralizeLatLng,
           nextPlaces: this.nextPlaces,
@@ -350,5 +240,106 @@ class _MainPageWidgetState extends State<MainPageWidget> {
       }
     );
   }
+
+  Future<bool> _requestLocation(location) async {
+    bool _serviceEnabled;
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+    }
+    PermissionStatus _permissionGranted;
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.DENIED) {
+      _permissionGranted = await location.requestPermission();
+    }
+    return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
+  }
+
+  void _addNextPlace(AskedPoint askedPoint) async {
+    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+      'icons/bell_small.png'
+    );
+    setState(() {
+      this.nextPlaces.add(Marker(
+        consumeTapEvents: true,
+        infoWindow: InfoWindow(title: "Você terá que estar aqui"),
+        onTap: (){
+          Navigator.push(context, 
+            MaterialPageRoute(
+              builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
+            )
+          );
+        },
+        markerId: MarkerId(askedPoint.origin.toString()),
+        icon: bitmapDescriptor,
+        position: askedPoint.origin
+      ));
+    });
+  }
+
+  String _placemarkToString(Placemark placemark){
+    List<String> info = [
+      placemark.administrativeArea, 
+      placemark.subAdministrativeArea, 
+      placemark.subLocality, placemark.thoroughfare, 
+      placemark.subThoroughfare
+    ];
+    String result = info.fold("", (String acc, String curr){
+      if(curr.trim() == "") return acc;
+      return "$acc$curr, ";
+    });
+    return result.substring(0, result.length-2);
+  }
+
+  StreamSubscription<QuerySnapshot> _initAgentListener(){
+    return firestore.collection("agent").where('email', isEqualTo: email)
+      .where('processed', isEqualTo: true)
+      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
+      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
+        if(agentSnapshot.documents.isNotEmpty){
+          Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
+          if(agent.route != null){
+            List<LatLng> route = agent.route.map<LatLng>((point)=>point.local).toList();
+            setState(() {
+              this.points.addAll(route);
+            });
+            this._buildRouteCooords(route);
+          }
+        }
+        setState(() {
+          this.isLoadingAgent = false;
+        });
+    });
+  }
+
+  StreamSubscription<QuerySnapshot> _initAskedPointListener(){
+    return firestore.collection("askedPoint").where('email', isEqualTo: email)
+      .where('processed', isEqualTo: true)
+      .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
+      .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
+        if(askedPointSnapshot.documents.isNotEmpty){
+          AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
+          if(askedPoint.origin != null)
+            this._addNextPlace(askedPoint);
+        }
+        setState(() {
+          this.isLoadingAskedPoint = false;
+        });
+    });
+  }
+
+  _buildRouteCooords(List<LatLng> points) async {
+    if(points.length >= 2){
+      List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
+        destination: points[1],
+        origin: points.first,
+        mode:  RouteMode.driving
+      );
+      setState(() {
+        this.routeCooords.addAll(coords);
+      });
+      await this._buildRouteCooords(points.sublist(1));
+    }
+  }  
 
 }
