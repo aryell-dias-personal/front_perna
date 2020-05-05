@@ -28,12 +28,6 @@ class AskedPoint {
     this.agentId
   });
 
-  static bool invalidArgs(LatLng origin, LatLng destiny, String friendlyOrigin, String friendlyDestiny, String name, DateTime askedStartAt, DateTime askedEndAt, String email){
-    return name == null || name == "" || origin == null || destiny == null
-      || friendlyOrigin == null || friendlyOrigin == "" || friendlyDestiny == null || friendlyDestiny == ""  
-      || askedStartAt == null || askedEndAt == null;
-  }
-
   factory AskedPoint.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson == null)
       return null;

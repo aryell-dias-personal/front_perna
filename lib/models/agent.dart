@@ -4,6 +4,7 @@ import 'package:perna/models/point.dart';
 
 class Agent {
   LatLng garage;
+  LatLng position;
   String friendlyGarage;
   List<Point> route;
   int places;
@@ -16,6 +17,7 @@ class Agent {
 
   Agent({
     this.garage, 
+    this.position, 
     this.friendlyGarage, 
     this.places, 
     this.name, 
@@ -27,17 +29,12 @@ class Agent {
     this.askedPointIds
   });
   
-  static bool invalidArgs(LatLng garage, String friendlyGarage, int places, String name, DateTime askedStartAt, DateTime askedEndAt, String email){
-    return email == null || email == "" || garage == null || places == 0
-      || name == null || name == "" || friendlyGarage == null || friendlyGarage == "" 
-      || askedStartAt == null || askedEndAt == null;
-  }
-
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
     if(parsedJson == null)
       return null;
     return Agent(
       garage: decodeLatLng(parsedJson['garage']),
+      position: parsedJson['position']!=null? decodeLatLng(parsedJson['position']): null,
       places: parsedJson['places'],
       friendlyGarage: parsedJson['friendlyGarage'],
       name: parsedJson['name'],
@@ -50,8 +47,9 @@ class Agent {
     );
   }
 
-  Agent copyWith({garage, friendlyGarage, places, name, route, askedStartAt, askedEndAt, email, fromEmail, askedPointIds}) => Agent(
+  Agent copyWith({garage, friendlyGarage, places, name, route, askedStartAt, askedEndAt, email, fromEmail, askedPointIds, position}) => Agent(
     garage: garage ?? this.garage,
+    position: position ?? this.position,
     friendlyGarage: friendlyGarage ?? this.friendlyGarage,
     places: places ?? this.places,
     name: name ?? this.name,
@@ -65,6 +63,7 @@ class Agent {
 
   dynamic toJson() => {
     "garage": "${garage.latitude}, ${garage.longitude}",
+    "position": position!=null?"${position.latitude}, ${position.longitude}":null,
     "places": places,
     "friendlyGarage": friendlyGarage,
     "name": name,
