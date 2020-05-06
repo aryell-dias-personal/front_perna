@@ -16,11 +16,11 @@ class LogAndSignInButton extends StatelessWidget {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 25.0,
-          color: !this.isSignIn? Theme.of(context).primaryColor : Colors.white
+          color: !this.isSignIn? Theme.of(context).primaryColor : Theme.of(context).backgroundColor
         ),
       ),
       onPressed: this.onPressed,
-      color: !this.isSignIn? Color(0xEEFFFFFF): Theme.of(context).primaryColor,
+      color: !this.isSignIn? Theme.of(context).backgroundColor.withOpacity(1): Theme.of(context).primaryColor,
       padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
       shape: StadiumBorder()
     );

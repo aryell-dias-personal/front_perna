@@ -13,7 +13,7 @@ class ReactiveFloatingButton extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    Color color = Colors.white;
+    Color color = Theme.of(context).backgroundColor;
     Widget icon = AnimatedIcon(
       size: 30, icon: AnimatedIcons.menu_home,
       color: Theme.of(context).primaryColor,
@@ -24,11 +24,11 @@ class ReactiveFloatingButton extends StatelessWidget {
     if(this.length != 0){
       color = Colors.greenAccent;
       if(this.length == 1){
-        icon = Icon(Icons.work, color: Colors.white);
+        icon = Icon(Icons.work, color: Theme.of(context).backgroundColor);
         description = "Adicionar Expediente";
         onPressed = this.addNewExpedient;
       }else{
-        icon = Icon(Icons.scatter_plot, color: Colors.white);
+        icon = Icon(Icons.scatter_plot, color: Theme.of(context).backgroundColor);
         description = "Adicionar Pedido";
         onPressed = this.addNewAsk;
       }

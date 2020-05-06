@@ -10,7 +10,7 @@ class NoConnectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: Center(
         child:Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -18,7 +18,7 @@ class NoConnectionPage extends StatelessWidget {
             AvatarGlow(
               endRadius: 90,
               duration: Duration(seconds: 2),
-              glowColor: Colors.white24,
+              glowColor: Colors.grey,
               repeat: true,
               repeatPauseDuration: Duration(seconds: 2),
               startDelay: Duration(seconds: 1),
@@ -26,7 +26,7 @@ class NoConnectionPage extends StatelessWidget {
                   elevation: 8.0,
                   shape: CircleBorder(),
                   child: CircleAvatar(
-                    backgroundColor: Colors.grey[100],
+                    backgroundColor: Theme.of(context).backgroundColor,
                     child: Icon(
                       Icons.signal_wifi_off,
                       size: 60,
@@ -40,14 +40,14 @@ class NoConnectionPage extends StatelessWidget {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
-                  color: Color(0xFFFFFFFF)),
+                  color: Theme.of(context).primaryColor),
             ),
             Text(
               "Se conecta ai...  😢",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
-                  color: Color(0xFFFFFFFF)),
+                  color: Theme.of(context).primaryColor),
             ),
             SizedBox(
               height: 50.0,
@@ -58,10 +58,10 @@ class NoConnectionPage extends StatelessWidget {
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 25.0,
-                    color: Theme.of(context).primaryColor),
+                    color: Theme.of(context).backgroundColor),
               ),
               onPressed: (){AppSettings.openWIFISettings();},
-              color: Colors.white,
+              color: Theme.of(context).primaryColor,
               padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
               shape: StadiumBorder()
             )

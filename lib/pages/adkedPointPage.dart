@@ -209,8 +209,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children:<Widget>[
-                            Text("Adicionar", style: TextStyle(color: Colors.white, fontSize: 18)),
-                            Icon(Icons.add, color: Colors.white, size: 20)
+                            Text("Adicionar", style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
+                            Icon(Icons.add, color: Theme.of(context).backgroundColor, size: 20)
                           ]
                         ),
                         color: Theme.of(context).primaryColor,

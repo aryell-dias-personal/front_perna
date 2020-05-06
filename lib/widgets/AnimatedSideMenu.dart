@@ -19,7 +19,7 @@ class AnimatedSideMenu extends StatelessWidget {
       left: !isOpen ? -screemWidth/1.7 : 0,
       right: !isOpen ? screemWidth : screemWidth/1.7,
       child: Material(
-        color: Colors.white,
+        color: Theme.of(context).backgroundColor,
         clipBehavior: Clip.antiAlias,
         borderRadius: BorderRadius.only(bottomRight: Radius.circular(30), topRight: Radius.circular(30)),
         elevation: 8,

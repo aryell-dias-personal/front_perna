@@ -50,7 +50,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color mainColor = Color(0xFF1c4966);
+    Color mainLightColor = Color(0xFF1c4966);
+    Color mainDarkColor = Color(0xFFb5f8ff);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -63,19 +64,29 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           brightness: Brightness.light,
           textTheme: TextTheme(
-            body1: TextStyle(color: mainColor)
+            body1: TextStyle(color: mainLightColor)
           ),
           iconTheme: IconThemeData(
-            color: mainColor
+            color: mainLightColor
           ),
-          primaryColor: mainColor,
-          accentColor: mainColor.withAlpha(66),
+          primaryColor: mainLightColor,
+          accentColor: mainLightColor.withAlpha(66),
           fontFamily: "ProductSans",
           backgroundColor: Colors.white
         ),
-        // darkTheme: ThemeData(
-        //   brightness: Brightness.dark
-        // ),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          textTheme: TextTheme(
+            body1: TextStyle(color: mainDarkColor)
+          ),
+          iconTheme: IconThemeData(
+            color: mainDarkColor
+          ),
+          primaryColor: mainDarkColor,
+          accentColor: mainDarkColor.withAlpha(66),
+          fontFamily: "ProductSans",
+          backgroundColor: Color(0xFF2b2b2b)
+        ),
       )
     );
   }

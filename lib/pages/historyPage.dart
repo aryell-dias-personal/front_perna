@@ -176,7 +176,7 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         position: TimelineItemPosition.right,
         iconBackground: operation['origin'] != null ? Colors.redAccent : Colors.greenAccent,
-        icon: Icon(operation['origin'] != null ? Icons.add_shopping_cart : Icons.directions_bus, color: Colors.white)
+        icon: Icon(operation['origin'] != null ? Icons.add_shopping_cart : Icons.directions_bus, color: Theme.of(context).backgroundColor)
       );
     }).toList();
   }
@@ -184,7 +184,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: isLoadingAgents || isLoadingAskedPoints || !passedTime ? Center(
         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
       ) : Timeline(

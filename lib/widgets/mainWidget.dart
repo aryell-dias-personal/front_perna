@@ -279,7 +279,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: Stack(
         children: <Widget>[
           Stack(
@@ -309,7 +309,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
                 color: Theme.of(context).primaryColor,
                 child: Icon(
                   Icons.navigation, size: 30,
-                  color: Colors.white,
+                  color: Theme.of(context).backgroundColor,
                 ),
                 description: "Navegar",
                 onPressed: this._navigate,

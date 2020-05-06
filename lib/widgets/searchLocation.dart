@@ -173,7 +173,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
               ]
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).backgroundColor,
               boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: Colors.black38,

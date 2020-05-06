@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:perna/constants/mapsStyle.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/adkedPointPage.dart';
@@ -83,6 +84,7 @@ class _MainPageWidgetState extends State<MainPageWidget> {
   }
 
   void onMapCreated(GoogleMapController googleMapController) async {
+    if(Theme.of(context).brightness == Brightness.dark) await googleMapController.setMapStyle(darkStyle); 
     Location location = Location();
     bool enabled = await _requestLocation(location);
     if (enabled) {  

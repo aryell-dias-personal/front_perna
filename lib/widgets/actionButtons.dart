@@ -17,7 +17,7 @@ class ActionButtons extends StatelessWidget {
           onPressed: this.accept,
           child: Text("Aceitar", style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white
+            color: Theme.of(context).backgroundColor
           )),
           color: Theme.of(context).primaryColor,
           shape: StadiumBorder()
@@ -28,7 +28,7 @@ class ActionButtons extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor
           )),
-          color: Colors.white,
+          color: Theme.of(context).backgroundColor,
           shape: StadiumBorder(),
         )
       ],
