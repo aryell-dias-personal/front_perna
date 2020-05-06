@@ -40,7 +40,7 @@ class MainPageWidget extends StatefulWidget {
   _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, email: email, firestore: firestore);
 }
 
-class _MainPageWidgetState extends State<MainPageWidget> {
+class _MainPageWidgetState extends State<MainPageWidget>{
   Function cancel;
   Set<Marker> nextPlaces = Set();
   LocationData currentLocation;
@@ -204,6 +204,14 @@ class _MainPageWidgetState extends State<MainPageWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if(this.mapsController!=null){
+      final Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
+      if(brightness == Brightness.dark) {
+        this.mapsController.setMapStyle(darkStyle); 
+      } else {
+        this.mapsController.setMapStyle("[]"); 
+      }
+    }
     return StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (store) {
         return {
