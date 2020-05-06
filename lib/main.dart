@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Home(firebaseMessaging: this.firebaseMessaging),
         theme: ThemeData(
+          brightness: Brightness.light,
           textTheme: TextTheme(
             body1: TextStyle(color: mainColor)
           ),
@@ -69,8 +70,12 @@ class MyApp extends StatelessWidget {
           ),
           primaryColor: mainColor,
           accentColor: mainColor.withAlpha(66),
-          fontFamily: "ProductSans"
-        )
+          fontFamily: "ProductSans",
+          backgroundColor: Colors.white
+        ),
+        // darkTheme: ThemeData(
+        //   brightness: Brightness.dark
+        // ),
       )
     );
   }

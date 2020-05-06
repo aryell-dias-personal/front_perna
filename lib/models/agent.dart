@@ -14,6 +14,7 @@ class Agent {
   String email;
   String fromEmail;
   List<String> askedPointIds;
+  bool old;
 
   Agent({
     this.garage, 
@@ -26,6 +27,7 @@ class Agent {
     this.askedEndAt, 
     this.email,
     this.fromEmail,
+    this.old=false,
     this.askedPointIds
   });
   
@@ -34,6 +36,7 @@ class Agent {
       return null;
     return Agent(
       garage: decodeLatLng(parsedJson['garage']),
+      old: parsedJson['old'],
       position: parsedJson['position']!=null? decodeLatLng(parsedJson['position']): null,
       places: parsedJson['places'],
       friendlyGarage: parsedJson['friendlyGarage'],
@@ -58,7 +61,8 @@ class Agent {
     askedEndAt: askedEndAt ?? this.askedEndAt,
     email: email ?? this.email,
     fromEmail: fromEmail ?? this.fromEmail,
-    askedPointIds: askedPointIds ?? this.askedPointIds
+    askedPointIds: askedPointIds ?? this.askedPointIds,
+    old: old ?? this.old
   );
 
   dynamic toJson() => {
@@ -72,6 +76,7 @@ class Agent {
     "askedEndAt": askedEndAt.millisecondsSinceEpoch/1000,
     "email": email,
     "fromEmail": fromEmail,
-    "askedPointIds": askedPointIds
+    "askedPointIds": askedPointIds,
+    "old": old
   };
 }

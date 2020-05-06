@@ -70,7 +70,7 @@ class SideMenu extends StatelessWidget {
                 Toast.show(
                   "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
                   context, backgroundColor: Colors.pinkAccent, duration: 3);
-                // cadastro de cartões de credito de forma segura, talvez uso do GPAY
+                //TODO: cadastro de cartões de credito de forma segura, talvez uso do GPAY
               },
               icon: Icons.credit_card,
             ),

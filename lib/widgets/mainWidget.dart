@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:perna/models/agent.dart';
 import 'package:perna/widgets/AnimatedSideMenu.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/myGoogleMap.dart';
@@ -8,7 +12,7 @@ import 'package:perna/widgets/reactiveFloatingButton.dart';
 import 'package:perna/widgets/sideMenu.dart';
 import 'package:perna/widgets/searchLocation.dart';
 import 'package:android_intent/android_intent.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:toast/toast.dart';
 
 class MainWidget extends StatefulWidget {
   final String name;
@@ -88,9 +92,14 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   final Function addNewAsk;
   final Function addNewExpedient;
   final Function centralize;
-  final Geoflutterfire geo = Geoflutterfire();
 
+  Set<Marker> watchedMarkers = Set();
+  List<String> agentIds = [];
+  LatLng previousLatLng;
   bool isOpen = false;
+  StreamSubscription<QuerySnapshot> watchAgentsSubscription;
+  StreamSubscription<QuerySnapshot> agentIdsSubscription;
+  StreamSubscription<LocationData> sendAgentSubscription;
   AnimationController controller;
 
   _MainWidgetState({
@@ -113,20 +122,97 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   });
 
   @override
+  void dispose() {
+    super.dispose();
+    watchAgentsSubscription.cancel();
+    sendAgentSubscription.cancel();
+    agentIdsSubscription.cancel();
+  }
+
+  @override
   void initState() {
     super.initState();
+    Location location = Location();
     setState(() {
       this.controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
+      agentIdsSubscription = firestore.collection("agent").where('email', isEqualTo: this.email)
+        .where('processed', isEqualTo: true)
+        .where('old', isEqualTo: false)
+        .where('askedStartAt', isLessThan: DateTime.now().millisecondsSinceEpoch/1000)
+        .snapshots().listen((QuerySnapshot agentSnapshot) {
+          setState(() {
+            this.agentIds = agentSnapshot.documents.map<String>((DocumentSnapshot document) {
+              return document.documentID;
+            }).toList();
+          });
+        });
+      sendAgentSubscription = location.onLocationChanged().listen(_updateLocation);
+      watchAgentsSubscription = firestore.collection("agent").where('fromEmail', isEqualTo: email)
+        .where('processed', isEqualTo: true)
+        .where('old', isEqualTo: false)
+        .where('askedStartAt', isLessThan: DateTime.now().millisecondsSinceEpoch/1000)
+        .snapshots().listen((QuerySnapshot agentSnapshot) {
+          _updateMarkers(agentSnapshot.documents);
+        });
     });
   }
 
-  // void _addGeoPoint(LatLng latLng) {
-  //   GeoFirePoint geoFirePoint = geo.point(latitude: latLng.latitude, longitude: latLng.longitude);
-  //   this.firestore.collection('locations')
-  //       .add({'name': 'random name', 'position': geoFirePoint.data}).then((_) {
-  //     print('added ${geoFirePoint.hash} successfully');
-  //   });
-  // }
+  void _addCarMarker(Agent agent) async {
+    MarkerId id = MarkerId(agent.email);
+    Marker _marker = Marker(
+      markerId: id,
+      position: agent.position,
+      consumeTapEvents: true,
+      onTap: (){
+        Toast.show(
+          "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+          context, backgroundColor: Colors.pinkAccent, duration: 3);
+        //TODO: mostrar detalhes sobre a viagem como qual o horario de inicio e fim, qual a rota qual o email do motorista, etc.
+      },
+      icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
+        'icons/car_small.png'
+      ),
+      infoWindow: InfoWindow(title: "Motorista", snippet: agent.email),
+    );
+    setState(() {
+      this.markers.removeWhere((marker)=> marker.markerId == id);
+      watchedMarkers.add(_marker);
+    });
+  }
+
+  double _calculateDistance(LatLng latLng1, LatLng latLng2){
+    int R = 6371000; // metros
+    double x = (latLng2.longitude - latLng1.longitude) * cos((latLng1.latitude + latLng2.latitude) / 2);
+    double y = (latLng2.latitude - latLng1.latitude);
+    double distance = sqrt(x * x + y * y) * R;
+    return distance;
+  }
+
+  void _updateLocation(LocationData locationData) {
+    LatLng currLatLng = LatLng(locationData.latitude, locationData.longitude);
+    if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>200){
+      setState(() {
+        this.previousLatLng = currLatLng;
+      });
+      this.agentIds.forEach((documentID) async {
+        DocumentReference ref = firestore.collection("agent").document(documentID);
+        DocumentSnapshot documentSnapshot = await ref.get();
+        Agent agent = Agent.fromJson(documentSnapshot.data);
+        await ref.updateData({
+          'position': "${locationData.latitude},${locationData.longitude}",
+          'old': DateTime.now().isAfter(agent.askedEndAt)
+        });
+      });
+    }
+  }
+
+  void _updateMarkers(List<DocumentSnapshot> documentList) {
+    if(documentList.length==0) this.watchedMarkers.clear();
+    documentList.forEach((DocumentSnapshot document) {
+      Agent agent = Agent.fromJson(document.data);
+      if(agent.position!=null) _addCarMarker(agent);
+    });
+  }
 
   _openSideMenu(){
     setState(() {
@@ -203,7 +289,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
                 polyline:this.polyline,
                 onLongPress: this.putMarker,
                 onMapCreated: this.onMapCreated,
-                markers: this.markers.union(this.nextPlaces),
+                markers: this.markers.union(this.nextPlaces).union(this.watchedMarkers),
                 preExecute: (){ if(this.isOpen) _openSideMenu(); },
               ),
               SearchLocation(
