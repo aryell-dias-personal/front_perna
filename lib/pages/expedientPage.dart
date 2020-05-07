@@ -1,15 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/models/user.dart';
+import 'package:perna/pages/userProfilePage.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/actionButtons.dart';
 import 'package:perna/widgets/formTimePicker.dart';
 import 'package:toast/toast.dart';
+
+enum ExpedientOptions { aboutDriver, aboutRequester }
 
 class ExpedientPage extends StatefulWidget {
   final Agent agent;
@@ -124,6 +129,34 @@ class _ExpedientState extends State<ExpedientPage> {
       )
     ];
   }
+  
+  void _onSelectedExpedientOptions(Firestore firestore, ExpedientOptions result){
+    setState(() {
+      this.isLoading = true;
+    });
+    String email = result == ExpedientOptions.aboutDriver ? this.agent.email : this.agent.fromEmail;
+    firestore.collection("user").where("email", isEqualTo:email).getDocuments().then((documentSnapshot){
+      User user = User.fromJson(documentSnapshot.documents.first.data);
+      Navigator.push(context, 
+        MaterialPageRoute(
+          builder: (context) => UserProfilePage(user: user)
+        )
+      ).whenComplete((){
+        setState(() {
+          this.isLoading = false;
+        });
+      });
+    }).catchError((error){
+      setState(() {
+        this.isLoading = false;
+      });
+      Toast.show(
+        "Não foi possivel encontrar o usuário especificado", context, 
+        backgroundColor: Colors.redAccent, 
+        duration: 3
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +178,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Row(
+                        mainAxisSize: MainAxisSize.max,
                         children:<Widget>[
                           Text(
                             "${this.readOnly?"":"Novo "}Expediente",
@@ -154,8 +188,27 @@ class _ExpedientState extends State<ExpedientPage> {
                             )
                           ),
                           SizedBox(width: 5),
-                          Icon(Icons.work, size: 30)
-                        ],
+                          Icon(Icons.work, size: 30),
+                        ] + (this.readOnly ? [
+                          SizedBox(width: 123.7),
+                          StoreConnector<StoreState, Firestore>(
+                            converter: (store)=>store.state.firestore, 
+                            builder: (context, firestore) => PopupMenuButton<ExpedientOptions>(
+                              tooltip: "Mostrar menu",
+                              onSelected: (ExpedientOptions result) => this._onSelectedExpedientOptions(firestore, result),
+                              itemBuilder: (BuildContext context) => <PopupMenuEntry<ExpedientOptions>>[
+                                PopupMenuItem<ExpedientOptions>(
+                                  value: ExpedientOptions.aboutDriver,
+                                  child: Text('Sobre o motorista')
+                                ),
+                                this.agent.fromEmail != null ? PopupMenuItem<ExpedientOptions>(
+                                  value: ExpedientOptions.aboutRequester,
+                                  child: Text('Sobre o requisitante')
+                                ): null
+                              ],
+                            )
+                          )
+                        ]: [])
                       ),
                       SizedBox(height: 26),
                       TextFormField(
@@ -212,7 +265,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: "Email do requisitor",
+                          labelText: "Email do requisitante",
                           suffixIcon: Icon(Icons.email)
                         ),
                       ),
@@ -278,13 +331,7 @@ class _ExpedientState extends State<ExpedientPage> {
                           border: OutlineInputBorder(),
                           labelText: "Garagem",
                           suffixIcon: Icon(Icons.pin_drop)
-                        ), 
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Digite uma local para sua garagem';
-                          }
-                          return null;
-                        }
+                        )
                       ),
                       SizedBox(height: 26)
                     ] + ( this.accept != null && this.deny != null && this.readOnly ? this._getActionButtons(context) : [
