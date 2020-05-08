@@ -14,6 +14,7 @@ class Agent {
   String email;
   String fromEmail;
   List<String> askedPointIds;
+  List<String> watchedBy;
   bool old;
 
   Agent({
@@ -28,7 +29,8 @@ class Agent {
     this.email,
     this.fromEmail,
     this.old=false,
-    this.askedPointIds
+    this.askedPointIds,
+    this.watchedBy=const[]
   });
   
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
@@ -46,6 +48,7 @@ class Agent {
       askedEndAt: DateTime.fromMillisecondsSinceEpoch(parsedJson['askedEndAt'].round()*1000),
       email: parsedJson['email'],
       fromEmail: parsedJson['fromEmail'],
+      watchedBy: parsedJson["watchedBy"]!=null?parsedJson["watchedBy"].map<String>((email)=>"$email").toList():null,
       askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null
     );
   }
@@ -62,6 +65,7 @@ class Agent {
     email: email ?? this.email,
     fromEmail: fromEmail ?? this.fromEmail,
     askedPointIds: askedPointIds ?? this.askedPointIds,
+    watchedBy: watchedBy ?? this.watchedBy,
     old: old ?? this.old
   );
 
@@ -77,6 +81,7 @@ class Agent {
     "email": email,
     "fromEmail": fromEmail,
     "askedPointIds": askedPointIds,
+    "watchedBy": watchedBy,
     "old": old
   };
 }

@@ -14,6 +14,8 @@ import 'package:perna/widgets/searchLocation.dart';
 import 'package:android_intent/android_intent.dart';
 import 'package:toast/toast.dart';
 
+enum ClientType { Provider, Client }
+
 class MainWidget extends StatefulWidget {
   final String name;
   final String email;
@@ -138,30 +140,43 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
       agentIdsSubscription = firestore.collection("agent").where('email', isEqualTo: this.email)
         .where('processed', isEqualTo: true)
         .where('old', isEqualTo: false)
-        .where('askedStartAt', isLessThan: DateTime.now().millisecondsSinceEpoch/1000)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
+          DateTime now = DateTime.now();
           setState(() {
-            this.agentIds = agentSnapshot.documents.map<String>((DocumentSnapshot document) {
-              return document.documentID;
-            }).toList();
+            this.agentIds = agentSnapshot.documents.fold(<String>[], (List<String> acc, DocumentSnapshot document) {
+              Agent agent = Agent.fromJson(document.data);
+              if(agent.askedStartAt.isBefore(now)){
+                acc.add(document.documentID);
+              }
+              return acc;
+            });
           });
         });
       sendAgentSubscription = location.onLocationChanged().listen(_updateLocation);
-      watchAgentsSubscription = firestore.collection("agent").where('fromEmail', isEqualTo: email)
-        .where('processed', isEqualTo: true)
-        .where('old', isEqualTo: false)
-        .where('askedStartAt', isLessThan: DateTime.now().millisecondsSinceEpoch/1000)
+      watchAgentsSubscription = firestore.collection("agent")
+        .where('watchedBy', arrayContains:email)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
-          _updateMarkers(agentSnapshot.documents);
+          DateTime now = DateTime.now();
+          List<Agent> agents =  agentSnapshot.documents.fold(<Agent>[], (List<Agent> acc, DocumentSnapshot document) {
+            Agent agent = Agent.fromJson(document.data);
+            if(agent.askedStartAt.isBefore(now)){
+              if(agent.position!=null) _addAgentMarker(agent);
+              acc.add(agent);
+            }
+            return acc;
+          });
+          setState(() {
+            if(agents.length==0) this.watchedMarkers.clear();
+          });
         });
     });
   }
 
-  void _addCarMarker(Agent agent) async {
-    MarkerId id = MarkerId(agent.email);
-    Marker _marker = Marker(
+  Future<Marker> _buildCarMarker(String title, LatLng position) async {
+    MarkerId id = MarkerId(title);
+    Marker marker = Marker(
       markerId: id,
-      position: agent.position,
+      position: position,
       consumeTapEvents: true,
       onTap: (){
         Toast.show(
@@ -171,11 +186,15 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
       },
       icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
         'icons/car_small.png'
-      ),
-      infoWindow: InfoWindow(title: "Motorista", snippet: agent.email),
+      )
     );
+    return marker;
+  }
+
+  void _addAgentMarker(Agent agent) async {
+    Marker _marker = await _buildCarMarker(agent.email, agent.position);
     setState(() {
-      this.markers.removeWhere((marker)=> marker.markerId == id);
+      this.markers.removeWhere((marker)=> marker.markerId == _marker.markerId);
       watchedMarkers.add(_marker);
     });
   }
@@ -204,14 +223,6 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
         });
       });
     }
-  }
-
-  void _updateMarkers(List<DocumentSnapshot> documentList) {
-    if(documentList.length==0) this.watchedMarkers.clear();
-    documentList.forEach((DocumentSnapshot document) {
-      Agent agent = Agent.fromJson(document.data);
-      if(agent.position!=null) _addCarMarker(agent);
-    });
   }
 
   _openSideMenu(){

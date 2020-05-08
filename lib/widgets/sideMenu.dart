@@ -76,6 +76,17 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
+              text: "Tema",
+              onPressed: (){
+                Toast.show(
+                  "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                  context, backgroundColor: Colors.pinkAccent, duration: 3);
+                //TODO: Seleção se o tema deve acompanhar a tema do sistema ser light ou dark
+              },
+              icon: Icons.palette,
+            ),
+            SideMenuButton(
+              textColor: textColor,
               text: "Deslogar",
               onPressed: this.logout,
               icon: Icons.exit_to_app,
