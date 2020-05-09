@@ -46,7 +46,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
   LocationData currentLocation;
   Set<Marker> markers = Set();
   Set<Polyline> polyline = Set();
-  List<LatLng> routeCooords = [];
+  List<LatLng> routeCoords = [];
   List<LatLng> points = [];
   GoogleMapController mapsController;
   final Geolocator _geolocator = Geolocator();
@@ -83,6 +83,28 @@ class _MainPageWidgetState extends State<MainPageWidget>{
     askedPointsListener.cancel();
   }
 
+  Future showInfoWindow(MarkerId markerId) async {
+    if(await this.mapsController.isMarkerInfoWindowShown(markerId)) 
+      return await this.mapsController.hideMarkerInfoWindow(markerId);
+    return await this.mapsController.showMarkerInfoWindow(markerId);
+  }
+
+  addPolyline(List<LatLng> points, String name) async {
+    await this._buildRouteCoords(points);
+    PolylineId polylineId = PolylineId(name);
+    this.polyline.removeWhere((Polyline polyline)=>polyline.polylineId==polylineId);
+    this.polyline.add(
+      Polyline(
+        geodesic: true,
+        jointType: JointType.round,
+        polylineId: polylineId, visible: false,
+        points: routeCoords.length >1 ? routeCoords: routeCoords, 
+        width: 6, color: Colors.amber,
+        startCap: Cap.roundCap, endCap: Cap.buttCap
+      )
+    );
+  }
+
   void onMapCreated(GoogleMapController googleMapController) async {
     if(Theme.of(context).brightness == Brightness.dark) await googleMapController.setMapStyle(darkStyle); 
     Location location = Location();
@@ -90,13 +112,6 @@ class _MainPageWidgetState extends State<MainPageWidget>{
     if (enabled) {  
       setState(() {
         this.mapsController = googleMapController;
-        this.polyline.add(Polyline(
-          geodesic: true,
-          jointType: JointType.round,
-          polylineId: PolylineId(routeCooords.toString()), visible: true,
-          points: routeCooords.length >1 ? routeCooords: routeCooords, width: 6, color: Theme.of(context).primaryColor,
-          startCap: Cap.roundCap, endCap: Cap.buttCap
-        ));
         this.cancel = location.onLocationChanged().listen((LocationData currentLocation) {
           setState(() {
             this.currentLocation = currentLocation;
@@ -204,14 +219,9 @@ class _MainPageWidgetState extends State<MainPageWidget>{
 
   @override
   Widget build(BuildContext context) {
-    if(this.mapsController!=null){
-      final Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
-      if(brightness == Brightness.dark) {
-        this.mapsController.setMapStyle(darkStyle); 
-      } else {
-        this.mapsController.setMapStyle("[]"); 
-      }
-    }
+    _refreshMap().catchError((error){
+      print(error);
+    });
     return StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (store) {
         return {
@@ -227,6 +237,8 @@ class _MainPageWidgetState extends State<MainPageWidget>{
       builder: (context, resources) {
         return MainWidget(
           firestore: this.firestore,
+          addPolyline: this.addPolyline,
+          showInfoWindow: this.showInfoWindow,
           points: this.points,
           centralize: this.centralizeLatLng,
           nextPlaces: this.nextPlaces,
@@ -249,6 +261,29 @@ class _MainPageWidgetState extends State<MainPageWidget>{
         );
       }
     );
+  }
+
+  Future _refreshMap() async {
+    PolylineId polylineId = PolylineId("MyRoute");
+    Function(Polyline) findFunction = (Polyline polyline)=>polyline.polylineId==polylineId;
+    if(this.mapsController!=null){
+      final Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
+      if(brightness == Brightness.dark) {
+        await this.mapsController.setMapStyle(darkStyle); 
+      } else {
+        await this.mapsController.setMapStyle("[]"); 
+      }
+    }
+    if(this.polyline.isNotEmpty){
+      Polyline oldPolyline = this.polyline.firstWhere(findFunction);
+      if(oldPolyline!=null && oldPolyline.color != Theme.of(context).primaryColor){
+        Polyline newPolyline= oldPolyline.copyWith(
+          colorParam: Theme.of(context).primaryColor
+        );
+        this.polyline.remove(oldPolyline);
+        this.polyline.add(newPolyline);
+      }
+    }
   }
 
   Future<bool> _requestLocation(location) async {
@@ -309,11 +344,11 @@ class _MainPageWidgetState extends State<MainPageWidget>{
         if(agentSnapshot.documents.isNotEmpty){
           Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
           if(agent.route != null){
-            List<LatLng> route = agent.route.map<LatLng>((point)=>point.local).toList();
+            List<LatLng> points = agent.route.map<LatLng>((point)=>point.local).toList();
             setState(() {
-              this.points.addAll(route);
+              this.points.addAll(points);
             });
-            this._buildRouteCooords(route);
+            _addMyRoutePolyline(points);
           }
         }
         setState(() {
@@ -338,7 +373,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
     });
   }
 
-  _buildRouteCooords(List<LatLng> points) async {
+  _buildRouteCoords(List<LatLng> points) async {
     if(points.length >= 2){
       List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
         destination: points[1],
@@ -346,10 +381,26 @@ class _MainPageWidgetState extends State<MainPageWidget>{
         mode:  RouteMode.driving
       );
       setState(() {
-        this.routeCooords.addAll(coords);
+        this.routeCoords.addAll(coords);
       });
-      await this._buildRouteCooords(points.sublist(1));
+      await this._buildRouteCoords(points.sublist(1));
     }
   }  
+
+  _addMyRoutePolyline(List<LatLng> points) async {
+    await this._buildRouteCoords(points);
+    PolylineId polylineId = PolylineId("MyRoute");
+    this.polyline.removeWhere((Polyline polyline)=>polyline.polylineId==polylineId);
+    this.polyline.add(
+      Polyline(
+        geodesic: true,
+        jointType: JointType.round,
+        polylineId: polylineId, visible: true,
+        points: routeCoords.length >1 ? routeCoords: routeCoords, 
+        width: 6, color: Theme.of(context).primaryColor,
+        startCap: Cap.roundCap, endCap: Cap.buttCap
+      )
+    );
+  }
 
 }

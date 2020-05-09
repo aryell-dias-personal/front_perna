@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/models/point.dart';
+import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/widgets/AnimatedSideMenu.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/myGoogleMap.dart';
@@ -12,7 +14,6 @@ import 'package:perna/widgets/reactiveFloatingButton.dart';
 import 'package:perna/widgets/sideMenu.dart';
 import 'package:perna/widgets/searchLocation.dart';
 import 'package:android_intent/android_intent.dart';
-import 'package:toast/toast.dart';
 
 enum ClientType { Provider, Client }
 
@@ -33,15 +34,19 @@ class MainWidget extends StatefulWidget {
   final Function addNewAsk;
   final Function addNewExpedient;
   final Function centralize;
+  final Function(List<LatLng>, String) addPolyline;
+  final Future Function(MarkerId) showInfoWindow;
 
   const MainWidget({
     Key key, 
     @required this.photoUrl, 
+    @required this.addPolyline, 
+    @required this.showInfoWindow, 
     @required this.firestore, 
     @required this.name,
     @required this.email, 
     @required this.logout,
-    @required this.onTap,
+    @required this.onTap, 
     @required this.putMarker,
     @required this.onMapCreated,
     @required this.polyline, 
@@ -57,6 +62,8 @@ class MainWidget extends StatefulWidget {
   @override
   _MainWidgetState createState() {
     return _MainWidgetState(
+      addPolyline: this.addPolyline,
+      showInfoWindow: this.showInfoWindow,
       firestore: this.firestore,
       photoUrl: this.photoUrl, 
       email: this.email, 
@@ -94,9 +101,12 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   final Function addNewAsk;
   final Function addNewExpedient;
   final Function centralize;
+  final Function(List<LatLng>, String) addPolyline;
+  final Future Function(MarkerId) showInfoWindow;
 
   Set<Marker> watchedMarkers = Set();
   List<String> agentIds = [];
+  Map<String, List<LatLng>> pointsPerRoute = {};
   LatLng previousLatLng;
   bool isOpen = false;
   StreamSubscription<QuerySnapshot> watchAgentsSubscription;
@@ -106,6 +116,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
 
   _MainWidgetState({
     @required this.photoUrl, 
+    @required this.addPolyline, 
     @required this.firestore, 
     @required this.name,
     @required this.email, 
@@ -120,7 +131,8 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     @required this.addNewExpedient, 
     @required this.centralize, 
     @required this.addNewAsk,
-    @required this.points
+    @required this.points,
+    @required this.showInfoWindow
   });
 
   @override
@@ -161,6 +173,11 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
             Agent agent = Agent.fromJson(document.data);
             if(agent.askedStartAt.isBefore(now)){
               if(agent.position!=null) _addAgentMarker(agent);
+              List<LatLng> points = agent.route.fold(<LatLng>[], (List<LatLng> acc, Point curr)=>acc+[curr.local]);
+              if(!_pointsPerRouteContains(points, email)){
+                this.pointsPerRoute[email] = points;
+                this.addPolyline(points, email);
+              }
               acc.add(agent);
             }
             return acc;
@@ -172,17 +189,38 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     });
   }
 
-  Future<Marker> _buildCarMarker(String title, LatLng position) async {
-    MarkerId id = MarkerId(title);
+  bool _pointsPerRouteContains(List<LatLng> points, String email){
+    if(!this.pointsPerRoute.containsKey(email)) return false;
+    List<LatLng> previousPoints = this.pointsPerRoute[email];
+    return previousPoints.toString() == points.toString();
+  }
+
+  Future<Marker> _buildCarMarker(Agent agent) async {
+    MarkerId id = MarkerId(email);
     Marker marker = Marker(
       markerId: id,
-      position: position,
+      position: agent.position,
       consumeTapEvents: true,
-      onTap: (){
-        Toast.show(
-          "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
-          context, backgroundColor: Colors.pinkAccent, duration: 3);
-        //TODO: mostrar detalhes sobre a viagem como qual o horario de inicio e fim, qual a rota qual o email do motorista, etc.
+      infoWindow: InfoWindow(
+        title: "Motorista", 
+        snippet: agent.email,
+        onTap: (){
+          Navigator.push(context, MaterialPageRoute(
+              builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){})
+            )
+          );
+        }
+      ),
+      onTap: () async {
+        await this.showInfoWindow(id);
+        Function(Polyline) findPolyline = (polyline)=>polyline.polylineId.value==email;
+        if(this.polyline.isNotEmpty){
+          Polyline oldPolyline = this.polyline.firstWhere(findPolyline);
+          setState(() {
+            this.polyline.removeWhere(findPolyline);
+            this.polyline.add(oldPolyline.copyWith(visibleParam: !oldPolyline.visible));
+          });
+        }
       },
       icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
         'icons/car_small.png'
@@ -192,7 +230,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   }
 
   void _addAgentMarker(Agent agent) async {
-    Marker _marker = await _buildCarMarker(agent.email, agent.position);
+    Marker _marker = await _buildCarMarker(agent);
     setState(() {
       this.markers.removeWhere((marker)=> marker.markerId == _marker.markerId);
       watchedMarkers.add(_marker);
@@ -209,7 +247,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
 
   void _updateLocation(LocationData locationData) {
     LatLng currLatLng = LatLng(locationData.latitude, locationData.longitude);
-    if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>200){
+    if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>500){
       setState(() {
         this.previousLatLng = currLatLng;
       });
