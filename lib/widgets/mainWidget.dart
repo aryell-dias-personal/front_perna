@@ -247,7 +247,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
 
   void _updateLocation(LocationData locationData) {
     LatLng currLatLng = LatLng(locationData.latitude, locationData.longitude);
-    if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>500){
+    if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>1000){
       setState(() {
         this.previousLatLng = currLatLng;
       });
