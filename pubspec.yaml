@@ -36,6 +36,8 @@ dependencies:
   flutter_google_places: ^0.2.4
   android_intent: ^0.3.7+1
   flutter_rating_bar: ^3.0.1+1
+  firebase_auth: ^0.16.0
+
 
 dev_dependencies:
   flutter_test:

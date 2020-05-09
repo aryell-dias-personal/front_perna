@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
@@ -7,7 +8,8 @@ import 'package:perna/models/user.dart';
 
 class SignInService {
   GoogleSignIn googleSignIn;
-  SignInService({this.googleSignIn});
+  FirebaseAuth firebaseAuth;
+  SignInService({this.googleSignIn, this.firebaseAuth});
   final encoder = JsonEncoder();
   final decoder = JsonDecoder();
 
@@ -23,8 +25,15 @@ class SignInService {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
       SignInResponse signInResponse = await this.getUser(user, messagingToken);
-      if (signInResponse != null)
+      if (signInResponse != null){
+        GoogleSignInAuthentication googleAuth = await user.authentication;
+        AuthCredential credential = GoogleAuthProvider.getCredential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        await firebaseAuth.signInWithCredential(credential);
         return signInResponse;
+      }
     }
     return await this.logOut();
   }

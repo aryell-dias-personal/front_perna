@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,18 +44,21 @@ Future onMessage(Map<String, dynamic> message) async {
 
 class Home extends StatefulWidget {
   final FirebaseMessaging firebaseMessaging;
+  final FirebaseAuth firebaseAuth;
 
-  Home({@required this.firebaseMessaging, Key key}) : super(key: key);
+  Home({@required this.firebaseMessaging, @required this.firebaseAuth, Key key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState(firebaseMessaging: this.firebaseMessaging);
+  _HomeState createState() => _HomeState(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth);
 }
 
 class _HomeState extends State<Home> {
   final FirebaseMessaging firebaseMessaging;
-  final SignInService signInService = new SignInService(googleSignIn: googleSignIn);
+  final FirebaseAuth firebaseAuth;
   final DriverService driverService = DriverService();
+
   bool isConnected = true;
+  SignInService signInService;
 
   Future askNewAgentHandler(Map<String, dynamic> message) async {
     NavigatorState navigatorState = Navigator.of(context);
@@ -130,7 +134,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    
+    setState(() {
+      this.signInService = new SignInService(googleSignIn: googleSignIn, firebaseAuth: this.firebaseAuth);
+    });
+
     AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
     InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
@@ -158,7 +165,7 @@ class _HomeState extends State<Home> {
 
   }
 
-  _HomeState({@required this.firebaseMessaging});
+  _HomeState({@required this.firebaseMessaging, @required this.firebaseAuth});
 
   @override
   Widget build(BuildContext context) {

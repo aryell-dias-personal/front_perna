@@ -10,6 +10,7 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,19 +35,21 @@ void main() async {
     )
   );
   final Firestore firestore = Firestore(app: app);
+  final FirebaseAuth firebaseAuth = FirebaseAuth.fromApp(app);
 
   final store = new Store<StoreState>(
     reduce, initialState: initialState.copyWith(firestore: firestore, messagingToken: messagingToken),
     middleware: [persistor.createMiddleware()]
   );
-  runApp(new MyApp(store: store, firebaseMessaging: firebaseMessaging));
+  runApp(new MyApp(store: store, firebaseAuth: firebaseAuth, firebaseMessaging: firebaseMessaging));
 }
 
 class MyApp extends StatelessWidget {
   final Store<StoreState> store;
   final FirebaseMessaging firebaseMessaging;
+  final FirebaseAuth firebaseAuth;
 
-  MyApp({@required this.store, @required this.firebaseMessaging});
+  MyApp({@required this.store, @required this.firebaseMessaging, @required this.firebaseAuth});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +63,7 @@ class MyApp extends StatelessWidget {
       store: store,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Home(firebaseMessaging: this.firebaseMessaging),
+        home: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth),
         theme: ThemeData(
           brightness: Brightness.light,
           textTheme: TextTheme(
