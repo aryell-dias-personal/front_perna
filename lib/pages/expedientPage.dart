@@ -90,7 +90,7 @@ class _ExpedientState extends State<ExpedientPage> {
             Navigator.pop(context);
             this.clear();
             Toast.show(
-              "O pedido foi adicionado com sucesso", context, 
+              "O expediente foi adicionado com sucesso", context, 
               backgroundColor: Colors.greenAccent, 
               duration: 3
             );
@@ -99,7 +99,7 @@ class _ExpedientState extends State<ExpedientPage> {
               isLoading = false;
             });
             Toast.show(
-              "Não foi possivel adicionar o pedido", context, 
+              "Não foi possivel adicionar o expediente", context, 
               backgroundColor: Colors.redAccent, 
               duration: 3
             );
