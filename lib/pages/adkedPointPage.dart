@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -17,18 +18,20 @@ enum AskedPointOptions { aboutExpedient }
 
 class AskedPointPage extends StatefulWidget {
   final AskedPoint askedPoint;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final bool readOnly;
   final Function() clear;
 
-  const AskedPointPage({Key key, @required this.askedPoint, @required this.readOnly, @required this.clear}) : super(key: key);
+  const AskedPointPage({Key key, @required this.askedPoint, @required this.readOnly, @required this.clear, this.getRefreshToken}) : super(key: key);
 
   @override
-  _AskedPointPageState createState() => _AskedPointPageState(askedPoint: this.askedPoint, readOnly: this.readOnly, clear: this.clear);
+  _AskedPointPageState createState() => _AskedPointPageState(askedPoint: this.askedPoint, readOnly: this.readOnly, clear: this.clear, getRefreshToken: this.getRefreshToken);
 }
 
 class _AskedPointPageState extends State<AskedPointPage> {
   final _formKey = GlobalKey<FormState>();
   final AskedPoint askedPoint;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final bool readOnly;
   final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
   final UserService userService = new UserService();
@@ -38,39 +41,39 @@ class _AskedPointPageState extends State<AskedPointPage> {
   String askedStartAt;
   final Function() clear;
 
-  _AskedPointPageState({@required this.readOnly, @required this.askedPoint, @required this.clear});
+  _AskedPointPageState({@required this.readOnly, @required this.askedPoint, @required this.clear, this.getRefreshToken});
 
-  void _onPressed(String email){
+  void _onPressed(String email) async {
     if(_formKey.currentState.validate()){
       setState(() {
         isLoading = true;
       });
-      userService.postNewAskedPoint(askedPoint.copyWith(
+      IdTokenResult idTokenResult = await this.getRefreshToken();
+      AskedPoint newAskedPoint =  this.askedPoint.copyWith(
         askedEndAt: format.parse(askedEndAt),
         askedStartAt: format.parse(askedStartAt),
         name: this.name,
         email: email
-        )
-      ).then((statusCode){
-        if(statusCode==200){
-          Navigator.pop(context);
-          this.clear();
-          Toast.show(
-            "O pedido foi adicionado com sucesso", context, 
-            backgroundColor: Colors.greenAccent, 
-            duration: 3
-          );
-        }else{
-          setState(() {
-            isLoading = false;
-          });
-          Toast.show(
-            "Não foi possivel adicionar o pedido", context, 
-            backgroundColor: Colors.redAccent, 
-            duration: 3
-          );
-        }
-      });
+      );
+      int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
+      if(statusCode==200){
+        Navigator.pop(context);
+        this.clear();
+        Toast.show(
+          "O pedido foi adicionado com sucesso", context, 
+          backgroundColor: Colors.greenAccent, 
+          duration: 3
+        );
+      }else{
+        setState(() {
+          isLoading = false;
+        });
+        Toast.show(
+          "Não foi possivel adicionar o pedido", context, 
+          backgroundColor: Colors.redAccent, 
+          duration: 3
+        );
+      }
     }
   }
 

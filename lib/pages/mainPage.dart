@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -16,31 +17,18 @@ import 'package:location/location.dart';
 import 'dart:async';
 import 'package:toast/toast.dart';
 
-class MainPage extends StatelessWidget {
-
+class MainPage extends StatefulWidget {
   final String email;
   final Function onLogout;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final Firestore firestore;
-  MainPage({@required this.email, @required this.onLogout, @required this.firestore});
+  MainPage({@required this.email, @required this.onLogout, @required this.getRefreshToken, @required this.firestore, Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MainPageWidget(onLogout: onLogout, email: email, firestore: firestore);
-  }
+  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, getRefreshToken: this.getRefreshToken, email: email, firestore: firestore);
 }
 
-class MainPageWidget extends StatefulWidget {
-
-  final String email;
-  final Function onLogout;
-  final Firestore firestore;
-  MainPageWidget({@required this.email, @required this.onLogout, @required this.firestore, Key key}) : super(key: key);
-
-  @override
-  _MainPageWidgetState createState() => _MainPageWidgetState(onLogout: this.onLogout, email: email, firestore: firestore);
-}
-
-class _MainPageWidgetState extends State<MainPageWidget>{
+class _MainPageWidgetState extends State<MainPage>{
   Function cancel;
   Set<Marker> nextPlaces = Set();
   LocationData currentLocation;
@@ -54,6 +42,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
 
   final String email;
   final Function onLogout;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final Firestore firestore;
 
   StreamSubscription<QuerySnapshot> agentsListener;
@@ -62,7 +51,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
   StreamSubscription<QuerySnapshot> askedPointsListener;
   bool isLoadingAskedPoint = false;
 
-  _MainPageWidgetState({@required this.email, @required this.onLogout, @required this.firestore});
+  _MainPageWidgetState({@required this.email, @required this.onLogout,  @required this.getRefreshToken, @required this.firestore});
 
   @override
   void initState() {
@@ -185,7 +174,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
       );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear)
+          builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
         )
       );
     } else {
@@ -205,7 +194,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
       );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear)
+          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
         )
       );
     } else {
@@ -236,6 +225,7 @@ class _MainPageWidgetState extends State<MainPageWidget>{
       },
       builder: (context, resources) {
         return MainWidget(
+          getRefreshToken: this.getRefreshToken,
           firestore: this.firestore,
           addPolyline: this.addPolyline,
           showInfoWindow: this.showInfoWindow,

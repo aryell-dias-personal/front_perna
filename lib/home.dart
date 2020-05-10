@@ -65,7 +65,8 @@ class _HomeState extends State<Home> {
     Agent agent = Agent.fromJson(JsonDecoder().convert(message['data']['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
-        builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){},
+        builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
+          getRefreshToken: this.signInService.getRefreshToken,
           accept: () async { await answerNewAgentHandler(agent, true); },
           deny: () async { await answerNewAgentHandler(agent, false); }
         )
@@ -75,7 +76,8 @@ class _HomeState extends State<Home> {
 
   Future answerNewAgentHandler(Agent agent, bool accepted) async {
     if(accepted){
-      int statusCodeNewAgent = await driverService.postNewAgent(agent);
+      IdTokenResult idTokenResult =  await this.signInService.getRefreshToken();
+      int statusCodeNewAgent = await driverService.postNewAgent(agent, idTokenResult.token);
       if(statusCodeNewAgent !=200){
         Toast.show(
           "Não foi possivel aceitar o pedido de ${agent.fromEmail} no momento", context, 
@@ -183,7 +185,7 @@ class _HomeState extends State<Home> {
         if(resources['logedIn'] == null || !resources['logedIn']){
           return InitialPage(signInService: signInService, messagingToken: resources['messagingToken']);
         } else {
-          return MainPage(onLogout: signInService.logOut, email: resources['email'], firestore: resources['firestore']);
+          return MainPage(getRefreshToken: signInService.getRefreshToken, onLogout: signInService.logOut, email: resources['email'], firestore: resources['firestore']);
         }
       }
     );

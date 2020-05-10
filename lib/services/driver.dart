@@ -6,8 +6,14 @@ import 'package:perna/models/agent.dart';
 class DriverService {
   final encoder = JsonEncoder();
 
-  Future<int> postNewAgent(Agent agent) async {
-    Response res = await post("${baseUrl}insertAgent", body: encoder.convert(agent.toJson()));
+  Future<int> postNewAgent(Agent agent, String token) async {
+    Response res = await post(
+      "${baseUrl}insertAgent", 
+      body: encoder.convert(agent.toJson()),
+      headers: {
+        'Authorization': token
+      }
+    );
     return res.statusCode;
   }
 

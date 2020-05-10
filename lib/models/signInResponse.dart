@@ -18,6 +18,12 @@ class SignInResponse{
     );
   }
 
+  SignInResponse copyWith({message, user, error}) => SignInResponse(
+    message: message ?? this.message, 
+    user: user ?? this.user, 
+    error: error ?? this.error
+  );
+
   dynamic toJson() => {
     "message": message,
     "user": user.toJson(),

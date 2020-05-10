@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -27,6 +28,7 @@ class MainWidget extends StatefulWidget {
   final List<LatLng> points;
   final Firestore firestore;
   final Function logout;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
@@ -40,6 +42,7 @@ class MainWidget extends StatefulWidget {
   const MainWidget({
     Key key, 
     @required this.photoUrl, 
+    @required this.getRefreshToken,
     @required this.addPolyline, 
     @required this.showInfoWindow, 
     @required this.firestore, 
@@ -62,6 +65,7 @@ class MainWidget extends StatefulWidget {
   @override
   _MainWidgetState createState() {
     return _MainWidgetState(
+      getRefreshToken: this.getRefreshToken,
       addPolyline: this.addPolyline,
       showInfoWindow: this.showInfoWindow,
       firestore: this.firestore,
@@ -97,6 +101,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   final Function onTap;
   final Function putMarker;
   final Function onMapCreated;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final Function cancelselection;
   final Function addNewAsk;
   final Function addNewExpedient;
@@ -119,6 +124,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     @required this.addPolyline, 
     @required this.firestore, 
     @required this.name,
+    @required this.getRefreshToken,
     @required this.email, 
     @required this.logout,
     @required this.onTap,

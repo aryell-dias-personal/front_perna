@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -18,20 +19,22 @@ enum ExpedientOptions { aboutDriver, aboutRequester }
 
 class ExpedientPage extends StatefulWidget {
   final Agent agent;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final bool readOnly;
   final Function() clear;
   final Function() accept;
   final Function() deny;
 
-  const ExpedientPage({Key key, @required this.agent, @required this.readOnly, @required this.clear, this.accept, this.deny}) : super(key: key);
+  const ExpedientPage({Key key, @required this.agent, @required this.readOnly, @required this.clear, this.getRefreshToken, this.accept, this.deny}) : super(key: key);
 
   @override
-  _ExpedientState createState() => _ExpedientState(agent: this.agent, readOnly: this.readOnly, clear: this.clear, accept: this.accept, deny: this.deny);
+  _ExpedientState createState() => _ExpedientState(agent: this.agent, readOnly: this.readOnly, clear: this.clear, getRefreshToken: this.getRefreshToken, accept: this.accept, deny: this.deny);
 }
 
 class _ExpedientState extends State<ExpedientPage> {
   final _formKey = GlobalKey<FormState>();
   final Agent agent;
+  final Future<IdTokenResult> Function() getRefreshToken;
   final bool readOnly;
   final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
   final DriverService driverService = new DriverService();
@@ -45,7 +48,7 @@ class _ExpedientState extends State<ExpedientPage> {
   String askedEndAt;
   String askedStartAt;
 
-  _ExpedientState({@required this.readOnly, @required this.agent, @required this.clear, this.accept, this.deny});
+  _ExpedientState({@required this.readOnly, @required this.agent, @required this.clear, this.getRefreshToken, this.accept, this.deny});
 
   void _askNewAgend(agent) async {
     int statusCode = await driverService.askNewAgent(agent);
@@ -69,7 +72,7 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  void _onPressed(String email, String fromEmail){
+  void _onPressed(String email, String fromEmail) async {
     if(_formKey.currentState.validate()){
       setState(() {
         isLoading = true;
@@ -85,26 +88,26 @@ class _ExpedientState extends State<ExpedientPage> {
       if(fromEmail != email) {
         this._askNewAgend(agent);
       } else {
-        driverService.postNewAgent(agent).then((statusCode){
-          if(statusCode==200){
-            Navigator.pop(context);
-            this.clear();
-            Toast.show(
-              "O expediente foi adicionado com sucesso", context, 
-              backgroundColor: Colors.greenAccent, 
-              duration: 3
-            );
-          }else{
-            setState(() {
-              isLoading = false;
-            });
-            Toast.show(
-              "Não foi possivel adicionar o expediente", context, 
-              backgroundColor: Colors.redAccent, 
-              duration: 3
-            );
-          }
-        });
+        IdTokenResult idTokenResult = await this.getRefreshToken();
+        int statusCode = await driverService.postNewAgent(agent, idTokenResult.token);
+        if(statusCode==200){
+          Navigator.pop(context);
+          this.clear();
+          Toast.show(
+            "O expediente foi adicionado com sucesso", context, 
+            backgroundColor: Colors.greenAccent, 
+            duration: 3
+          );
+        }else{
+          setState(() {
+            isLoading = false;
+          });
+          Toast.show(
+            "Não foi possivel adicionar o expediente", context, 
+            backgroundColor: Colors.redAccent, 
+            duration: 3
+          );
+        }
       }
     }
   }

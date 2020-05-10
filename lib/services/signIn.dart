@@ -13,10 +13,16 @@ class SignInService {
   final encoder = JsonEncoder();
   final decoder = JsonDecoder();
 
+  Future<IdTokenResult> getRefreshToken() async {
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    IdTokenResult idTokenResult = await firebaseUser.getIdToken(refresh: true);
+    return idTokenResult;
+  }
+
   Future<SignInResponse> logOut({dynamic user, String messagingToken}) async {
     await this.googleSignIn.signOut();
     if(user!=null){
-      await logoutService(user, messagingToken);
+      await _logoutService(user, messagingToken);
     }
     return null;
   }
@@ -24,14 +30,9 @@ class SignInService {
   Future<SignInResponse> logIn(String messagingToken) async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
-      SignInResponse signInResponse = await this.getUser(user, messagingToken);
-      if (signInResponse != null){
-        GoogleSignInAuthentication googleAuth = await user.authentication;
-        AuthCredential credential = GoogleAuthProvider.getCredential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        await firebaseAuth.signInWithCredential(credential);
+      SignInResponse signInResponse = await this._getUser(user, messagingToken);
+      if (signInResponse != null){ 
+        await _authFirebase(user);
         return signInResponse;
       }
     }
@@ -41,14 +42,16 @@ class SignInService {
   Future<SignInResponse> signIn(String messagingToken) async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
-      SignInResponse signInResponse = await this.creatUser(user, messagingToken, true);
-      if (signInResponse != null)
+      SignInResponse signInResponse = await this._creatUser(user, messagingToken, true);
+      if (signInResponse != null){
+        await _authFirebase(user);
         return signInResponse;
+      }
     }
     return await this.logOut();
   }
 
-  Future<SignInResponse> creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
+  Future<SignInResponse> _creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
     final body = encoder.convert({
       'email': user?.email,
       'isProvider': isProvider,
@@ -60,7 +63,7 @@ class SignInService {
     return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
   }
 
-  Future<SignInResponse> getUser(GoogleSignInAccount user, String messagingToken) async {
+  Future<SignInResponse> _getUser(GoogleSignInAccount user, String messagingToken) async {
     final body = encoder.convert({
       'email': user?.email,
       'messagingToken': messagingToken
@@ -69,12 +72,21 @@ class SignInService {
     return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
   }
 
-  Future<SignInResponse> logoutService(User user, String messagingToken) async {
+  Future<SignInResponse> _logoutService(User user, String messagingToken) async {
     final body = encoder.convert({
       'email': user?.email,
       'messagingToken': messagingToken
     });
     Response res = await post("${baseUrl}logout", body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(json.decode(res.body)) : null;
+  }
+
+  Future _authFirebase(GoogleSignInAccount user) async {
+    GoogleSignInAuthentication googleAuth = await user.authentication;
+    AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await firebaseAuth.signInWithCredential(credential);
   }
 }
