@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_map_polyline/google_map_polyline.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/constants/mapsStyle.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/adkedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
+import 'package:perna/services/directions.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/mainWidget.dart';
@@ -37,8 +38,8 @@ class _MainPageWidgetState extends State<MainPage>{
   List<LatLng> routeCoords = [];
   List<LatLng> points = [];
   GoogleMapController mapsController;
+  DirectionsService directionsService = DirectionsService();
   final Geolocator _geolocator = Geolocator();
-  GoogleMapPolyline googleMapPolyline = new GoogleMapPolyline(apiKey: "AIzaSyA0c4Mw7rRAiJxiTQwu6eJcoroBeWWa06w");
 
   final String email;
   final Function onLogout;
@@ -128,15 +129,20 @@ class _MainPageWidgetState extends State<MainPage>{
   }
 
   void putMarker(location) async {
-    List<Placemark> placeMarkers = await _geolocator.placemarkFromCoordinates(location.latitude, location.longitude);
-    Placemark placemark = placeMarkers.first;
+    // isso aqui é muito lento 👇
+    // List<Placemark> placeMarkers = await _geolocator.placemarkFromCoordinates(location.latitude, location.longitude);
+    // Placemark placemark = placeMarkers.first;
     if(markers.length< 2){
       Marker marker = Marker(
         markerId: MarkerId(location.toString()),
         icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
          'icons/${this.markers.length == 0 ? "bus_small.png": "red-flag_small.png"}'
         ),
-        infoWindow: InfoWindow(title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", snippet: _placemarkToString(placemark)),
+        infoWindow: InfoWindow(
+          title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", 
+          snippet: "lat: ${location.latitude}, long: ${location.longitude}"
+          // snippet: _placemarkToString(placemark)
+        ),
         consumeTapEvents: true,
         onTap: (){
           setState(() {
@@ -365,15 +371,12 @@ class _MainPageWidgetState extends State<MainPage>{
 
   _buildRouteCoords(List<LatLng> points) async {
     if(points.length >= 2){
-      List<LatLng> coords = await googleMapPolyline.getCoordinatesWithLocation(
-        destination: points[1],
-        origin: points.first,
-        mode:  RouteMode.driving
-      );
-      setState(() {
-        this.routeCoords.addAll(coords);
-      });
-      await this._buildRouteCoords(points.sublist(1));
+      List<LatLng> coords = await directionsService.getRouteBetweenCoordinates(apiKey, points);
+      if (coords.isNotEmpty) {
+        setState(() {
+          this.routeCoords.addAll(coords);
+        });
+      }
     }
   }  
 
