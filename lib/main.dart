@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/home.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ void main() async {
     name: 'perna-app',
     options: const FirebaseOptions(
       googleAppID: '1:172739913177:android:38f4c6eb4f67cb674b25c8',
-      apiKey: 'AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ',
+      apiKey: apiKey,
       projectID: 'perna-app',
       gcmSenderID: '172739913177'
     )

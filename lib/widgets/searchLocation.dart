@@ -4,6 +4,7 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:perna/constants/constants.dart';
 
 class SearchLocation extends StatefulWidget {
   final Function() preExecute;
@@ -35,7 +36,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
 
-  GoogleMapsPlaces _places = new GoogleMapsPlaces(apiKey:"AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ");
+  GoogleMapsPlaces _places = new GoogleMapsPlaces(apiKey: apiKey);
 
   _SearchLocationState({
     @required this.onStartPlaceSelected, 
@@ -48,7 +49,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     this.preExecute();
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
-      apiKey: "AIzaSyB8vF6jy-hpVosJ_LwwczTJTN55TimCEfQ",
+      apiKey: apiKey,
       mode: Mode.overlay,
       hint: hint,
       overlayBorderRadius: BorderRadius.all(Radius.circular(15.0)),
