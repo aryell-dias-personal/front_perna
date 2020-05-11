@@ -127,32 +127,52 @@ class _MainPageWidgetState extends State<MainPage>{
     }
   }
 
+  void onTapMarker(location) async {
+    bool isFirst = false;
+    setState(() {
+      this.markers.removeWhere((marker){
+        bool found = marker.markerId.value == location.toString();
+        if(found) isFirst = isFirst || this.markers.first.markerId == marker.markerId;
+        return found;
+      });
+    });
+    if(this.markers.length == 1 && isFirst){
+      BitmapDescriptor startBitmapDescriptor = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5), 
+        'icons/bus_small.png'
+      );
+      Marker newMarker = this.markers.first.copyWith(
+        iconParam: startBitmapDescriptor,
+        infoWindowParam: this.markers.first.infoWindow.copyWith(
+          titleParam: "Partida ou garagem"
+        )
+      );
+      setState(() {
+        this.markers.clear();
+        this.markers.add(newMarker);
+      });
+    }
+  }
+
   void putMarker(location) async {
     Coordinates coordinates = new Coordinates(location.latitude, location.longitude);
     List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     String snippet = addresses.isNotEmpty?addresses.first.addressLine: "lat: ${location.latitude}, long: ${location.longitude}";
     if(markers.length< 2){
+      bool isStart = this.markers.length == 0;
       Marker marker = Marker(
         markerId: MarkerId(location.toString()),
-        icon: await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 
-         'icons/${this.markers.length == 0 ? "bus_small.png": "red-flag_small.png"}'
+        icon: await BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(devicePixelRatio: 2.5), 
+         'icons/${isStart ? "bus_small.png": "red-flag_small.png"}'
         ),
         infoWindow: InfoWindow(
-          title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", 
+          title: isStart ? "Partida ou garagem": "Chegada", 
           snippet: snippet
         ),
         consumeTapEvents: true,
-        onTap: (){
-          setState(() {
-            this.markers.removeWhere((marker){
-              return marker.markerId.value == location.toString();
-            });
-            if(this.markers.length == 1){
-              LatLng postion = this.markers.first.position;
-              this.markers.clear();
-              putMarker(postion);
-            }
-          });
+        onTap: () {
+          onTapMarker(location);
         }, 
         position: location
       );
