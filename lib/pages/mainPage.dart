@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/constants/mapsStyle.dart';
@@ -39,7 +39,6 @@ class _MainPageWidgetState extends State<MainPage>{
   List<LatLng> points = [];
   GoogleMapController mapsController;
   DirectionsService directionsService = DirectionsService();
-  final Geolocator _geolocator = Geolocator();
 
   final String email;
   final Function onLogout;
@@ -129,9 +128,9 @@ class _MainPageWidgetState extends State<MainPage>{
   }
 
   void putMarker(location) async {
-    // isso aqui é muito lento 👇
-    // List<Placemark> placeMarkers = await _geolocator.placemarkFromCoordinates(location.latitude, location.longitude);
-    // Placemark placemark = placeMarkers.first;
+    Coordinates coordinates = new Coordinates(location.latitude, location.longitude);
+    List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    String snippet = addresses.isNotEmpty?addresses.first.addressLine: "lat: ${location.latitude}, long: ${location.longitude}";
     if(markers.length< 2){
       Marker marker = Marker(
         markerId: MarkerId(location.toString()),
@@ -140,8 +139,7 @@ class _MainPageWidgetState extends State<MainPage>{
         ),
         infoWindow: InfoWindow(
           title: this.markers.length == 0 ? "Partida ou garagem": "Chegada", 
-          snippet: "lat: ${location.latitude}, long: ${location.longitude}"
-          // snippet: _placemarkToString(placemark)
+          snippet: snippet
         ),
         consumeTapEvents: true,
         onTap: (){
@@ -316,20 +314,6 @@ class _MainPageWidgetState extends State<MainPage>{
         position: askedPoint.origin
       ));
     });
-  }
-
-  String _placemarkToString(Placemark placemark){
-    List<String> info = [
-      placemark.administrativeArea, 
-      placemark.subAdministrativeArea, 
-      placemark.subLocality, placemark.thoroughfare, 
-      placemark.subThoroughfare
-    ];
-    String result = info.fold("", (String acc, String curr){
-      if(curr.trim() == "") return acc;
-      return "$acc$curr, ";
-    });
-    return result.substring(0, result.length-2);
   }
 
   StreamSubscription<QuerySnapshot> _initAgentListener(){
