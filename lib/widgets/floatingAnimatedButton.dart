@@ -13,22 +13,20 @@ class FloatingAnimatedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 15, bottom: this.bottom, right: 15),
-      child: AnimatedAlign(
-        duration: Duration(milliseconds: 200),
-        alignment: Alignment.bottomRight,
-        child: Container(
-          child: FloatingActionButton(
-            heroTag: heroTag,
-            backgroundColor: color,
-            child: child,
-            tooltip: this.description,
-            onPressed: onPressed,
-          ),
-          padding: const EdgeInsets.all(1.0)
-        )
-      ),
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 200),
+      bottom: this.bottom, 
+      right: 15,
+      child: Container(
+        child: FloatingActionButton(
+          heroTag: heroTag,
+          backgroundColor: color,
+          child: child,
+          tooltip: this.description,
+          onPressed: onPressed,
+        ),
+        padding: const EdgeInsets.all(1.0)
+      )
     );
   }
 }

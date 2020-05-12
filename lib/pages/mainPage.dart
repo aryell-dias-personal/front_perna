@@ -72,12 +72,6 @@ class _MainPageWidgetState extends State<MainPage>{
     askedPointsListener.cancel();
   }
 
-  Future showInfoWindow(MarkerId markerId) async {
-    if(await this.mapsController.isMarkerInfoWindowShown(markerId)) 
-      return await this.mapsController.hideMarkerInfoWindow(markerId);
-    return await this.mapsController.showMarkerInfoWindow(markerId);
-  }
-
   addPolyline(List<LatLng> points, String name) async {
     await this._buildRouteCoords(points);
     PolylineId polylineId = PolylineId(name);
@@ -252,7 +246,6 @@ class _MainPageWidgetState extends State<MainPage>{
           getRefreshToken: this.getRefreshToken,
           firestore: this.firestore,
           addPolyline: this.addPolyline,
-          showInfoWindow: this.showInfoWindow,
           points: this.points,
           centralize: this.centralizeLatLng,
           nextPlaces: this.nextPlaces,
@@ -392,7 +385,7 @@ class _MainPageWidgetState extends State<MainPage>{
       Polyline(
         geodesic: true,
         jointType: JointType.round,
-        polylineId: polylineId, visible: true,
+        polylineId: polylineId, visible: false,
         points: routeCoords.length >1 ? routeCoords: routeCoords, 
         width: 6, color: Theme.of(context).primaryColor,
         startCap: Cap.roundCap, endCap: Cap.buttCap

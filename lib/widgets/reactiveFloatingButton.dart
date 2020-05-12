@@ -6,10 +6,11 @@ class ReactiveFloatingButton extends StatelessWidget {
   final AnimationController controller;
   final Function() defaultFunction;
   final int length;
+  final double bottom;
   final Function() addNewExpedient;
   final Function() addNewAsk;
 
-  const ReactiveFloatingButton({Key key, this.controller, this.defaultFunction, this.length, this.addNewExpedient, this.addNewAsk}) : super(key: key);
+  const ReactiveFloatingButton({Key key, this.controller, this.defaultFunction, this.length, this.addNewExpedient, this.addNewAsk, this.bottom}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class ReactiveFloatingButton extends StatelessWidget {
     }
     return FloatingAnimatedButton(
       heroTag: "2",
-      bottom: 15,
+      bottom: this.bottom,
       color: color,
       child: icon,
       description: description,

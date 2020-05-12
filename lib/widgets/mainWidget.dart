@@ -11,6 +11,7 @@ import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/widgets/AnimatedSideMenu.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/myGoogleMap.dart';
+import 'package:perna/widgets/pinInfo.dart';
 import 'package:perna/widgets/reactiveFloatingButton.dart';
 import 'package:perna/widgets/sideMenu.dart';
 import 'package:perna/widgets/searchLocation.dart';
@@ -37,14 +38,12 @@ class MainWidget extends StatefulWidget {
   final Function addNewExpedient;
   final Function centralize;
   final Function(List<LatLng>, String) addPolyline;
-  final Future Function(MarkerId) showInfoWindow;
 
   const MainWidget({
     Key key, 
     @required this.photoUrl, 
     @required this.getRefreshToken,
     @required this.addPolyline, 
-    @required this.showInfoWindow, 
     @required this.firestore, 
     @required this.name,
     @required this.email, 
@@ -67,7 +66,6 @@ class MainWidget extends StatefulWidget {
     return _MainWidgetState(
       getRefreshToken: this.getRefreshToken,
       addPolyline: this.addPolyline,
-      showInfoWindow: this.showInfoWindow,
       firestore: this.firestore,
       photoUrl: this.photoUrl, 
       email: this.email, 
@@ -107,13 +105,14 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   final Function addNewExpedient;
   final Function centralize;
   final Function(List<LatLng>, String) addPolyline;
-  final Future Function(MarkerId) showInfoWindow;
 
   Set<Marker> watchedMarkers = Set();
   List<String> agentIds = [];
   Map<String, List<LatLng>> pointsPerRoute = {};
   LatLng previousLatLng;
   bool isOpen = false;
+  bool isPinVisible = false;
+  Agent visiblePin;
   StreamSubscription<QuerySnapshot> watchAgentsSubscription;
   StreamSubscription<QuerySnapshot> agentIdsSubscription;
   StreamSubscription<LocationData> sendAgentSubscription;
@@ -138,7 +137,6 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     @required this.centralize, 
     @required this.addNewAsk,
     @required this.points,
-    @required this.showInfoWindow
   });
 
   @override
@@ -218,10 +216,15 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
         }
       ),
       onTap: () async {
-        await this.showInfoWindow(id);
         Function(Polyline) findPolyline = (polyline)=>polyline.polylineId.value==email;
         if(this.polyline.isNotEmpty){
           Polyline oldPolyline = this.polyline.firstWhere(findPolyline);
+          this.setState((){
+            if(this.visiblePin == null || this.visiblePin == agent) {
+              this.isPinVisible = !oldPolyline.visible;
+            }
+            this.visiblePin = agent;
+          });
           setState(() {
             this.polyline.removeWhere(findPolyline);
             this.polyline.add(oldPolyline.copyWith(visibleParam: !oldPolyline.visible));
@@ -360,7 +363,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
             ]  + (this.points==null || this.points.length <= 1 ? [] : [
               FloatingAnimatedButton(
                 heroTag: "1",
-                bottom: 90,
+                bottom: this.isPinVisible? 190 : 90,
                 color: Theme.of(context).primaryColor,
                 child: Icon(
                   Icons.navigation, size: 30,
@@ -371,6 +374,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
               )
             ]) + [
               ReactiveFloatingButton(
+                bottom: this.isPinVisible? 115 : 15,
                 controller:this.controller,
                 defaultFunction:this._openSideMenu,
                 length:this.markers.length,
@@ -378,6 +382,10 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
                 addNewAsk:this.addNewAsk
               )
             ]
+          ),
+          PinInfo(
+            visible: this.isPinVisible,
+            agent: this.visiblePin
           ),
           AnimatedSideMenu(
             isOpen: this.isOpen,
