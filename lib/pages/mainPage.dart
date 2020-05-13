@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:random_color/random_color.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/constants/mapsStyle.dart';
@@ -79,10 +80,11 @@ class _MainPageWidgetState extends State<MainPage>{
     this.polyline.add(
       Polyline(
         geodesic: true,
+        zIndex: 1,
         jointType: JointType.round,
         polylineId: polylineId, visible: false,
         points: routeCoords.length >1 ? routeCoords: routeCoords, 
-        width: 6, color: Colors.amber,
+        width: 6, color: RandomColor().randomColor(),
         startCap: Cap.roundCap, endCap: Cap.buttCap
       )
     );
@@ -385,7 +387,8 @@ class _MainPageWidgetState extends State<MainPage>{
       Polyline(
         geodesic: true,
         jointType: JointType.round,
-        polylineId: polylineId, visible: false,
+        zIndex: 0,
+        polylineId: polylineId, visible: true,
         points: routeCoords.length >1 ? routeCoords: routeCoords, 
         width: 6, color: Theme.of(context).primaryColor,
         startCap: Cap.roundCap, endCap: Cap.buttCap
