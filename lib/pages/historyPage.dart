@@ -131,7 +131,7 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAskedPoint(AskedPoint askedPoint) {
     return <Widget>[
       SizedBox(height: 20),
-      Text("PEDIDO", style: Theme.of(context).textTheme.body1),
+      Text("PEDIDO", style: Theme.of(context).textTheme.bodyText2),
       TitledValueWidget(title: "Nome", value: askedPoint.name ?? "NO_NAME"),
       TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.askedStartAt.toString())),
       TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.askedEndAt.toString())),
@@ -144,7 +144,7 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAgent(Agent agent) {
     return <Widget>[
       SizedBox(height: 20),
-      Text("EXPEDIENTE", style: Theme.of(context).textTheme.body1),
+      Text("EXPEDIENTE", style: Theme.of(context).textTheme.bodyText2),
       TitledValueWidget(title: "Nome", value: agent.name),
       TitledValueWidget(title: "Inicio do Expediente", value: parseData(agent.askedStartAt.toString())),
       TitledValueWidget(title: "Fim do Expediente", value: parseData(agent.askedEndAt.toString())),

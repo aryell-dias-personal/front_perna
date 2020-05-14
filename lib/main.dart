@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           brightness: Brightness.light,
           textTheme: TextTheme(
-            body1: TextStyle(color: mainLightColor)
+            bodyText2: TextStyle(color: mainLightColor)
           ),
           iconTheme: IconThemeData(
             color: mainLightColor
@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData(
           brightness: Brightness.dark,
           textTheme: TextTheme(
-            body1: TextStyle(color: mainDarkColor)
+            bodyText2: TextStyle(color: mainDarkColor)
           ),
           iconTheme: IconThemeData(
             color: mainDarkColor

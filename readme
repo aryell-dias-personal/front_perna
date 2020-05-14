@@ -1,1 +1,12 @@
-icons from https://www.flaticon.com/free-icon
+Algumas observações:
+
+1. Não esquece que os icones são do https://www.flaticon.com/free-icon.
+2. uses unchecked or unsafe operations warnings durante a compilação são causados pelo uso de 
+
+List myList = new ArrayList();
+
+ao invés de
+
+List<String> myList = new ArrayList<String>();
+
+no Java.

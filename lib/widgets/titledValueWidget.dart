@@ -18,7 +18,7 @@ class TitledValueWidget extends StatelessWidget {
     return !this._isEmptyValue() ? RichText(
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
-        style: TextStyle(color: Theme.of(context).textTheme.body1.color, fontFamily: "ProductSans"),
+        style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color, fontFamily: "ProductSans"),
         children:  <TextSpan>[
           TextSpan(text: "$title:", style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold) ),
           TextSpan(text: " $value", style: TextStyle(fontSize: valueSize)),
