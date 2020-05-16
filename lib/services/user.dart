@@ -7,7 +7,6 @@ import 'package:perna/models/askedPoint.dart';
 class UserService {
   final encoder = JsonEncoder();
   Future<int> postNewAskedPoint(AskedPoint askedPoint, String token) async {
-    print(token);
     Response res = await post(
       "${baseUrl}insertAskedPoint", 
       body: encoder.convert(askedPoint.toJson()),

@@ -30,7 +30,6 @@ GoogleSignIn googleSignIn = GoogleSignIn(
 Future onMessage(Map<String, dynamic> message) async {
   JsonEncoder enc = JsonEncoder();
   Random rand = Random();
-  print("on message $message");
   AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
     updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
   );
@@ -115,7 +114,6 @@ class _HomeState extends State<Home> {
     );
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, null);
-    print("notificação marcada para: $date");
     await flutterLocalNotificationsPlugin.schedule(
       rand.nextInt(1000), "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
       payload: 'remember', androidAllowWhileIdle: true
@@ -124,7 +122,6 @@ class _HomeState extends State<Home> {
   
   Future onLaunch(Map<String, dynamic> message) async {
     if(message.keys.contains("data")){
-      print("data: ${message['data']}");
       if(message['data']['time'] != null && message['data']['type'] != null){
         await scheduleMessage(message);
       } else if(message['data']['agent'] != null){
