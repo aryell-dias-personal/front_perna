@@ -7,7 +7,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/constants/mapsStyle.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
-import 'package:perna/pages/adkedPointPage.dart';
+import 'package:perna/pages/askedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/services/directions.dart';
 import 'package:perna/store/actions.dart';

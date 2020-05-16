@@ -6,7 +6,7 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
-import 'package:perna/pages/adkedPointPage.dart';
+import 'package:perna/pages/askedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 import 'package:timeline_list/timeline.dart';
