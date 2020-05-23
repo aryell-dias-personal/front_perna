@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:172739913177:android:38f4c6eb4f67cb674b25c8",
+        "mobilesdk_app_id": "1:172739913177:android:669df5d67074a3404b25c8",
         "android_client_info": {
-          "package_name": "com.example.perna"
+          "package_name": "com.bluehands.perna.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "172739913177-fd6qa4ga2varvhdjsd083ubjh8eqvsf2.apps.googleusercontent.com",
+          "client_id": "172739913177-v7pgnq819qsdnc1dr0hg6ukrblvckj94.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.perna",
-            "certificate_hash": "050c5a94c874d25bed5959848c47229c2aa272f4"
+            "package_name": "com.bluehands.perna.app",
+            "certificate_hash": "7f8cc8c2a4feebdaeb0435e0b456accb68c75fb3"
           }
         },
         {
@@ -29,7 +29,50 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA"
+          "current_key": "AIzaSyA_m-omyZa0xzhhzwCXxMvBA3r_JZcMsfY"
+        },
+        {
+          "current_key": "AIzaSyBgQnuVG3TfvrgSf3L_zyOX7uCq4FdFsEA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172739913177:android:546c351975831a384b25c8",
+        "android_client_info": {
+          "package_name": "com.example.perna"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172739913177-00dj3lssi1dajh524hu13tbf9pcsaqtt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.perna",
+            "certificate_hash": "7f8cc8c2a4feebdaeb0435e0b456accb68c75fb3"
+          }
+        },
+        {
+          "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_m-omyZa0xzhhzwCXxMvBA3r_JZcMsfY"
+        },
+        {
+          "current_key": "AIzaSyBgQnuVG3TfvrgSf3L_zyOX7uCq4FdFsEA"
         }
       ],
       "services": {

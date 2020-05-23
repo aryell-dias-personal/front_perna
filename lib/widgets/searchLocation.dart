@@ -8,8 +8,8 @@ import 'package:perna/constants/constants.dart';
 
 class SearchLocation extends StatefulWidget {
   final Function() preExecute;
-  final Future Function(Location, String) onStartPlaceSelected;
-  final Future Function(Location, String) onEndPlaceSelected;
+  final Function(Location, String) onStartPlaceSelected;
+  final Function(Location, String) onEndPlaceSelected;
   final Set<Marker> markers;
 
   const SearchLocation({
@@ -29,8 +29,8 @@ class SearchLocation extends StatefulWidget {
 class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin {
   bool showSecond = false;
   final Function() preExecute;
-  final Future Function(Location, String) onStartPlaceSelected;
-  final Future Function(Location, String) onEndPlaceSelected;
+  final Function(Location, String) onStartPlaceSelected;
+  final Function(Location, String) onEndPlaceSelected;
   final Set<Marker> markers;
   
   TextEditingController initialController = TextEditingController();
@@ -45,7 +45,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     @required this.preExecute
   });
 
-  void _execute(String hint, int type) async {
+  Future _execute(String hint, int type) async {
     this.preExecute();
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
@@ -61,10 +61,10 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
       PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
       Location location = placesDetailsResponse.result.geometry.location;
       if(type == 0){
-        await onStartPlaceSelected(location, prediction.description);
+        onStartPlaceSelected(location, prediction.description);
         this.initialController.text = prediction.description;
       }else{
-        await onEndPlaceSelected(location, prediction.description);
+        onEndPlaceSelected(location, prediction.description);
         this.endControler.text = prediction.description;
       }
     }
@@ -110,8 +110,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   enableInteractiveSelection: false,
                   readOnly: true,
                   showCursor: false,
-                  onTap: () {
-                    this._execute("Digite o nome do seu local de partida", 0);
+                  onTap: () async {
+                    await this._execute("Digite o nome do seu local de partida", 0);
                   }
                 ),
                 AnimatedSize(
@@ -135,8 +135,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       enableInteractiveSelection: false,
                       readOnly: true,
                       showCursor: false,
-                      onTap: () {
-                        this._execute("Digite o nome do seu local de destino", 1);
+                      onTap: () async {
+                        await this._execute("Digite o nome do seu local de destino", 1);
                       }
                     ): SizedBox()
                   )
