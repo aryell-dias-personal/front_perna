@@ -61,7 +61,7 @@
     "successfully_added_order": "O pedido foi adicionado com sucesso",
     "unsuccessfully_added_order": "Não foi possivel adicionar o pedido",
     "not_found_expedient": "Não foi possivel encontrar o expediente que atende este pedido",
-    "order": "Order",
+    "order": "Pedido",
     "about_expedient": "Sobre o expediente",
     "order_name": "Nome do pedido",
     "enter_order_name": "Digite um nome para seu pedido",
