@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/user.dart';
 import 'package:toast/toast.dart';
 
@@ -58,7 +59,7 @@ class UserProfilePage extends StatelessWidget {
                 ),
                 onRatingUpdate: (rating) {
                   Toast.show(
-                    "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                    AppLocalizations.of(context).translate("not_implemented"), 
                     context, backgroundColor: Colors.pinkAccent, duration: 3);
                   // TODO: Enviar rating do usuário para o backend, não esquecer de salvar que já foi classificado por esta pessoa.
                 },
@@ -69,7 +70,7 @@ class UserProfilePage extends StatelessWidget {
                 initialValue: user.name,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: "Nome do Usuário",
+                  labelText: AppLocalizations.of(context).translate("user_name"),
                   suffixIcon: Icon(Icons.person)
                 )
               ),
@@ -79,7 +80,7 @@ class UserProfilePage extends StatelessWidget {
                 initialValue: user.email,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: "Email do Usuário",
+                  labelText: AppLocalizations.of(context).translate("user_email"),
                   suffixIcon: Icon(Icons.person)
                 )
               ),
@@ -87,14 +88,14 @@ class UserProfilePage extends StatelessWidget {
               RaisedButton(
                 onPressed: (){
                   Toast.show(
-                    "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                    AppLocalizations.of(context).translate("not_implemented"), 
                     context, backgroundColor: Colors.pinkAccent, duration: 3);
                   // TODO: Redirecionar para email ou criar um chat para conversa entre usuários.
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children:<Widget>[
-                    Text("Conversar", style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
+                    Text(AppLocalizations.of(context).translate("talk"), style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
                     SizedBox(width: 5),
                     Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
                   ]

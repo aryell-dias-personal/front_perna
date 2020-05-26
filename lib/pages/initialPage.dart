@@ -1,5 +1,6 @@
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/signInResponse.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/services/signIn.dart';
@@ -42,7 +43,7 @@ class _InitialPageState extends State<InitialPage> {
             User user = signInResponse?.user;
             if(user==null){
               Toast.show(
-                "Não foi possivel reconhecer o usuário", context, 
+                AppLocalizations.of(context).translate("unrecognized_user"), context, 
                 backgroundColor: Colors.redAccent, 
                 duration: 3
               );
@@ -75,7 +76,7 @@ class _InitialPageState extends State<InitialPage> {
                 height: 20.0,
               ),
               Text(
-                'E aí?!',
+                AppLocalizations.of(context).translate("hey_there"),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 40.0,
@@ -83,7 +84,7 @@ class _InitialPageState extends State<InitialPage> {
                 ),
               ),
               Text(
-                'Bem vindo ao Perna!',
+                AppLocalizations.of(context).translate("welcome"),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 35.0,
@@ -95,7 +96,7 @@ class _InitialPageState extends State<InitialPage> {
               ),
               LogAndSignInButton(
                 isSignIn: true,
-                text: 'Primeira vez por aqui',
+                text: AppLocalizations.of(context).translate("first_time"),
                 onPressed: (){
                   setState(() {
                     this.isLoading = true;
@@ -111,7 +112,7 @@ class _InitialPageState extends State<InitialPage> {
                 height: 20.0,
               ),
               LogAndSignInButton(
-                text: 'Já estive aqui',
+                text: AppLocalizations.of(context).translate("have_been_here"),
                 onPressed: (){
                   setState(() {
                     this.isLoading = true;

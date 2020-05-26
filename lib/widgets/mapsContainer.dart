@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/mapListener.dart';
@@ -109,7 +110,7 @@ class _MapsContainerState extends State<MapsContainer> {
         )
       );
     } else {
-      Toast.show("Você deve marcar um ponto para esta ação", 
+      Toast.show(AppLocalizations.of(context).translate("select_one_point"), 
         context, backgroundColor: Colors.redAccent, duration: 3);
     }
   }
@@ -128,7 +129,7 @@ class _MapsContainerState extends State<MapsContainer> {
         )
       );
     } else {
-      Toast.show("Você deve marcar dois pontos para esta ação", 
+      Toast.show(AppLocalizations.of(context).translate("select_two_points"),
         context, backgroundColor: Colors.redAccent, duration: 3);
     }
   }
@@ -202,7 +203,7 @@ class _MapsContainerState extends State<MapsContainer> {
           color: Theme.of(context).primaryColor,
           child: Icon(Icons.navigation, size: 30,
             color: Theme.of(context).backgroundColor),
-          description: "Navegar",
+          description: AppLocalizations.of(context).translate("navegate"),
           onPressed: this.navigate,
         )
       ]) + [

@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 
 class NoConnectionPage extends StatelessWidget {
 
@@ -36,14 +37,14 @@ class NoConnectionPage extends StatelessWidget {
                   )),
             ),
             Text(
-              "Você não tá conectado!!!",
+              AppLocalizations.of(context).translate("no_connection"),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
                   color: Theme.of(context).primaryColor),
             ),
             Text(
-              "Se conecta ai...  😢",
+              AppLocalizations.of(context).translate("ask_to_connect"),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
@@ -54,7 +55,7 @@ class NoConnectionPage extends StatelessWidget {
             ),
             RaisedButton(
               child: Text(
-                'Ver as configurações',
+                AppLocalizations.of(context).translate("go_to_settings"),
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 25.0,

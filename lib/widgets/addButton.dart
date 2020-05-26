@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 
 class AddButton extends StatelessWidget {
   final bool readOnly;
@@ -14,7 +15,7 @@ class AddButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children:<Widget>[
-          Text("Adicionar", style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
+          Text(AppLocalizations.of(context).translate("add"), style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
           Icon(Icons.add, color: Theme.of(context).backgroundColor, size: 20)
         ]
       ),

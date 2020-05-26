@@ -119,7 +119,6 @@ class _MapListenerState extends State<MapListener> {
     setState(() {
       this.nextPlaces.add(Marker(
         consumeTapEvents: true,
-        infoWindow: InfoWindow(title: "Você terá que estar aqui"),
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(

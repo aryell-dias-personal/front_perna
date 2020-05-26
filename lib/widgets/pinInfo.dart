@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
@@ -42,7 +43,7 @@ class PinInfo extends StatelessWidget {
                         Container(
                           width: 260,
                           child: TitledValueWidget(
-                            title: "Nome do Expediente", 
+                            title: AppLocalizations.of(context).translate("expedient_name"), 
                             value: (this.agent?.name ?? ""),
                             titleSize: 14,
                             valueSize: 14,
@@ -51,14 +52,14 @@ class PinInfo extends StatelessWidget {
                         Container(
                           width: 260,
                           child: TitledValueWidget(
-                            title: "Email do Motorista", 
+                            title: AppLocalizations.of(context).translate("driver_email"),  
                             value: (this.agent?.email ?? ""),
                             titleSize: 14,
                             valueSize: 14,
                           ),
                         ),
                         TitledValueWidget(
-                          title: "Nº Vagas", 
+                          title: AppLocalizations.of(context).translate("seats_number"),  
                           value: "${this.agent?.places ?? ""}",
                           titleSize: 14,
                           valueSize: 14,

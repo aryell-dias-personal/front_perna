@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 
 class SearchLocation extends StatefulWidget {
   final Function() preExecute;
@@ -104,14 +105,14 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                     suffixIcon: Icon(Icons.pin_drop),
                     contentPadding:
                         EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                    hintText: "Digite o nome do seu local de partida"
+                    hintText: AppLocalizations.of(context).translate("search_start")
                   ),
                   autofocus: false,
                   enableInteractiveSelection: false,
                   readOnly: true,
                   showCursor: false,
                   onTap: () async {
-                    await this._execute("Digite o nome do seu local de partida", 0);
+                    await this._execute(AppLocalizations.of(context).translate("search_start"), 0);
                   }
                 ),
                 AnimatedSize(
@@ -129,14 +130,14 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                         disabledBorder: InputBorder.none,
                         suffixIcon: Icon(Icons.flag),
                         contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                        hintText: "Digite o nome do seu local de destino"
+                        hintText: AppLocalizations.of(context).translate("search_end")
                       ),
                       autofocus: false,
                       enableInteractiveSelection: false,
                       readOnly: true,
                       showCursor: false,
                       onTap: () async {
-                        await this._execute("Digite o nome do seu local de destino", 1);
+                        await this._execute(AppLocalizations.of(context).translate("search_end"), 1);
                       }
                     ): SizedBox()
                   )
@@ -156,7 +157,8 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(showSecond || endControler.text != ""? "Ocultar destino":"Mostrar destino", 
+                        Text(showSecond || endControler.text != ""? AppLocalizations.of(context).translate("hide_end"):
+                          AppLocalizations.of(context).translate("show_end"), 
                           style: TextStyle(
                             color: endControler.text != ""? Colors.grey :Theme.of(context).primaryColor, 
                             fontSize: 18

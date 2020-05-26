@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/askedPointPage.dart';
@@ -132,11 +133,11 @@ class _HistoryPageState extends State<HistoryPage> {
     return <Widget>[
       SizedBox(height: 20),
       Text("PEDIDO", style: Theme.of(context).textTheme.bodyText2),
-      TitledValueWidget(title: "Nome", value: askedPoint.name ?? "NO_NAME"),
-      TitledValueWidget(title: "Hora da Partida", value: parseData(askedPoint.askedStartAt.toString())),
-      TitledValueWidget(title: "Hora da Chegada", value: parseData(askedPoint.askedEndAt.toString())),
-      TitledValueWidget(title: "Local da Partida", value: parsePlace(askedPoint.friendlyOrigin)),
-      TitledValueWidget(title: "Local da Chegada", value: parsePlace(askedPoint.friendlyDestiny)),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: askedPoint.name ?? "NO_NAME"),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("start_time"), value: parseData(askedPoint.askedStartAt.toString())),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("end_time"), value: parseData(askedPoint.askedEndAt.toString())),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("start_place"), value: parsePlace(askedPoint.friendlyOrigin)),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("end_place"), value: parsePlace(askedPoint.friendlyDestiny)),
       SizedBox(height: 20)
     ];
   }
@@ -145,11 +146,11 @@ class _HistoryPageState extends State<HistoryPage> {
     return <Widget>[
       SizedBox(height: 20),
       Text("EXPEDIENTE", style: Theme.of(context).textTheme.bodyText2),
-      TitledValueWidget(title: "Nome", value: agent.name),
-      TitledValueWidget(title: "Inicio do Expediente", value: parseData(agent.askedStartAt.toString())),
-      TitledValueWidget(title: "Fim do Expediente", value: parseData(agent.askedEndAt.toString())),
-      TitledValueWidget(title: "Garagem", value: parsePlace(agent.friendlyGarage)),
-      TitledValueWidget(title: "Vagas", value: agent.places.toString()),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: agent.name),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_start"), value: parseData(agent.askedStartAt.toString())),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_end"), value: parseData(agent.askedEndAt.toString())),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("garage"), value: parsePlace(agent.friendlyGarage)),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("seats"), value: agent.places.toString()),
       SizedBox(height: 20)
     ];
   }
@@ -193,8 +194,8 @@ class _HistoryPageState extends State<HistoryPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Image.asset('assets/empty.png', scale: 2),
-              Text("Nada por aqui.", style: TextStyle(fontSize: 20)),
-              Text("Você ainda não fez nenhuma operação 😢", style: TextStyle(fontSize: 17),)
+              Text(AppLocalizations.of(context).translate("nothing_here"), style: TextStyle(fontSize: 20)),
+              Text(AppLocalizations.of(context).translate("no_operation"), style: TextStyle(fontSize: 17),)
             ],
           )
         ) : Timeline(

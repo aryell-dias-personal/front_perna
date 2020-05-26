@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/home.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +67,24 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth),
+        supportedLocales: [
+          Locale('en', 'US'),
+          Locale('pt', 'BR'),
+        ],
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        localeResolutionCallback: (locale, supportedLocales) {
+          for (var supportedLocale in supportedLocales) {
+            if (supportedLocale.languageCode == locale.languageCode &&
+                supportedLocale.countryCode == locale.countryCode) {
+              return supportedLocale;
+            }
+          }
+          return supportedLocales.first;
+        },
         theme: ThemeData(
           brightness: Brightness.light,
           textTheme: TextTheme(

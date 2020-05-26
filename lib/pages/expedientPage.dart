@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/pages/userProfilePage.dart';
@@ -80,11 +81,11 @@ class _ExpedientState extends State<ExpedientPage> {
     if(statusCode == 200){
       Navigator.pop(context);
       this.clear();
-      Toast.show("O pedido de expediente foi feito com sucesso", context, 
+      Toast.show(AppLocalizations.of(context).translate("successful_work_order"), context, 
         backgroundColor: Colors.greenAccent, duration: 3);
     } else {
       setState(() { isLoading = false; });
-      Toast.show("Não foi possível fazer o pedido", context, 
+      Toast.show(AppLocalizations.of(context).translate("unsuccessful_work_order"), context, 
         backgroundColor: Colors.redAccent, duration: 3);
     }
   }
@@ -108,11 +109,11 @@ class _ExpedientState extends State<ExpedientPage> {
         if(statusCode==200){
           Navigator.pop(context);
           this.clear();
-          Toast.show( "O expediente foi adicionado com sucesso", context, 
+          Toast.show( AppLocalizations.of(context).translate("successfully_added_expedient"), context, 
             backgroundColor: Colors.greenAccent, duration: 3);
         }else{
           setState(() { isLoading = false; });
-          Toast.show("Não foi possivel adicionar o expediente", context, 
+          Toast.show(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), context, 
             backgroundColor: Colors.redAccent, duration: 3);
         }
       }
@@ -136,7 +137,7 @@ class _ExpedientState extends State<ExpedientPage> {
         )
       );
     } else {
-      Toast.show("Não foi possivel encontrar o usuário especificado", context, 
+      Toast.show(AppLocalizations.of(context).translate("not_found_user"), context, 
         backgroundColor: Colors.redAccent, duration: 3
       );
     }
@@ -159,21 +160,20 @@ class _ExpedientState extends State<ExpedientPage> {
         children: <Widget>[
           AddHeader(
             icon: Icons.work,
-            name: "Expediente",
+            name: AppLocalizations.of(context).translate("expedient"),
             readOnly: this.readOnly,
             showMenu: this.readOnly,
-            spaceBetween: 123.7,
             child: PopupMenuButton(
-              tooltip: "Mostrar menu",
+              tooltip: AppLocalizations.of(context).translate("open_menu"),
               onSelected: (ExpedientOptions result) => this._onSelectedExpedientOptions(resources["firestore"], result),
               itemBuilder: (BuildContext context) => <PopupMenuEntry<ExpedientOptions>>[
                 PopupMenuItem<ExpedientOptions>(
                   value: ExpedientOptions.aboutDriver,
-                  child: Text('Sobre o motorista')
+                  child: Text(AppLocalizations.of(context).translate("about_driver"))
                 ),
                 this.agent.fromEmail != null ? PopupMenuItem<ExpedientOptions>(
                   value: ExpedientOptions.aboutRequester,
-                  child: Text('Sobre o requisitante')
+                  child: Text(AppLocalizations.of(context).translate("about_requester"))
                 ): null
               ],
             )
@@ -183,10 +183,10 @@ class _ExpedientState extends State<ExpedientPage> {
             readOnly: this.readOnly,
             initialValue: this.agent.name ?? "",
             onChanged: (text){ this.name = text; },
-            labelText: "Nome do expediente",
+            labelText: AppLocalizations.of(context).translate("expedient_name"),
             icon: Icons.short_text,
             textInputAction: TextInputAction.next,
-            validatorMessage: 'Digite um nome para seu expediente',
+            validatorMessage: AppLocalizations.of(context).translate("enter_expedient_name"),
             onFieldSubmitted: (text){ FocusScope.of(context).nextFocus(); },
           ),
           SizedBox(height: 26),
@@ -195,10 +195,10 @@ class _ExpedientState extends State<ExpedientPage> {
             initialValue: this.agent.email ?? "",
             onChanged: (text){ this.email = text; },
             textInputType: TextInputType.emailAddress,
-            labelText: "Email do motorista",
+            labelText: AppLocalizations.of(context).translate("driver_email"),
             icon: Icons.email,
             textInputAction: TextInputAction.next,
-            validatorMessage: 'Digite um email para o motorista',
+            validatorMessage: AppLocalizations.of(context).translate("enter_driver_email"),
             onFieldSubmitted: (text){ FocusScope.of(context).nextFocus(); },
           )
         ] + (this.agent.fromEmail!=null ? [
@@ -207,7 +207,7 @@ class _ExpedientState extends State<ExpedientPage> {
             readOnly: true,
             initialValue: this.agent.fromEmail,
             textInputType: TextInputType.emailAddress,
-            labelText: "Email do requisitante",
+            labelText: AppLocalizations.of(context).translate("requester_email"),
             icon: Icons.email
           ),
         ]: []) + [
@@ -216,20 +216,20 @@ class _ExpedientState extends State<ExpedientPage> {
             initialValue: this.agent.askedStartAt,
             onChanged: (text){ this.askedStartAt = text; },
             action: TextInputAction.next,
-            labelText: "Início do expediente",
+            labelText: AppLocalizations.of(context).translate("expedient_start"),
             icon: Icons.insert_invitation,
             readOnly: this.readOnly,
             onSubmit: (text){ FocusScope.of(context).nextFocus(); },
-            validatorMessage: 'Digite uma hora de início para o expediente',
+            validatorMessage: AppLocalizations.of(context).translate("enter_start_expedient"),
           ),
           SizedBox(height: 26),
           FormTimePicker(
             initialValue: this.agent.askedEndAt,
             icon: Icons.insert_invitation,
-            labelText: "Fim do expediente",
+            labelText: AppLocalizations.of(context).translate("expedient_end"),
             onChanged: (text){ this.askedEndAt = text; },
             readOnly: this.readOnly,
-            validatorMessage: 'Digite uma hora de fim para o expediente',
+            validatorMessage: AppLocalizations.of(context).translate("enter_end_expedient"),
             onSubmit: (text){ FocusScope.of(context).nextFocus(); }
           ),
           SizedBox(height: 26),
@@ -238,17 +238,17 @@ class _ExpedientState extends State<ExpedientPage> {
             initialValue: this.agent.places?.toString() ?? "",
             onChanged: (text){ this.places = text; },
             textInputType: TextInputType.number,
-            labelText: "Número de lugares",
+            labelText: AppLocalizations.of(context).translate("seats_number"),
             icon: Icons.airline_seat_legroom_normal,
             textInputAction: TextInputAction.done,
-            validatorMessage: 'Digite o número de vagas do expediente',
+            validatorMessage: AppLocalizations.of(context).translate("enter_seats_number"),
             onFieldSubmitted: (text){ this._onPressed(this.email, resources['email']); },
           ),
           SizedBox(height: 26),
           OutlinedTextFormField(
             readOnly: true,
             initialValue: this.agent.friendlyGarage,
-            labelText: "Garagem",
+            labelText: AppLocalizations.of(context).translate("garage"),
             icon: Icons.pin_drop
           ),
           SizedBox(height: 26)

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/store/state.dart';
@@ -40,7 +41,7 @@ class SideMenu extends StatelessWidget {
             SizedBox(height: 20),
             SideMenuButton(
               textColor: textColor,
-              text: "Histórico",
+              text: AppLocalizations.of(context).translate("history"),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => StoreConnector<StoreState, Firestore>(
@@ -54,7 +55,7 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: "Ajuda",
+              text: AppLocalizations.of(context).translate("help"),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(
                     builder: (context) => HelpPage()
@@ -65,10 +66,10 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: "Pagamento",
+              text: AppLocalizations.of(context).translate("payment"),
               onPressed: (){
                 Toast.show(
-                  "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                  AppLocalizations.of(context).translate("not_implemented"), 
                   context, backgroundColor: Colors.pinkAccent, duration: 3);
                 //TODO: cadastro de cartões de credito de forma segura, talvez uso do GPAY
               },
@@ -76,10 +77,10 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: "Tema",
+              text: AppLocalizations.of(context).translate("theme"),
               onPressed: (){
                 Toast.show(
-                  "Eita, você esbarrou em algo que ainda não foi implementado 😳", 
+                  AppLocalizations.of(context).translate("not_implemented"), 
                   context, backgroundColor: Colors.pinkAccent, duration: 3);
                 //TODO: Seleção se o tema deve acompanhar a tema do sistema ser light ou dark
               },
@@ -87,7 +88,7 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: "Deslogar",
+              text: AppLocalizations.of(context).translate("logout"),
               onPressed: this.logout,
               icon: Icons.exit_to_app,
             )

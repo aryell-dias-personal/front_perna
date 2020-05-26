@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/expedientPage.dart';
@@ -77,11 +78,11 @@ class _AskedPointPageState extends State<AskedPointPage> {
       if(statusCode==200){
         Navigator.pop(context);
         this.clear();
-        Toast.show("O pedido foi adicionado com sucesso", context, 
+        Toast.show(AppLocalizations.of(context).translate("successfully_added_order"), context, 
           backgroundColor: Colors.greenAccent, duration: 3);
       }else{
         setState(() { isLoading = false; });
-        Toast.show("Não foi possivel adicionar o pedido", context, 
+        Toast.show(AppLocalizations.of(context).translate("unsuccessfully_added_order"), context, 
           backgroundColor: Colors.redAccent, duration: 3);
       }
     }
@@ -96,7 +97,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
         builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){})
       ));
     } else {
-      Toast.show("Não foi possivel encontrar o expediente que atende este pedido", context, 
+      Toast.show(AppLocalizations.of(context).translate("not_found_expedient"), context, 
         backgroundColor: Colors.redAccent, duration: 3);
     }
     setState(() { this.isLoading = false; });
@@ -115,18 +116,17 @@ class _AskedPointPageState extends State<AskedPointPage> {
         formkey: this._formKey,
         children: <Widget>[
           AddHeader(
-            name: "Pedido",
-            spaceBetween: 179.7,
+            name: AppLocalizations.of(context).translate("order"),
             readOnly: this.readOnly,
             icon: Icons.scatter_plot,
             showMenu: this.readOnly && this.askedPoint.agentId != null,
             child: PopupMenuButton(
-              tooltip: "Mostrar menu",
+              tooltip: AppLocalizations.of(context).translate("open_menu"),
               onSelected: (AskedPointOptions result) => this._onSelectedAskedPointOptions(resources["firestore"], result),
               itemBuilder:  (BuildContext context) => <PopupMenuEntry<AskedPointOptions>>[
                 PopupMenuItem<AskedPointOptions>(
                   value: AskedPointOptions.aboutExpedient,
-                  child: Text('Sobre o expediente')
+                  child: Text(AppLocalizations.of(context).translate("about_expedient"))
                 )
               ]
             )
@@ -137,19 +137,19 @@ class _AskedPointPageState extends State<AskedPointPage> {
             initialValue: this.askedPoint.name ?? "",
             onChanged: (text){ this.name = text; },
             textInputAction: TextInputAction.next,
-            labelText: "Nome do pedido",
+            labelText: AppLocalizations.of(context).translate("order_name"),
             icon: Icons.short_text,
-            validatorMessage: 'Digite um nome para seu pedido',
+            validatorMessage: AppLocalizations.of(context).translate("enter_order_name"),
             onFieldSubmitted: (text) { FocusScope.of(context).nextFocus(); },
           ),
           SizedBox(height: 26),
           FormTimePicker(
             initialValue: this.askedPoint.askedStartAt,
             icon: Icons.insert_invitation,
-            labelText: "Deseja Embarcar",
+            labelText: AppLocalizations.of(context).translate("desired_start"),
             onChanged: (text){ this.askedStartAt = text; },
             readOnly: this.readOnly,
-            validatorMessage: 'Digite a hora que deseja embarcar',
+            validatorMessage: AppLocalizations.of(context).translate("enter_desired_start"),
             onSubmit: (text) { FocusScope.of(context).nextFocus(); }
           ),
           SizedBox(height: 26),
@@ -157,25 +157,25 @@ class _AskedPointPageState extends State<AskedPointPage> {
             initialValue: this.askedPoint.askedEndAt,
             onChanged: (text){ this.askedEndAt= text; },
             action: TextInputAction.done,
-            labelText: "Deseja Desembarcar",
+            labelText: AppLocalizations.of(context).translate("desired_end"),
             icon: Icons.insert_invitation,
             readOnly: this.readOnly,
             onSubmit: (text) => _onPressed(resources["email"]),
-            validatorMessage: 'Digite uma hora que deseja desembarcar',
+            validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
           ),
           SizedBox(height: 26)
         ] + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
           FormTimePicker(
             readOnly: true,
             initialValue: this.askedPoint.actualStartAt,
-            labelText: "Hora da partida",
+            labelText: AppLocalizations.of(context).translate("actual_start"),
             icon: Icons.insert_invitation
           ),
           SizedBox(height: 26),
           FormTimePicker(
             readOnly: true,
             initialValue: this.askedPoint.actualEndAt,
-            labelText: "Hora da chegada",
+            labelText: AppLocalizations.of(context).translate("actual_end"),
             icon: Icons.insert_invitation
           ),
           SizedBox(height: 26)
@@ -183,14 +183,14 @@ class _AskedPointPageState extends State<AskedPointPage> {
           OutlinedTextFormField(
             readOnly: true,
             initialValue: this.askedPoint.friendlyOrigin,
-            labelText: "Local da partida",
+            labelText: AppLocalizations.of(context).translate("start_place"),
             icon: Icons.pin_drop
           ),
           SizedBox(height: 26),
           OutlinedTextFormField(
             readOnly: true,
             initialValue: this.askedPoint.friendlyDestiny,
-            labelText: "Local da chegada",
+            labelText: AppLocalizations.of(context).translate("end_place"),
             icon: Icons.flag
           ),
           SizedBox(height: 26),

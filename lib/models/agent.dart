@@ -2,6 +2,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 import 'package:perna/models/point.dart';
 
+// TODO: trocar places por seatsNumber e talvez trocar de Agent para expedient (inclusive no backend)
 class Agent {
   LatLng garage;
   LatLng position;

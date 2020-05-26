@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 
 class ActionButtons extends StatelessWidget {
   final Function() accept;
@@ -15,7 +16,7 @@ class ActionButtons extends StatelessWidget {
       children: <Widget>[
         RaisedButton(
           onPressed: this.accept,
-          child: Text("Aceitar", style: TextStyle(
+          child: Text(AppLocalizations.of(context).translate("accept"), style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).backgroundColor
           )),
@@ -24,7 +25,7 @@ class ActionButtons extends StatelessWidget {
         ),
         RaisedButton(
           onPressed: this.deny,
-          child: Text("Negar", style: TextStyle(
+          child: Text(AppLocalizations.of(context).translate("deny"), style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor
           )),

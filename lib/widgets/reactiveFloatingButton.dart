@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 
 class ReactiveFloatingButton extends StatelessWidget {
@@ -20,17 +21,17 @@ class ReactiveFloatingButton extends StatelessWidget {
       color: Theme.of(context).primaryColor,
       progress: this.controller
     );
-    String description = "Abrir Menu";
+    String description = AppLocalizations.of(context).translate("open_menu");
     Function() onPressed =  this.defaultFunction;
     if(this.length != 0){
       color = Colors.greenAccent;
       if(this.length == 1){
         icon = Icon(Icons.work, color: Theme.of(context).backgroundColor);
-        description = "Adicionar Expediente";
+        description = AppLocalizations.of(context).translate("add_expedient");
         onPressed = this.addNewExpedient;
       }else{
         icon = Icon(Icons.scatter_plot, color: Theme.of(context).backgroundColor);
-        description = "Adicionar Pedido";
+        description = AppLocalizations.of(context).translate("add_order");
         onPressed = this.addNewAsk;
       }
     }
