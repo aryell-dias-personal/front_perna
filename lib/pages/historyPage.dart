@@ -187,9 +187,20 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: Theme.of(context).backgroundColor,
       body: isLoadingAgents || isLoadingAskedPoints || !passedTime ? Center(
         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
-      ) : Timeline(
-        position: TimelinePosition.Left,
-        children: this.buildHistoryTiles()
+      ) : (
+        (this.agents + this.askedPoints).isEmpty ?  Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Image.asset('assets/empty.png', scale: 2),
+              Text("Nada por aqui.", style: TextStyle(fontSize: 20)),
+              Text("Você ainda não fez nenhuma operação 😢", style: TextStyle(fontSize: 17),)
+            ],
+          )
+        ) : Timeline(
+          position: TimelinePosition.Left,
+          children: this.buildHistoryTiles()
+        )
       )
     );
   }
