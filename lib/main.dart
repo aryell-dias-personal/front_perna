@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/home.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Builder(
           builder: (context) => Scaffold(
+            key: scaffoldKey,
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth)
           )

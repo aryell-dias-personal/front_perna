@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
       if(statusCodeNewAgent !=200){
         showSnackBar(
           AppLocalizations.of(context).translateFormat("accept_not_possible", [agent.fromEmail]),
-          context, Colors.redAccent
+          Colors.redAccent, context: context
         );
         return;
       }
@@ -92,12 +92,12 @@ class _HomeState extends State<Home> {
       String answer = AppLocalizations.of(context).translate(accepted? "accepted" : "denied");
       showSnackBar(
         AppLocalizations.of(context).translateFormat("answer_order", [answer, agent.fromEmail]), 
-        context, Colors.greenAccent
+        Colors.greenAccent, context: context
       );
     } else {
       showSnackBar(
         AppLocalizations.of(context).translateFormat("not_answer_order", [agent.fromEmail]), 
-        context, Colors.redAccent
+        Colors.redAccent, context: context
       );
     }
     Navigator.of(context).popUntil((route) => route.isFirst);

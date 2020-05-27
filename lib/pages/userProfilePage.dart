@@ -61,7 +61,7 @@ class UserProfilePage extends StatelessWidget {
                   onRatingUpdate: (rating) {
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      context, Colors.pinkAccent);
+                      Colors.pinkAccent, context: context);
                     // TODO: Enviar rating do usuário para o backend, não esquecer de salvar que já foi classificado por esta pessoa.
                   },
                 ),
@@ -92,7 +92,7 @@ class UserProfilePage extends StatelessWidget {
                   onPressed: (){
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      context, Colors.pinkAccent);
+                      Colors.pinkAccent, context: context);
                     // TODO: Redirecionar para email ou criar um chat para conversa entre usuários.
                   },
                   child: Row(

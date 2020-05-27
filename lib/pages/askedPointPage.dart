@@ -77,13 +77,13 @@ class _AskedPointPageState extends State<AskedPointPage> {
       int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
       if(statusCode==200){
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
-          context, Colors.greenAccent);
+          Colors.greenAccent, isGlobal: true);
         Navigator.pop(context);
         this.clear();
       }else{
         setState(() { isLoading = false; });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
-          context, Colors.redAccent);
+          Colors.redAccent, context: context);
       }
     }
   }
@@ -100,7 +100,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
       ));
     } else {
       showSnackBar(AppLocalizations.of(context).translate("not_found_expedient"), 
-        context, Colors.redAccent);
+        Colors.redAccent, context: context);
     }
     setState(() { this.isLoading = false; });
   }

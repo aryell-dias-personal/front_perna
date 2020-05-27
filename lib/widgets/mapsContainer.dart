@@ -113,7 +113,7 @@ class _MapsContainerState extends State<MapsContainer> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("select_one_point"), 
-        context, Colors.redAccent);
+        Colors.redAccent, context: context);
     }
   }
 
@@ -134,7 +134,7 @@ class _MapsContainerState extends State<MapsContainer> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("select_two_points"),
-        context, Colors.redAccent);
+        Colors.redAccent, context: context);
     }
   }
 

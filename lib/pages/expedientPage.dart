@@ -80,13 +80,13 @@ class _ExpedientState extends State<ExpedientPage> {
     int statusCode = await driverService.askNewAgent(agent);
     if(statusCode == 200){
       showSnackBar(AppLocalizations.of(context).translate("successful_work_order"), 
-        context, Colors.greenAccent);
+        Colors.greenAccent, isGlobal: true);
       Navigator.pop(context);
       this.clear();
     } else {
       setState(() { isLoading = false; });
       showSnackBar(AppLocalizations.of(context).translate("unsuccessful_work_order"), 
-        context, Colors.redAccent);
+        Colors.redAccent, context: context);
     }
   }
 
@@ -108,13 +108,13 @@ class _ExpedientState extends State<ExpedientPage> {
         int statusCode = await driverService.postNewAgent(agent, idTokenResult.token);
         if(statusCode==200){
           showSnackBar( AppLocalizations.of(context).translate("successfully_added_expedient"), 
-            context, Colors.greenAccent);
+            Colors.greenAccent, isGlobal: true);
           Navigator.pop(context);
           this.clear();
         }else{
           setState(() { isLoading = false; });
           showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), 
-            context, Colors.redAccent);
+            Colors.redAccent, context: context);
         }
       }
     }
@@ -138,7 +138,7 @@ class _ExpedientState extends State<ExpedientPage> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("not_found_user"), 
-        context, Colors.redAccent
+        Colors.redAccent, context: context
       );
     }
     setState(() {
