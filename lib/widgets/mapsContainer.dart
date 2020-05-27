@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/mapListener.dart';
@@ -14,7 +15,6 @@ import 'package:perna/widgets/searchLocation.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/askedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
-import 'package:toast/toast.dart';
 
 class MapsContainer extends StatefulWidget {
   final Function preExecute;
@@ -106,12 +106,14 @@ class _MapsContainerState extends State<MapsContainer> {
       );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+          builder: (context) => Scaffold(
+            body: ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+          )
         )
       );
     } else {
-      Toast.show(AppLocalizations.of(context).translate("select_one_point"), 
-        context, backgroundColor: Colors.redAccent, duration: 3);
+      showSnackBar(AppLocalizations.of(context).translate("select_one_point"), 
+        context, Colors.redAccent);
     }
   }
 
@@ -125,12 +127,14 @@ class _MapsContainerState extends State<MapsContainer> {
       );
       Navigator.push(context, 
         MaterialPageRoute(
-          builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+          builder: (context) => Scaffold(
+            body: AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+          )
         )
       );
     } else {
-      Toast.show(AppLocalizations.of(context).translate("select_two_points"),
-        context, backgroundColor: Colors.redAccent, duration: 3);
+      showSnackBar(AppLocalizations.of(context).translate("select_two_points"),
+        context, Colors.redAccent);
     }
   }
 

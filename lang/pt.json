@@ -70,5 +70,14 @@
     "desired_end": "Deseja Desembarcar",
     "enter_desired_end": "Digite a hora que deseja desembarcar",
     "actual_start": "Hora da partida",
-    "actual_end": "Hora da chegada"
+    "actual_end": "Hora da chegada",
+    "answer_order": "Você <?> o pedido feito por <?>",
+    "not_answer_order": "Não foi possivel responder <?> no momento",
+    "accept_not_possible": "Não foi possivel aceitar o pedido de <?> no momento",
+    "remind": "Passando só pra te lembrar",
+    "reminder_message": "De <?>:<?> você tem um<?> 😀",
+    "reminder_content_expedient": " expediente",
+    "reminder_content_travel": "a viajem",
+    "accepted": "aceitou",
+    "denied": "negou"
 }

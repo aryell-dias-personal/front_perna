@@ -3,11 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
-import 'package:toast/toast.dart';
 
 class SideMenu extends StatelessWidget {
   final String email;
@@ -68,9 +68,9 @@ class SideMenu extends StatelessWidget {
               textColor: textColor,
               text: AppLocalizations.of(context).translate("payment"),
               onPressed: (){
-                Toast.show(
+                showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
-                  context, backgroundColor: Colors.pinkAccent, duration: 3);
+                  context, Colors.pinkAccent);
                 //TODO: cadastro de cartões de credito de forma segura, talvez uso do GPAY
               },
               icon: Icons.credit_card,
@@ -79,9 +79,9 @@ class SideMenu extends StatelessWidget {
               textColor: textColor,
               text: AppLocalizations.of(context).translate("theme"),
               onPressed: (){
-                Toast.show(
+                showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
-                  context, backgroundColor: Colors.pinkAccent, duration: 3);
+                  context, Colors.pinkAccent);
                 //TODO: Seleção se o tema deve acompanhar a tema do sistema ser light ou dark
               },
               icon: Icons.palette,

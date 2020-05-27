@@ -71,40 +71,37 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Stack(
-        children: <Widget>[
-          MapsContainer(
-            preExecute: (){ if(this.isSideMenuOpen) changeSideMenuState(); },
-            changeSideMenuState: this.changeSideMenuState,
-            controller: this.controller,
-            email: this.email,
-            firestore: this.firestore,
-            getRefreshToken: this.getRefreshToken,
-            setVisiblePin: (Agent agent, Polyline oldPolyline) { 
-              this.setState((){
-                this.isPinVisible = !oldPolyline.visible;
-                visiblePin = agent;
-              });
-            }
-          ),
-          PinInfo(
-            visible: this.isPinVisible,
-            agent: this.visiblePin
-          ),
-          AnimatedSideMenu(
-            isOpen: this.isSideMenuOpen,
-            sideMenu: SideMenu(
-              email: this.email, 
-              name: this.name, 
-              logout: this.logout, 
-              photoUrl: this.photoUrl,
-              textColor: Theme.of(context).primaryColor
-            )
+    return Stack(
+      children: <Widget>[
+        MapsContainer(
+          preExecute: (){ if(this.isSideMenuOpen) changeSideMenuState(); },
+          changeSideMenuState: this.changeSideMenuState,
+          controller: this.controller,
+          email: this.email,
+          firestore: this.firestore,
+          getRefreshToken: this.getRefreshToken,
+          setVisiblePin: (Agent agent, Polyline oldPolyline) { 
+            this.setState((){
+              this.isPinVisible = !oldPolyline.visible;
+              visiblePin = agent;
+            });
+          }
+        ),
+        PinInfo(
+          visible: this.isPinVisible,
+          agent: this.visiblePin
+        ),
+        AnimatedSideMenu(
+          isOpen: this.isSideMenuOpen,
+          sideMenu: SideMenu(
+            email: this.email, 
+            name: this.name, 
+            logout: this.logout, 
+            photoUrl: this.photoUrl,
+            textColor: Theme.of(context).primaryColor
           )
-        ],
-      )
+        )
+      ],
     );
   }
 

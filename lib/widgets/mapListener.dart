@@ -122,7 +122,9 @@ class _MapListenerState extends State<MapListener> {
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute(
-              builder: (context) => AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
+              builder: (context) => Scaffold(
+                body: AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
+              )
             )
           );
         },

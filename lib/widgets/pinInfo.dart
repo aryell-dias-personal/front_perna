@@ -28,7 +28,9 @@ class PinInfo extends StatelessWidget {
           child: InkWell(
             onTap: (){
               Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => ExpedientPage(agent: this.agent, readOnly: true, clear: (){})
+                  builder: (context) => Scaffold(
+                    body: ExpedientPage(agent: this.agent, readOnly: true, clear: (){})
+                  )
                 )
               );
             },

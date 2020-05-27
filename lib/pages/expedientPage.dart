@@ -6,6 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/pages/userProfilePage.dart';
@@ -18,7 +19,6 @@ import 'package:perna/widgets/addHeader.dart';
 import 'package:perna/widgets/formContainer.dart';
 import 'package:perna/widgets/formTimePicker.dart';
 import 'package:perna/widgets/outlinedTextFormField.dart';
-import 'package:toast/toast.dart';
 
 enum ExpedientOptions { aboutDriver, aboutRequester }
 
@@ -79,14 +79,14 @@ class _ExpedientState extends State<ExpedientPage> {
   void _askNewAgend(agent) async {
     int statusCode = await driverService.askNewAgent(agent);
     if(statusCode == 200){
+      showSnackBar(AppLocalizations.of(context).translate("successful_work_order"), 
+        context, Colors.greenAccent);
       Navigator.pop(context);
       this.clear();
-      Toast.show(AppLocalizations.of(context).translate("successful_work_order"), context, 
-        backgroundColor: Colors.greenAccent, duration: 3);
     } else {
       setState(() { isLoading = false; });
-      Toast.show(AppLocalizations.of(context).translate("unsuccessful_work_order"), context, 
-        backgroundColor: Colors.redAccent, duration: 3);
+      showSnackBar(AppLocalizations.of(context).translate("unsuccessful_work_order"), 
+        context, Colors.redAccent);
     }
   }
 
@@ -107,14 +107,14 @@ class _ExpedientState extends State<ExpedientPage> {
         IdTokenResult idTokenResult = await this.getRefreshToken();
         int statusCode = await driverService.postNewAgent(agent, idTokenResult.token);
         if(statusCode==200){
+          showSnackBar( AppLocalizations.of(context).translate("successfully_added_expedient"), 
+            context, Colors.greenAccent);
           Navigator.pop(context);
           this.clear();
-          Toast.show( AppLocalizations.of(context).translate("successfully_added_expedient"), context, 
-            backgroundColor: Colors.greenAccent, duration: 3);
         }else{
           setState(() { isLoading = false; });
-          Toast.show(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), context, 
-            backgroundColor: Colors.redAccent, duration: 3);
+          showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), 
+            context, Colors.redAccent);
         }
       }
     }
@@ -137,8 +137,8 @@ class _ExpedientState extends State<ExpedientPage> {
         )
       );
     } else {
-      Toast.show(AppLocalizations.of(context).translate("not_found_user"), context, 
-        backgroundColor: Colors.redAccent, duration: 3
+      showSnackBar(AppLocalizations.of(context).translate("not_found_user"), 
+        context, Colors.redAccent
       );
     }
     setState(() {

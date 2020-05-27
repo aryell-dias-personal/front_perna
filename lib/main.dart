@@ -66,7 +66,12 @@ class MyApp extends StatelessWidget {
       store: store,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth),
+        home: Builder(
+          builder: (context) => Scaffold(
+            backgroundColor: Theme.of(context).backgroundColor, 
+            body: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth)
+          )
+        ),
         supportedLocales: [
           Locale('en', 'US'),
           Locale('pt', 'BR'),

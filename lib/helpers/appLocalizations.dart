@@ -31,6 +31,14 @@ class AppLocalizations {
     return _localizedStrings[key];
   }
 
+  String translateFormat(String key, List formatters) {
+    return _localizedStrings[key].replaceAllMapped("<?>", (Match match) {
+      dynamic replacement = formatters.first;
+      formatters.remove(replacement);
+      return "$replacement";
+    });
+  }
+
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 }
 

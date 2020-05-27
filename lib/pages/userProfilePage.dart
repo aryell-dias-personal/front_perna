@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/user.dart';
-import 'package:toast/toast.dart';
 
 class UserProfilePage extends StatelessWidget {
   final User user;
@@ -41,28 +41,30 @@ class UserProfilePage extends StatelessWidget {
                     )
                 )
               ),
-              RatingBar(
-                initialRating: 5,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                unratedColor: Theme.of(context).brightness == Brightness.light? 
-                  Colors.grey.withOpacity(0.2): 
-                  Theme.of(context).backgroundColor.withOpacity(0.8),
-                glow: false,
-                itemCount: 5,
-                itemSize: 50.0,
-                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
+              Builder(
+                builder: (context) => RatingBar(
+                  initialRating: 5,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  unratedColor: Theme.of(context).brightness == Brightness.light? 
+                    Colors.grey.withOpacity(0.2): 
+                    Theme.of(context).backgroundColor.withOpacity(0.8),
+                  glow: false,
+                  itemCount: 5,
+                  itemSize: 50.0,
+                  itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (rating) {
+                    showSnackBar(
+                      AppLocalizations.of(context).translate("not_implemented"), 
+                      context, Colors.pinkAccent);
+                    // TODO: Enviar rating do usuário para o backend, não esquecer de salvar que já foi classificado por esta pessoa.
+                  },
                 ),
-                onRatingUpdate: (rating) {
-                  Toast.show(
-                    AppLocalizations.of(context).translate("not_implemented"), 
-                    context, backgroundColor: Colors.pinkAccent, duration: 3);
-                  // TODO: Enviar rating do usuário para o backend, não esquecer de salvar que já foi classificado por esta pessoa.
-                },
               ),
               SizedBox(height: 26),
               TextFormField(
@@ -85,23 +87,25 @@ class UserProfilePage extends StatelessWidget {
                 )
               ),
               SizedBox(height: 26),
-              RaisedButton(
-                onPressed: (){
-                  Toast.show(
-                    AppLocalizations.of(context).translate("not_implemented"), 
-                    context, backgroundColor: Colors.pinkAccent, duration: 3);
-                  // TODO: Redirecionar para email ou criar um chat para conversa entre usuários.
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children:<Widget>[
-                    Text(AppLocalizations.of(context).translate("talk"), style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
-                    SizedBox(width: 5),
-                    Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
-                  ]
-                ),
-                color: Theme.of(context).primaryColor,
-                shape: StadiumBorder(),
+              Builder(
+                builder: (context)=> RaisedButton(
+                  onPressed: (){
+                    showSnackBar(
+                      AppLocalizations.of(context).translate("not_implemented"), 
+                      context, Colors.pinkAccent);
+                    // TODO: Redirecionar para email ou criar um chat para conversa entre usuários.
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children:<Widget>[
+                      Text(AppLocalizations.of(context).translate("talk"), style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
+                      SizedBox(width: 5),
+                      Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
+                    ]
+                  ),
+                  color: Theme.of(context).primaryColor,
+                  shape: StadiumBorder(),
+                )
               )
             ],
           )

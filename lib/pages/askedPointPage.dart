@@ -6,6 +6,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/expedientPage.dart';
@@ -17,7 +18,6 @@ import 'package:perna/widgets/addHeader.dart';
 import 'package:perna/widgets/formContainer.dart';
 import 'package:perna/widgets/formTimePicker.dart';
 import 'package:perna/widgets/outlinedTextFormField.dart';
-import 'package:toast/toast.dart';
 
 enum AskedPointOptions { aboutExpedient }
 
@@ -76,14 +76,14 @@ class _AskedPointPageState extends State<AskedPointPage> {
       );
       int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
       if(statusCode==200){
+        showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
+          context, Colors.greenAccent);
         Navigator.pop(context);
         this.clear();
-        Toast.show(AppLocalizations.of(context).translate("successfully_added_order"), context, 
-          backgroundColor: Colors.greenAccent, duration: 3);
       }else{
         setState(() { isLoading = false; });
-        Toast.show(AppLocalizations.of(context).translate("unsuccessfully_added_order"), context, 
-          backgroundColor: Colors.redAccent, duration: 3);
+        showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
+          context, Colors.redAccent);
       }
     }
   }
@@ -94,11 +94,13 @@ class _AskedPointPageState extends State<AskedPointPage> {
     if (documentSnapshot.data.isNotEmpty) {
       Agent agent = Agent.fromJson(documentSnapshot.data);
       await Navigator.push(context, MaterialPageRoute(
-        builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){})
+        builder: (context) => Scaffold(
+          body: ExpedientPage(agent: agent, readOnly: true, clear: (){})
+        )
       ));
     } else {
-      Toast.show(AppLocalizations.of(context).translate("not_found_expedient"), context, 
-        backgroundColor: Colors.redAccent, duration: 3);
+      showSnackBar(AppLocalizations.of(context).translate("not_found_expedient"), 
+        context, Colors.redAccent);
     }
     setState(() { this.isLoading = false; });
   }

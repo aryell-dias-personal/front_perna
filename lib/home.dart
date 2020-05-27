@@ -1,11 +1,12 @@
 import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:perna/constants/notification.dart';
+import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/services/driver.dart';
@@ -19,7 +20,6 @@ import 'package:connectivity/connectivity.dart';
 import 'dart:convert';
 import 'package:perna/constants/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:toast/toast.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -64,10 +64,12 @@ class _HomeState extends State<Home> {
     Agent agent = Agent.fromJson(JsonDecoder().convert(message['data']['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
-        builder: (context) => ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
-          getRefreshToken: this.signInService.getRefreshToken,
-          accept: () async { await answerNewAgentHandler(agent, true); },
-          deny: () async { await answerNewAgentHandler(agent, false); }
+        builder: (context) => Scaffold(
+          body: ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
+            getRefreshToken: this.signInService.getRefreshToken,
+            accept: () async { await answerNewAgentHandler(agent, true); },
+            deny: () async { await answerNewAgentHandler(agent, false); }
+          )
         )
       )
     );
@@ -78,27 +80,24 @@ class _HomeState extends State<Home> {
       IdTokenResult idTokenResult =  await this.signInService.getRefreshToken();
       int statusCodeNewAgent = await driverService.postNewAgent(agent, idTokenResult.token);
       if(statusCodeNewAgent !=200){
-        Toast.show(
-          "Não foi possivel aceitar o pedido de ${agent.fromEmail} no momento", context, 
-          backgroundColor: Colors.redAccent, 
-          duration: 3
+        showSnackBar(
+          AppLocalizations.of(context).translateFormat("accept_not_possible", [agent.fromEmail]),
+          context, Colors.redAccent
         );
         return;
       }
     }
     int statusCodeAnswer = await driverService.answerNewAgent(agent.fromEmail, agent.email, accepted);
     if(statusCodeAnswer == 200){
-      String answer = accepted? "aceitou": "negou";
-      Toast.show(
-        "Você $answer o pedido feito por ${agent.fromEmail}", context, 
-        backgroundColor: Colors.greenAccent, 
-        duration: 3
+      String answer = AppLocalizations.of(context).translate(accepted? "accepted" : "denied");
+      showSnackBar(
+        AppLocalizations.of(context).translateFormat("answer_order", [answer, agent.fromEmail]), 
+        context, Colors.greenAccent
       );
     } else {
-      Toast.show(
-        "Não foi possivel responder ${agent.fromEmail} no momento", context, 
-        backgroundColor: Colors.redAccent, 
-        duration: 3
+      showSnackBar(
+        AppLocalizations.of(context).translateFormat("not_answer_order", [agent.fromEmail]), 
+        context, Colors.redAccent
       );
     }
     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -107,7 +106,8 @@ class _HomeState extends State<Home> {
   Future scheduleMessage(Map<String, dynamic> message) async {
     Random rand = Random();
     int time = double.parse(message['data']['time']).round();
-    String content = message['data']['type'] == expedientType ? " expediente": "a viajem";
+    String content = AppLocalizations.of(context).translate(
+      message['data']['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
     DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
@@ -115,8 +115,10 @@ class _HomeState extends State<Home> {
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, null);
     await flutterLocalNotificationsPlugin.schedule(
-      rand.nextInt(1000), "Passando só pra te lembrar", "De ${date.hour}:${date.minute} você tem um$content 😀", date, platformChannelSpecifics,
-      payload: 'remember', androidAllowWhileIdle: true
+      rand.nextInt(1000), 
+      AppLocalizations.of(context).translate("remind"), 
+      AppLocalizations.of(context).translateFormat("reminder_message", [date.hour, date.minute, content]), 
+      date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true
     );
   }
   

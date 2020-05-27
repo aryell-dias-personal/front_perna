@@ -70,5 +70,14 @@
     "desired_end": "Desired arrival time",
     "enter_desired_end": "Enter the desired arrival time",
     "actual_start": "Actual departure time",
-    "actual_end": "Actual arrival time"
+    "actual_end": "Actual arrival time",
+    "answer_order": "You <?> the order made by <?>",
+    "not_answer_order": "Couldn't reply <?> at the moment",
+    "accept_not_possible": "Couldn't accept the order made by <?> at the moment",
+    "remind": "Passing by just to remind you",
+    "reminder_message": "<?>:<?> You have a<?> 😀",
+    "reminder_content_expedient": "n expedient",
+    "reminder_content_travel": " departure",
+    "accepted": "accepted",
+    "denied": "denied"
 }

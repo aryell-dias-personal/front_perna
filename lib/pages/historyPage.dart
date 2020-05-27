@@ -162,10 +162,12 @@ class _HistoryPageState extends State<HistoryPage> {
           onPressed: (){
             Navigator.push(context, 
               MaterialPageRoute(
-                builder: (context) => operation['origin'] != null?
-                  AskedPointPage(askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
-                  ExpedientPage(agent: Agent.fromJson(operation), readOnly: true, clear: (){})
-                )
+                builder: (context) => Scaffold(
+                  body: operation['origin'] != null?
+                    AskedPointPage(askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
+                    ExpedientPage(agent: Agent.fromJson(operation), readOnly: true, clear: (){})
+                  )
+              )
             );
           }, 
           child: Column(
