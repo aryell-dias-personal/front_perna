@@ -76,10 +76,10 @@ class _AskedPointPageState extends State<AskedPointPage> {
       );
       int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
       if(statusCode==200){
+        this.clear();
+        Navigator.pop(context);
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
           Colors.greenAccent, isGlobal: true);
-        Navigator.pop(context);
-        this.clear();
       }else{
         setState(() { isLoading = false; });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 

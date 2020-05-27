@@ -79,10 +79,10 @@ class _ExpedientState extends State<ExpedientPage> {
   void _askNewAgend(agent) async {
     int statusCode = await driverService.askNewAgent(agent);
     if(statusCode == 200){
+      this.clear();
+      Navigator.pop(context);
       showSnackBar(AppLocalizations.of(context).translate("successful_work_order"), 
         Colors.greenAccent, isGlobal: true);
-      Navigator.pop(context);
-      this.clear();
     } else {
       setState(() { isLoading = false; });
       showSnackBar(AppLocalizations.of(context).translate("unsuccessful_work_order"), 
@@ -107,10 +107,10 @@ class _ExpedientState extends State<ExpedientPage> {
         IdTokenResult idTokenResult = await this.getRefreshToken();
         int statusCode = await driverService.postNewAgent(agent, idTokenResult.token);
         if(statusCode==200){
+          this.clear();
+          Navigator.pop(context);
           showSnackBar( AppLocalizations.of(context).translate("successfully_added_expedient"), 
             Colors.greenAccent, isGlobal: true);
-          Navigator.pop(context);
-          this.clear();
         }else{
           setState(() { isLoading = false; });
           showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), 
