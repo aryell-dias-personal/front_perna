@@ -166,6 +166,7 @@ class _MapListenerState extends State<MapListener> {
         });
       watchAgentsSubscription = this.firestore.collection("agent")
         .where('watchedBy', arrayContains: this.email)
+        .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
           DateTime now = DateTime.now();
           List<Agent> agents =  agentSnapshot.documents.fold(<Agent>[], (List<Agent> acc, DocumentSnapshot document) {
