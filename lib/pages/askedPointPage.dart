@@ -10,6 +10,7 @@ import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/expedientPage.dart';
+import 'package:perna/services/driver.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
@@ -25,12 +26,14 @@ class AskedPointPage extends StatefulWidget {
   final bool readOnly;
   final Function() clear;
   final AskedPoint askedPoint;
+  final UserService userService;
   final Future<IdTokenResult> Function() getRefreshToken;
 
   const AskedPointPage({
-    @required this.clear, 
+    @required this.userService, 
     @required this.readOnly, 
     @required this.askedPoint, 
+    @required this.clear, 
     this.getRefreshToken
   });
 
@@ -39,7 +42,8 @@ class AskedPointPage extends StatefulWidget {
     clear: this.clear, 
     readOnly: this.readOnly, 
     askedPoint: this.askedPoint, 
-    getRefreshToken: this.getRefreshToken
+    getRefreshToken: this.getRefreshToken,
+    userService: this.userService
   );
 }
 
@@ -48,7 +52,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   final Function() clear;
   final AskedPoint askedPoint;
   final _formKey = GlobalKey<FormState>();
-  final UserService userService = new UserService();
+  final UserService userService;
   final Future<IdTokenResult> Function() getRefreshToken;
   final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
 
@@ -58,6 +62,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   bool isLoading = false;
 
   _AskedPointPageState({
+    @required this.userService, 
     @required this.readOnly, 
     @required this.askedPoint, 
     @required this.clear, 
@@ -95,7 +100,15 @@ class _AskedPointPageState extends State<AskedPointPage> {
       Agent agent = Agent.fromJson(documentSnapshot.data);
       await Navigator.push(context, MaterialPageRoute(
         builder: (context) => Scaffold(
-          body: ExpedientPage(agent: agent, readOnly: true, clear: (){})
+          body: StoreConnector<StoreState, DriverService>(
+            builder: (context, driverService) => ExpedientPage(
+              driverService: driverService,
+              agent: agent, 
+              readOnly: true, 
+              clear: (){}
+            ),
+            converter: (store)=>store.state.driverService
+          )
         )
       ));
     } else {

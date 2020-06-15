@@ -3,8 +3,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/rsaDecoder.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/home.dart';
+import 'package:perna/services/driver.dart';
+import 'package:perna/services/signIn.dart';
+import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -15,6 +19,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+GoogleSignIn googleSignIn = GoogleSignIn(
+  scopes: <String>[emailUserInfo],
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,19 +50,38 @@ void main() async {
   final Firestore firestore = Firestore(app: app);
   final FirebaseAuth firebaseAuth = FirebaseAuth.fromApp(app);
 
+  QuerySnapshot querySnapshot = await firestore.collection("frontKeys").getDocuments();
+  Map<String, dynamic> frontKeys = querySnapshot.documents.first.data;
+  RsaDecoder rsaDecoder = RsaDecoder(
+    rsaPrivateKey: frontKeys['PRIVATE_FRONT'],
+    rsaPublicKey: frontKeys['PUBLIC_BACK']
+  );
   final store = new Store<StoreState>(
-    reduce, initialState: initialState.copyWith(firestore: firestore, messagingToken: messagingToken),
+    reduce, initialState: initialState.copyWith(
+      firestore: firestore, 
+      messagingToken: messagingToken,
+      userService: UserService(
+        rsaDecoder: rsaDecoder
+      ),
+      driverService: DriverService(
+        rsaDecoder: rsaDecoder
+      ),
+      signInService: SignInService(
+        firebaseAuth: firebaseAuth,
+        googleSignIn: googleSignIn,
+        rsaDecoder: rsaDecoder
+      )
+    ),
     middleware: [persistor.createMiddleware()]
   );
-  runApp(new MyApp(store: store, firebaseAuth: firebaseAuth, firebaseMessaging: firebaseMessaging));
+  runApp(new MyApp(store: store, firebaseMessaging: firebaseMessaging));
 }
 
 class MyApp extends StatelessWidget {
   final Store<StoreState> store;
   final FirebaseMessaging firebaseMessaging;
-  final FirebaseAuth firebaseAuth;
 
-  MyApp({@required this.store, @required this.firebaseMessaging, @required this.firebaseAuth});
+  MyApp({@required this.store, @required this.firebaseMessaging});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +99,11 @@ class MyApp extends StatelessWidget {
           builder: (context) => Scaffold(
             key: scaffoldKey,
             backgroundColor: Theme.of(context).backgroundColor, 
-            body: Home(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth)
+            body: Home(
+              firebaseMessaging: this.firebaseMessaging, 
+              driverService: store.state.driverService,
+              signInService: store.state.signInService,
+            )
           )
         ),
         supportedLocales: [

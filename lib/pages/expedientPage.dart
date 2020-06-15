@@ -28,9 +28,11 @@ class ExpedientPage extends StatefulWidget {
   final Function() deny;
   final Function() clear;
   final Function() accept;
+  final DriverService driverService;
   final Future<IdTokenResult> Function() getRefreshToken;
 
   const ExpedientPage({
+    @required this.driverService, 
     @required this.readOnly, 
     @required this.agent, 
     @required this.clear, 
@@ -41,6 +43,7 @@ class ExpedientPage extends StatefulWidget {
 
   @override
   _ExpedientState createState() => _ExpedientState(
+    driverService: this.driverService, 
     clear: this.clear, 
     agent: this.agent, 
     accept: this.accept, 
@@ -58,7 +61,7 @@ class _ExpedientState extends State<ExpedientPage> {
   final Function() clear;
   final _formKey = GlobalKey<FormState>();
   final Future<IdTokenResult> Function() getRefreshToken;
-  final DriverService driverService = new DriverService();
+  final DriverService driverService;
   final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
   String name;
   String email;
@@ -68,6 +71,7 @@ class _ExpedientState extends State<ExpedientPage> {
   bool isLoading = false;
 
   _ExpedientState({
+    @required this.driverService, 
     @required this.readOnly, 
     @required this.agent, 
     @required this.clear, 

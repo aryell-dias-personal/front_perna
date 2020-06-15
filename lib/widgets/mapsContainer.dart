@@ -3,11 +3,15 @@ import 'package:android_intent/android_intent.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/services/driver.dart';
+import 'package:perna/services/user.dart';
+import 'package:perna/store/state.dart';
 import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/mapListener.dart';
 import 'package:perna/widgets/reactiveFloatingButton.dart';
@@ -107,7 +111,16 @@ class _MapsContainerState extends State<MapsContainer> {
       Navigator.push(context, 
         MaterialPageRoute(
           builder: (context) => Scaffold(
-            body: ExpedientPage(agent: agent, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+            body: StoreConnector<StoreState, DriverService>(
+              builder: (context, driverService) => ExpedientPage(
+                agent: agent, 
+                readOnly: false,
+                driverService: driverService, 
+                clear: this.markers.clear, 
+                getRefreshToken: this.getRefreshToken
+              ),
+              converter: (store)=>store.state.driverService
+            )
           )
         )
       );
@@ -128,7 +141,16 @@ class _MapsContainerState extends State<MapsContainer> {
       Navigator.push(context, 
         MaterialPageRoute(
           builder: (context) => Scaffold(
-            body: AskedPointPage(askedPoint: askedPoint, readOnly: false, clear: this.markers.clear, getRefreshToken: this.getRefreshToken)
+            body: StoreConnector<StoreState, UserService>(
+              builder: (context, userService) => AskedPointPage(
+                userService: userService, 
+                askedPoint: askedPoint, 
+                readOnly: false, 
+                clear: this.markers.clear, 
+                getRefreshToken: this.getRefreshToken
+              ),
+              converter: (store)=>store.state.userService
+            )
           )
         )
       );

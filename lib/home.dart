@@ -18,14 +18,8 @@ import 'package:perna/pages/initialPage.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
 import 'dart:convert';
-import 'package:perna/constants/constants.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-GoogleSignIn googleSignIn = GoogleSignIn(
-  scopes: <String>[emailUserInfo],
-);
 
 Future onMessage(Map<String, dynamic> message) async {
   JsonEncoder enc = JsonEncoder();
@@ -43,21 +37,30 @@ Future onMessage(Map<String, dynamic> message) async {
 
 class Home extends StatefulWidget {
   final FirebaseMessaging firebaseMessaging;
-  final FirebaseAuth firebaseAuth;
+  final DriverService driverService;
+  final SignInService signInService;
 
-  Home({@required this.firebaseMessaging, @required this.firebaseAuth, Key key}) : super(key: key);
+  Home({
+    @required this.firebaseMessaging, 
+    @required this.driverService, 
+    @required this.signInService, 
+    Key key
+  }) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState(firebaseMessaging: this.firebaseMessaging, firebaseAuth: this.firebaseAuth);
+  _HomeState createState() => _HomeState(
+    firebaseMessaging: this.firebaseMessaging, 
+    driverService: this.driverService,
+    signInService: this.signInService
+  );
 }
 
 class _HomeState extends State<Home> {
   final FirebaseMessaging firebaseMessaging;
-  final FirebaseAuth firebaseAuth;
-  final DriverService driverService = DriverService();
+  final DriverService driverService;
+  final SignInService signInService;
 
   bool isConnected = true;
-  SignInService signInService;
 
   Future askNewAgentHandler(Map<String, dynamic> message) async {
     NavigatorState navigatorState = Navigator.of(context);
@@ -67,6 +70,7 @@ class _HomeState extends State<Home> {
         builder: (context) => Scaffold(
           body: ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
             getRefreshToken: this.signInService.getRefreshToken,
+            driverService: this.driverService,
             accept: () async { await answerNewAgentHandler(agent, true); },
             deny: () async { await answerNewAgentHandler(agent, false); }
           )
@@ -135,10 +139,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      this.signInService = new SignInService(googleSignIn: googleSignIn, firebaseAuth: this.firebaseAuth);
-    });
-
     AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
     InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
@@ -166,7 +166,11 @@ class _HomeState extends State<Home> {
 
   }
 
-  _HomeState({@required this.firebaseMessaging, @required this.firebaseAuth});
+  _HomeState({
+    @required this.firebaseMessaging, 
+    @required this.driverService, 
+    @required this.signInService
+  });
 
   @override
   Widget build(BuildContext context) {

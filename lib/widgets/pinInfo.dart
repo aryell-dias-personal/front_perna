@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedientPage.dart';
+import 'package:perna/services/driver.dart';
+import 'package:perna/store/state.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 
 class PinInfo extends StatelessWidget {
@@ -29,7 +32,15 @@ class PinInfo extends StatelessWidget {
             onTap: (){
               Navigator.push(context, MaterialPageRoute(
                   builder: (context) => Scaffold(
-                    body: ExpedientPage(agent: this.agent, readOnly: true, clear: (){})
+                    body: StoreConnector<StoreState, DriverService>(
+                      builder: (context, driverService) => ExpedientPage(
+                        driverService: driverService,
+                        agent: this.agent, 
+                        readOnly: true, 
+                        clear: (){}
+                      ),
+                      converter: (store)=>store.state.driverService
+                    )
                   )
                 )
               );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
@@ -9,6 +10,7 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/askedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
+import 'package:perna/store/state.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
 import 'package:timeline_list/timeline.dart';
 import 'package:timeline_list/timeline_model.dart';
@@ -163,10 +165,16 @@ class _HistoryPageState extends State<HistoryPage> {
             Navigator.push(context, 
               MaterialPageRoute(
                 builder: (context) => Scaffold(
-                  body: operation['origin'] != null?
-                    AskedPointPage(askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
-                    ExpedientPage(agent: Agent.fromJson(operation), readOnly: true, clear: (){})
+                  body: StoreConnector<StoreState, Map<String, dynamic>>(
+                    converter: (store) => {
+                      "userService": store.state.userService,
+                      "driverService": store.state.driverService
+                    },
+                    builder: (context, resources) => operation['origin'] != null?
+                      AskedPointPage(userService: resources['userService'], askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
+                      ExpedientPage(driverService: resources['driverService'], agent: Agent.fromJson(operation), readOnly: true, clear: (){})
                   )
+                )
               )
             );
           }, 

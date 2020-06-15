@@ -2,10 +2,13 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/services/directions.dart';
+import 'package:perna/services/user.dart';
+import 'package:perna/store/state.dart';
 import 'package:perna/widgets/myGoogleMap.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/models/point.dart';
@@ -123,7 +126,10 @@ class _MapListenerState extends State<MapListener> {
           Navigator.push(context, 
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                body: AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
+                body: StoreConnector<StoreState, UserService>(
+                  builder: (context, userService) => AskedPointPage(userService: userService, askedPoint: askedPoint, readOnly: true, clear: (){}),
+                  converter: (store)=>store.state.userService
+                )
               )
             )
           );
@@ -145,13 +151,14 @@ class _MapListenerState extends State<MapListener> {
         .snapshots().listen((QuerySnapshot agentSnapshot) {
           DateTime now = DateTime.now();
           setState(() {
-            this.agentIds = agentSnapshot.documents.fold(<String>[], (List<String> acc, DocumentSnapshot document) {
+            this.agentIds.clear();
+            this.agentIds.addAll(agentSnapshot.documents.fold<List<String>>(<String>[], (List<String> acc, DocumentSnapshot document) {
               Agent agent = Agent.fromJson(document.data);
               if(agent.askedStartAt.isBefore(now)){
                 acc.add(document.documentID);
               }
               return acc;
-            });
+            }));
           });
         });
       watchAskedPointSubscription = firestore.collection("askedPoint").where('email', isEqualTo: email)
@@ -165,6 +172,7 @@ class _MapListenerState extends State<MapListener> {
           }
         });
       watchAgentsSubscription = this.firestore.collection("agent")
+        .where('processed', isEqualTo: true)
         .where('watchedBy', arrayContains: this.email)
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
