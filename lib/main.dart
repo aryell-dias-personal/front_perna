@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
-import 'package:perna/helpers/rsaDecoder.dart';
+import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
@@ -50,26 +50,21 @@ void main() async {
   final Firestore firestore = Firestore(app: app);
   final FirebaseAuth firebaseAuth = FirebaseAuth.fromApp(app);
 
-  QuerySnapshot querySnapshot = await firestore.collection("frontKeys").getDocuments();
-  Map<String, dynamic> frontKeys = querySnapshot.documents.first.data;
-  RsaDecoder rsaDecoder = RsaDecoder(
-    rsaPrivateKey: frontKeys['PRIVATE_FRONT'],
-    rsaPublicKey: frontKeys['PUBLIC_BACK']
-  );
+  MyDecoder myDecoder = MyDecoder();
   final store = new Store<StoreState>(
     reduce, initialState: initialState.copyWith(
       firestore: firestore, 
       messagingToken: messagingToken,
       userService: UserService(
-        rsaDecoder: rsaDecoder
+        myDecoder: myDecoder
       ),
       driverService: DriverService(
-        rsaDecoder: rsaDecoder
+        myDecoder: myDecoder
       ),
       signInService: SignInService(
         firebaseAuth: firebaseAuth,
         googleSignIn: googleSignIn,
-        rsaDecoder: rsaDecoder
+        myDecoder: myDecoder
       )
     ),
     middleware: [persistor.createMiddleware()]

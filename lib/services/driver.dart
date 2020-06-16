@@ -1,19 +1,19 @@
 import 'package:perna/constants/constants.dart';
 import 'package:http/http.dart';
-import 'package:perna/helpers/rsaDecoder.dart';
+import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/models/agent.dart';
 
 class DriverService {
-  RsaDecoder rsaDecoder;
+  MyDecoder myDecoder;
 
   DriverService({
-    this.rsaDecoder
+    this.myDecoder
   });
 
   Future<int> postNewAgent(Agent agent, String token) async {
     Response res = await post(
       "${baseUrl}insertAgent", 
-      body: await rsaDecoder.encode(agent.toJson()),
+      body: await myDecoder.encode(agent.toJson()),
       headers: {
         'Authorization': token
       }
@@ -22,7 +22,7 @@ class DriverService {
   }
 
   Future<int> answerNewAgent(String fromEmail, String toEmail, bool accepted) async {
-    final body = await rsaDecoder.encode({
+    final body = await myDecoder.encode({
       "fromEmail": fromEmail,
       "toEmail": toEmail,
       "accepted": accepted
@@ -32,7 +32,7 @@ class DriverService {
   }
 
   Future<int> askNewAgent(Agent agent) async {
-    Response res = await post("${baseUrl}askNewAgent", body: await rsaDecoder.encode(agent.toJson()));
+    Response res = await post("${baseUrl}askNewAgent", body: await myDecoder.encode(agent.toJson()));
     return res.statusCode;
   }
 }

@@ -2,19 +2,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
-import 'package:perna/helpers/rsaDecoder.dart';
+import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/models/signInResponse.dart';
 import 'package:perna/models/user.dart';
 
 class SignInService {
   GoogleSignIn googleSignIn;
   FirebaseAuth firebaseAuth;
-  RsaDecoder rsaDecoder;
+  MyDecoder myDecoder;
 
   SignInService({
     this.googleSignIn, 
     this.firebaseAuth,
-    this.rsaDecoder,
+    this.myDecoder,
   });
 
   Future<IdTokenResult> getRefreshToken() async {
@@ -56,7 +56,7 @@ class SignInService {
   }
 
   Future<SignInResponse> _creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
-    final body = await rsaDecoder.encode({
+    final body = await myDecoder.encode({
       'email': user?.email,
       'isProvider': isProvider,
       'photoUrl': user?.photoUrl,
@@ -64,25 +64,25 @@ class SignInService {
       'messagingTokens': [ messagingToken ]
     });
     Response res = await post("${baseUrl}insertUser", body: body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(await rsaDecoder.decode(res.body)) : null;
+    return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
   Future<SignInResponse> _getUser(GoogleSignInAccount user, String messagingToken) async {
-    final body = await rsaDecoder.encode({
+    final body = await myDecoder.encode({
       'email': user?.email,
       'messagingToken': messagingToken
     });
     Response res = await post("${baseUrl}getUser", body: body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(await rsaDecoder.decode(res.body)) : null;
+    return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
   Future<SignInResponse> _logoutService(User user, String messagingToken) async {
-    final body = await rsaDecoder.encode({
+    final body = await myDecoder.encode({
       'email': user?.email,
       'messagingToken': messagingToken
     });
     Response res = await post("${baseUrl}logout", body: body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(await rsaDecoder.decode(res.body)) : null;
+    return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
   Future _authFirebase(GoogleSignInAccount user) async {
