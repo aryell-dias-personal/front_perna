@@ -1,9 +1,11 @@
-final String baseUrl = 'https://us-central1-perna-app.cloudfunctions.net/';
+// remember, the functions used here should not be private
+final String baseUrl = 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-';
 final String emailUserInfo = 'https://www.googleapis.com/auth/userinfo.email';
-final String encodedNamesSeparetor = '<{*_-_*}>';
+
+// Dado sensível
 const String apiKey = 'AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA';
-const String secret = """
-NT05IQQfJiUrJwsxGx8JOwYdDjQsNg4mBwA9MSYaAyc8EB8CAy0BHB4pFRsFFhoyDgEBLw0oBRY6PiwHBxA9HykpEhwdPQ42AxAzMBMIABYpERcJFDsODykXBBArCC8BBy4eBAsyDgU9JSQkPxMmLQgWPz8MLAYkGBMoBTA+EiQVKBkjIhIwFRYyDj0WGTIHHhcvFxQHBCoaPRwvNgUxDiMCJAQsBQQYDgUeGCcdNgwfPA0pJgUxKgIpOjIdCAkHPi0iNR8xFQo7Ix0eFyEdHToZNRwVEyQDPTASOScKKiYiBg8KNxs9ERAmGC4yIhEIJSgCFSM6MjkZBjkyDS0ONxATBwgHAzgQMQA/HwYzNT4jITYPLSITPxQlIwMYPwIALgUNCB01KCAxDCYlJwgVPTYUBygKEw4NOgYJKwIiDBYHOgUOFAkkOBIZJR0LHj0IKhYoEDoOIxgBPisJKxgAAgkeAQQOIyY1OxI9GRg4LD4fERYuNSIVLS8BMBQwLBgMDC8mHA8FCzsWGhgSDAE5ER8TBA0nEyI3KTokGD8IFT4pBRsxMhEXDBsRNTUsNhgLPCABLx4iJAwkDwEfFxkIMyYgBBo6ORscMRoWPQwvIg4MKCwBGTA/JTsLGgsLOxE2OzoxECw7JCYtOh0ZCh8yPAY3HAA=
-""";
+
+final String encodedNamesSeparetor = '<{*_-_*}>';
+
 enum MenuOption { logout, clear }
 enum MarkerType { origin, destiny }
