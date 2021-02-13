@@ -8,6 +8,7 @@ import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
+import 'package:perna/widgets/visibleRichText.dart';
 
 class SideMenu extends StatelessWidget {
   final String email;
@@ -35,9 +36,9 @@ class SideMenu extends StatelessWidget {
               backgroundImage: NetworkImage(this.photoUrl)
             ),
             SizedBox(height: 10),
-            Text(this._getName(), style: TextStyle(color: this.textColor, fontSize: 22)),
+            VisibleRichText(fontSize: 22, text: this._getName(), textColor: this.textColor),
             SizedBox(height: 5),
-            Text(this._getEmail(), style: TextStyle(color: this.textColor, fontSize: 11)),
+            VisibleRichText(fontSize: 11, text: this._getEmail(), textColor: this.textColor),
             SizedBox(height: 20),
             SideMenuButton(
               textColor: textColor,

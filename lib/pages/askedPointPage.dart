@@ -54,7 +54,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   final _formKey = GlobalKey<FormState>();
   final UserService userService;
   final Future<IdTokenResult> Function() getRefreshToken;
-  final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
+  final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
 
   String name;
   String askedEndAt;

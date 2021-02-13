@@ -62,7 +62,7 @@ class _ExpedientState extends State<ExpedientPage> {
   final _formKey = GlobalKey<FormState>();
   final Future<IdTokenResult> Function() getRefreshToken;
   final DriverService driverService;
-  final DateFormat format = DateFormat('hh:mm dd/MM/yyyy');
+  final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   String name;
   String email;
   String places;

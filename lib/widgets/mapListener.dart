@@ -54,6 +54,7 @@ class _MapListenerState extends State<MapListener> {
   final List<LatLng> points;
   final Set<Marker> markers;
   final Function setVisiblePin;
+  Function hidePin =() {};
   Set<Polyline> polyline = Set();
   Set<Marker> nextPlaces = Set();
   Set<Marker> watchedMarkers = Set();
@@ -216,7 +217,15 @@ class _MapListenerState extends State<MapListener> {
               this.polyline.add(oldestPolyline.copyWith(visibleParam: false));
             }
             this.polyline.removeWhere(findPolyline);
-            this.polyline.add(oldPolyline.copyWith(visibleParam: !oldPolyline.visible));
+            Polyline newPolyline = oldPolyline.copyWith(visibleParam: !oldPolyline.visible);
+            this.polyline.add(newPolyline);
+            this.hidePin = () {
+              if(newPolyline.visible) {
+                this.polyline.removeWhere(findPolyline);
+                this.setVisiblePin(agent, newPolyline);
+                this.polyline.add(newPolyline.copyWith(visibleParam: !newPolyline.visible));
+              }
+            };
           });
         }
       },
@@ -252,7 +261,10 @@ class _MapListenerState extends State<MapListener> {
       nextPlaces: this.nextPlaces,
       points: this.points,
       polyline: this.polyline,
-      preExecute: this.preExecute,
+      preExecute: () {
+        this.hidePin();
+        this.preExecute();
+      },
       putMarker: this.putMarker,
       watchedMarkers: this.watchedMarkers
     );

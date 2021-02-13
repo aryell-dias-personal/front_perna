@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:perna/helpers/timeFormatter.dart';
 
 class FormTimePicker extends StatelessWidget {
-  final DateFormat format = DateFormat('kk:mm dd/MM/yyyy');
+  final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateTime initialValue;
   final String labelText;
   final String validatorMessage;

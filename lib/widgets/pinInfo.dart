@@ -54,18 +54,18 @@ class PinInfo extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          width: 260,
+                          width: 230,
                           child: TitledValueWidget(
-                            title: AppLocalizations.of(context).translate("expedient_name"), 
+                            title: AppLocalizations.of(context).translate("expedient"), 
                             value: (this.agent?.name ?? ""),
                             titleSize: 14,
                             valueSize: 14,
                           ),
                         ),
                         Container(
-                          width: 260,
+                          width: 230,
                           child: TitledValueWidget(
-                            title: AppLocalizations.of(context).translate("driver_email"),  
+                            title: AppLocalizations.of(context).translate("driver"),  
                             value: (this.agent?.email ?? ""),
                             titleSize: 14,
                             valueSize: 14,
