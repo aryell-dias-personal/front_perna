@@ -133,7 +133,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         Agent oldAgent = Agent.fromJson(documentSnapshot.data);
         DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
         bool endHasPassed = DateTime.now().isAfter(askedEndAtTime);
-        if(oldAgent.queue.isEmpty || !endHasPassed) {
+        if(oldAgent?.queue?.isEmpty == null || oldAgent.queue.isEmpty) {
           await ref.updateData({
             'position': "${locationData.latitude}, ${locationData.longitude}",
             'old': endHasPassed
