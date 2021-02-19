@@ -83,7 +83,7 @@ class UserProfilePage extends StatelessWidget {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: AppLocalizations.of(context).translate("user_email"),
-                  suffixIcon: Icon(Icons.person)
+                  suffixIcon: Icon(Icons.email)
                 )
               ),
               SizedBox(height: 26),
