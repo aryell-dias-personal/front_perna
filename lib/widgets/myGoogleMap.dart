@@ -130,11 +130,23 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
       this.agentIds.forEach((documentID) async {
         DocumentReference ref = firestore.collection("agent").document(documentID);
         DocumentSnapshot documentSnapshot = await ref.get();
-        Agent agent = Agent.fromJson(documentSnapshot.data);
-        await ref.updateData({
-          'position': "${locationData.latitude},${locationData.longitude}",
-          'old': DateTime.now().isAfter(agent.askedEndAt)
-        });
+        Agent oldAgent = Agent.fromJson(documentSnapshot.data);
+        DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
+        bool endHasPassed = DateTime.now().isAfter(askedEndAtTime);
+        if(oldAgent.queue.isEmpty || !endHasPassed) {
+          await ref.updateData({
+            'position': "${locationData.latitude}, ${locationData.longitude}",
+            'old': endHasPassed
+          });
+        } else {
+          Agent newAgent = oldAgent.copyWith(
+            queue: oldAgent.queue.sublist(1),
+            history: [oldAgent.date] + oldAgent.history,
+            date: oldAgent.queue.first,
+            position: LatLng(locationData.latitude, locationData.longitude)
+          );
+          await ref.updateData(newAgent.toJson());
+        }
       });
     }
   }

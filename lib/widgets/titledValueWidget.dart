@@ -7,7 +7,7 @@ class TitledValueWidget extends StatelessWidget {
   final double titleSize;
   final double valueSize;
 
-  const TitledValueWidget({@required this.title, @required this.value, this.titleSize=14, this.valueSize=20});
+  const TitledValueWidget({@required this.title, @required this.value, this.titleSize=14, this.valueSize=14});
 
   bool _isEmptyValue(){
     return RegExp(r"^ *$").hasMatch(this.value);
@@ -18,13 +18,16 @@ class TitledValueWidget extends StatelessWidget {
     return !this._isEmptyValue() ? RichText(
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
-        style: TextStyle(color: Theme.of(context).textTheme.bodyText2.color, fontFamily: "ProductSans"),
+        style: TextStyle(
+          color: Theme.of(context).textTheme.bodyText2.color, 
+          fontFamily: "ProductSans"
+        ),
         children:  <TextSpan>[
-          TextSpan(text: "$title:", style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold) ),
+          TextSpan(text: "$title:", style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.bold)),
           TextSpan(text: " $value", style: TextStyle(fontSize: valueSize)),
-        ]
+        ],
       ) 
-      , maxLines: 1
+      , maxLines: 2
     ) : SizedBox();
   }
 }

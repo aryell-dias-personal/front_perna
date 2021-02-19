@@ -90,38 +90,21 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  RichText buildRichText(String title, String value) {
-    return RichText(
-      overflow: TextOverflow.ellipsis,
-      text: TextSpan(
-        style: TextStyle(color: Colors.black, fontFamily: "ProductSans"),
-        children: <TextSpan>[
-          TextSpan(text: "$title:", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold) ),
-          TextSpan(text: " $value", style: TextStyle(fontSize: 20)),
-        ]
-      )
-      , maxLines: 1
-    );
-  }
-
-  String parseData(String date){
-    String cuttedDate = date.substring(0,16);
+  String parseDuration(Duration shift, DateTime date){
+    DateTime currTime = date.add(shift);
+    String cuttedDate = currTime.toString().substring(0,16);
     List<String> datePieces = cuttedDate.split(' ');
-    return "${datePieces[0].split('-').reversed.join('/')} ${datePieces[1]}";
+    return "${datePieces[1]} ${datePieces[0].split('-').reversed.join('/')}";
   }
 
   String parsePlace(String place){
-    List<String> placePieces = place.split(',');
-    if(placePieces.length > 4){
-      return "${placePieces[3]}, ${placePieces[4]}";
-    } 
     return place;
   }
 
   List getHistory(){
     List history = this.agents + this.askedPoints;
     history.sort((first, second){
-      return -(first['askedEndAt'] - second['askedEndAt']);
+      return -((first['askedEndAt'] ?? 0) - (second['askedEndAt'] ?? 0));
     });
     return history;
   }
@@ -134,10 +117,13 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAskedPoint(AskedPoint askedPoint) {
     return <Widget>[
       SizedBox(height: 20),
-      Text("PEDIDO", style: Theme.of(context).textTheme.bodyText2),
       TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: askedPoint.name ?? "NO_NAME"),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("start_time"), value: parseData(askedPoint.askedStartAt.toString())),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("end_time"), value: parseData(askedPoint.askedEndAt.toString())),
+      askedPoint.askedStartAt != null ? 
+        TitledValueWidget(title: AppLocalizations.of(context).translate("start_time"), value: parseDuration(askedPoint.askedStartAt, askedPoint.date)) : 
+        SizedBox(),
+      askedPoint.askedEndAt != null ? 
+        TitledValueWidget(title: AppLocalizations.of(context).translate("end_time"), value: parseDuration(askedPoint.askedEndAt, askedPoint.date)) : 
+        SizedBox(),
       TitledValueWidget(title: AppLocalizations.of(context).translate("start_place"), value: parsePlace(askedPoint.friendlyOrigin)),
       TitledValueWidget(title: AppLocalizations.of(context).translate("end_place"), value: parsePlace(askedPoint.friendlyDestiny)),
       SizedBox(height: 20)
@@ -147,10 +133,9 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAgent(Agent agent) {
     return <Widget>[
       SizedBox(height: 20),
-      Text("EXPEDIENTE", style: Theme.of(context).textTheme.bodyText2),
       TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: agent.name),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_start"), value: parseData(agent.askedStartAt.toString())),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_end"), value: parseData(agent.askedEndAt.toString())),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_start"), value: parseDuration(agent.askedStartAt, agent.date)),
+      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_end"), value: parseDuration(agent.askedEndAt, agent.date)),
       TitledValueWidget(title: AppLocalizations.of(context).translate("garage"), value: parsePlace(agent.friendlyGarage)),
       TitledValueWidget(title: AppLocalizations.of(context).translate("seats"), value: agent.places.toString()),
       SizedBox(height: 20)

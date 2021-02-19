@@ -155,7 +155,8 @@ class _MapListenerState extends State<MapListener> {
             this.agentIds.clear();
             this.agentIds.addAll(agentSnapshot.documents.fold<List<String>>(<String>[], (List<String> acc, DocumentSnapshot document) {
               Agent agent = Agent.fromJson(document.data);
-              if(agent.askedStartAt.isBefore(now)){
+              DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
+              if(askedStartAtTime.isBefore(now)){
                 acc.add(document.documentID);
               }
               return acc;
@@ -180,7 +181,8 @@ class _MapListenerState extends State<MapListener> {
           DateTime now = DateTime.now();
           List<Agent> agents =  agentSnapshot.documents.fold(<Agent>[], (List<Agent> acc, DocumentSnapshot document) {
             Agent agent = Agent.fromJson(document.data);
-            if(agent.askedStartAt.isBefore(now)){
+            DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
+            if(askedStartAtTime.isBefore(now)){
               if(agent.position!=null) _addAgentMarker(agent);
               List<LatLng> points = agent.route.fold(<LatLng>[], (List<LatLng> acc, Point curr)=>acc+[curr.local]);
               if(!_pointsPerRouteContains(points, this.email)){

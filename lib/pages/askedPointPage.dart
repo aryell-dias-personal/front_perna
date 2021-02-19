@@ -17,6 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:perna/widgets/addButton.dart';
 import 'package:perna/widgets/addHeader.dart';
 import 'package:perna/widgets/formContainer.dart';
+import 'package:perna/widgets/formDatePicker.dart';
 import 'package:perna/widgets/formTimePicker.dart';
 import 'package:perna/widgets/outlinedTextFormField.dart';
 
@@ -55,7 +56,12 @@ class _AskedPointPageState extends State<AskedPointPage> {
   final UserService userService;
   final Future<IdTokenResult> Function() getRefreshToken;
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
+  DateTime initialDateTime = DateTime.now();
+  DateTime now = DateTime.now();
+  DateTime minTime;
+  String date;
   String name;
   String askedEndAt;
   String askedStartAt;
@@ -65,19 +71,31 @@ class _AskedPointPageState extends State<AskedPointPage> {
     @required this.userService, 
     @required this.readOnly, 
     @required this.askedPoint, 
-    @required this.clear, 
+    @required this.clear,
     this.getRefreshToken
-  });
+  }) {
+    initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
+    minTime = initialDateTime;
+    date = dateFormat.format(this.askedPoint.date ?? minTime);
+  }
 
   void _onPressed(String email) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
       IdTokenResult idTokenResult = await this.getRefreshToken();
+      DateTime dateTime = dateFormat.parse(this.date);
+      DateTime askedEndAtTime, askedStartAtTime;
+      if(this.askedEndAt != null) {
+        String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} ${this.date}';
+        askedEndAtTime = format.parse(askedEndAtString);
+      }
+      if(this.askedStartAt != null) askedStartAtTime = format.parse('${this.askedStartAt} ${this.date}');
       AskedPoint newAskedPoint =  this.askedPoint.copyWith(
         email: email,
         name: this.name,
-        askedEndAt: format.parse(askedEndAt),
-        askedStartAt: format.parse(askedStartAt)
+        date: dateTime,
+        askedEndAt: askedStartAtTime?.difference(dateTime),
+        askedStartAt: askedEndAtTime?.difference(dateTime),
       );
       int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
       if(statusCode==200){
@@ -86,7 +104,12 @@ class _AskedPointPageState extends State<AskedPointPage> {
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
           Colors.greenAccent, isGlobal: true);
       }else{
-        setState(() { isLoading = false; });
+        setState(() { 
+          isLoading = false; 
+          date = null;
+          askedEndAt = null;
+          askedStartAt = null;
+        });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
           Colors.redAccent, context: context);
       }
@@ -116,6 +139,48 @@ class _AskedPointPageState extends State<AskedPointPage> {
         Colors.redAccent, context: context);
     }
     setState(() { this.isLoading = false; });
+  }
+
+  void _updateMinTime(String text) {
+    DateTime nextMinTime = this.dateFormat.parse(text);
+    String nextAskedEndAt = this.askedEndAt;
+    if(this.askedEndAt != null && this.askedStartAt != null) {
+      String minTimeString = this.dateFormat.format(this.minTime);
+      String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} $minTimeString';
+      DateTime askedEndAtTime = this.format.parse(askedEndAtString);
+      Duration shift = nextMinTime.difference(this.minTime);
+      DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
+      nextAskedEndAt = this.format.format(nextAskedEndAtTime);
+      if(RegExp(text).hasMatch(nextAskedEndAt)) {
+        nextAskedEndAt = nextAskedEndAt.split(" ")[0];
+      }
+    }
+    setState(() {
+      this.date = text;
+      this.minTime = nextMinTime;
+      this.askedEndAt = nextAskedEndAt;
+    });
+  }
+
+  void _updateStartAt(String nextStartAt) {
+    String nextAskedEndAt = this.askedEndAt;
+    if(this.askedEndAt != null && this.askedStartAt != null) {
+      String minTimeString = this.dateFormat.format(this.minTime);
+      DateTime oldAskedStartAt = this.format.parse('${this.askedStartAt} $minTimeString');
+      DateTime newAskedStartAt = this.format.parse('$nextStartAt $minTimeString');
+      String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} $minTimeString';
+      DateTime askedEndAtTime = this.format.parse(askedEndAtString);
+      Duration shift = newAskedStartAt.difference(oldAskedStartAt);
+      DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
+      nextAskedEndAt = this.format.format(nextAskedEndAtTime);
+      if(RegExp(minTimeString).hasMatch(nextAskedEndAt)) {
+        nextAskedEndAt = nextAskedEndAt.split(" ")[0];
+      }
+    }
+    setState(() {
+      this.askedStartAt = nextStartAt; 
+      this.askedEndAt = nextAskedEndAt;
+    });
   }
 
   @override
@@ -158,40 +223,81 @@ class _AskedPointPageState extends State<AskedPointPage> {
             onFieldSubmitted: (text) { FocusScope.of(context).nextFocus(); },
           ),
           SizedBox(height: 26),
-          FormTimePicker(
-            initialValue: this.askedPoint.askedStartAt,
+          FormDatePicker(
+            value: this.date,
+            isRequired: true,
+            initialValue: this.askedPoint.date ?? this.initialDateTime,
+            onChanged: _updateMinTime,
+            action: TextInputAction.next,
+            labelText: AppLocalizations.of(context).translate("date"),
             icon: Icons.insert_invitation,
+            readOnly: this.readOnly,
+            onSubmit: (text){ FocusScope.of(context).nextFocus(); },
+            validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
+          ),
+          SizedBox(height: 26),
+        ] + (this.askedPoint.askedStartAt == null && this.readOnly ? [] : [
+          FormTimePicker(
+            isRequired: false,
+            value: this.askedStartAt,
+            minTime: this.initialDateTime,
+            initialValue: this.askedPoint?.date?.add(this.askedPoint.askedStartAt),
+            icon: Icons.access_time,
             labelText: AppLocalizations.of(context).translate("desired_start"),
-            onChanged: (text){ this.askedStartAt = text; },
+            onChanged: (text){
+              List<String> chuncks = text.split(" "); 
+              String minTimeString = this.dateFormat.format(this.initialDateTime);
+              if(chuncks.length == 2) {
+                minTimeString = chuncks[1];
+              }
+              this._updateStartAt(chuncks[0]);
+              this._updateMinTime(minTimeString);
+            },
+            selectedDay: this.date,
+            lastDay: 31,
             readOnly: this.readOnly,
             validatorMessage: AppLocalizations.of(context).translate("enter_desired_start"),
             onSubmit: (text) { FocusScope.of(context).nextFocus(); }
           ),
           SizedBox(height: 26),
+        ]) + (this.askedPoint.askedEndAt == null && this.readOnly ? [] : [
           FormTimePicker(
-            initialValue: this.askedPoint.askedEndAt,
-            onChanged: (text){ this.askedEndAt= text; },
+            isRequired: false,
+            value: this.askedEndAt,
+            minTime: this.minTime,
+            initialValue: this.askedPoint?.date?.add(this.askedPoint.askedEndAt),
+            onChanged: (text){ 
+              String minTimeString = this.dateFormat.format(this.minTime);
+              setState(() {
+                if(RegExp(minTimeString).hasMatch(text)) {
+                  this.askedEndAt = text.split(" ")[0];
+                } else {
+                  this.askedEndAt = text; 
+                }
+              });
+            },
             action: TextInputAction.done,
+            selectedDay: this.date,
             labelText: AppLocalizations.of(context).translate("desired_end"),
-            icon: Icons.insert_invitation,
+            icon: Icons.access_time,
             readOnly: this.readOnly,
             onSubmit: (text) => _onPressed(resources["email"]),
             validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
           ),
           SizedBox(height: 26)
-        ] + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
+        ]) + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
           FormTimePicker(
             readOnly: true,
             initialValue: this.askedPoint.actualStartAt,
             labelText: AppLocalizations.of(context).translate("actual_start"),
-            icon: Icons.insert_invitation
+            icon: Icons.access_time
           ),
           SizedBox(height: 26),
           FormTimePicker(
             readOnly: true,
             initialValue: this.askedPoint.actualEndAt,
             labelText: AppLocalizations.of(context).translate("actual_end"),
-            icon: Icons.insert_invitation
+            icon: Icons.access_time
           ),
           SizedBox(height: 26)
         ]: []) + [

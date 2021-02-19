@@ -17,6 +17,7 @@ import 'package:perna/pages/noConnectionPage.dart';
 import 'package:perna/pages/initialPage.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:intl/intl.dart';
 import 'dart:convert';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -116,12 +117,13 @@ class _HomeState extends State<Home> {
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
     );
+    DateFormat format = DateFormat('HH:mm');
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, null);
     await flutterLocalNotificationsPlugin.schedule(
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate("remind"), 
-      AppLocalizations.of(context).translateFormat("reminder_message", [date.hour, date.minute, content]), 
+      AppLocalizations.of(context).translateFormat("reminder_message", [format.format(date), content]), 
       date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true
     );
   }
