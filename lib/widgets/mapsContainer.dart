@@ -102,7 +102,7 @@ class _MapsContainerState extends State<MapsContainer> {
     });
   }
 
-  void addNewExpedient(){
+  void addNewExpedient() async {
     if(this.markers.length == 1){
       Agent agent = Agent(
         friendlyGarage: markers.first.infoWindow.snippet,
@@ -130,7 +130,7 @@ class _MapsContainerState extends State<MapsContainer> {
     }
   }
 
-  void addNewAsk() {
+  void addNewAsk() async {
     if(this.markers.length == 2){
       AskedPoint askedPoint = AskedPoint(
         friendlyOrigin: markers.first.infoWindow.snippet,

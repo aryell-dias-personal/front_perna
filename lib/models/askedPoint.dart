@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 
@@ -10,19 +12,18 @@ class AskedPoint {
   Duration askedStartAt;
   LatLng origin;
   LatLng destiny;
-  String name;
   String email;
   String friendlyOrigin;
   String friendlyDestiny;
   DateTime actualStartAt;
   DateTime actualEndAt;
   String agentId;
+  Uint8List staticMap;
 
   AskedPoint({
     this.date,
     this.queue,
     this.history,
-    this.name, 
     this.email, 
     this.origin, 
     this.destiny,
@@ -32,7 +33,8 @@ class AskedPoint {
     this.askedEndAt,
     this.actualStartAt,
     this.actualEndAt,
-    this.agentId
+    this.agentId,
+    this.staticMap
   });
 
 
@@ -51,7 +53,6 @@ class AskedPoint {
     if(parsedJson == null)
       return null;
     return AskedPoint(
-      name: parsedJson['name'],
       email: parsedJson['email'],
       origin: decodeLatLng(parsedJson['origin']),
       destiny: decodeLatLng(parsedJson['destiny']),
@@ -64,12 +65,12 @@ class AskedPoint {
       history: parsedJson['history']?.map<DateTime>(parseDate)?.toList(),
       actualStartAt: parseDate(parsedJson['actualStartAt']),
       actualEndAt: parseDate(parsedJson['actualEndAt']),
-      agentId: parsedJson ['agentId']
+      agentId: parsedJson ['agentId'],
+      staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
   }
 
   AskedPoint copyWith({
-    String name, 
     String email, 
     LatLng origin, 
     LatLng destiny, 
@@ -82,9 +83,9 @@ class AskedPoint {
     List<DateTime> history, 
     DateTime actualStartAt, 
     DateTime actualEndAt, 
-    String agentId
+    String agentId,
+    Uint8List staticMap
   }) => AskedPoint(
-    name: name ?? this.name,
     email: email ?? this.email,
     origin: origin ?? this.origin,
     destiny: destiny ?? this.destiny,
@@ -97,11 +98,11 @@ class AskedPoint {
     askedEndAt: askedEndAt ?? this.askedEndAt,
     actualStartAt: actualStartAt ?? this.actualStartAt,
     actualEndAt: actualEndAt ?? this.actualEndAt,
-    agentId: agentId ?? this.agentId
+    agentId: agentId ?? this.agentId,
+    staticMap: staticMap ?? this.staticMap
   );
 
   dynamic toJson() => {
-    "name": name,
     "email": email,
     "origin": "${origin.latitude}, ${origin.longitude}",
     "destiny": "${destiny.latitude}, ${destiny.longitude}",
@@ -114,6 +115,7 @@ class AskedPoint {
     "askedEndAt": askedEndAt != null ? askedEndAt.inSeconds : null,
     "actualStartAt": actualStartAt != null ? actualStartAt.millisecondsSinceEpoch/1000: null,
     "actualEndAt": actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
-    "agentId": agentId
+    "agentId": agentId,
+    "staticMap": staticMap != null ? base64Encode(staticMap) : null
   };
 }

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 import 'package:perna/models/point.dart';
@@ -14,19 +17,18 @@ class Agent {
   List<DateTime> history;
   Duration askedEndAt;
   Duration askedStartAt;
-  String name;
   String email;
   String fromEmail;
   List<String> askedPointIds;
   List<String> watchedBy;
   bool old;
+  Uint8List staticMap;
 
   Agent({
     this.garage, 
     this.position, 
     this.friendlyGarage, 
     this.places, 
-    this.name, 
     this.route, 
     this.date,
     this.queue,
@@ -37,7 +39,8 @@ class Agent {
     this.fromEmail,
     this.old=false,
     this.askedPointIds,
-    this.watchedBy=const[]
+    this.watchedBy=const[],
+    this.staticMap
   });
   
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
@@ -60,7 +63,6 @@ class Agent {
       position: parsedJson['position']!=null? decodeLatLng(parsedJson['position']): null,
       places: parsedJson['places'],
       friendlyGarage: parsedJson['friendlyGarage'],
-      name: parsedJson['name'],
       route: parsedJson['route']?.map<Point>((point)=>Point.fromJson(point))?.toList(),
       date: parseDate(parsedJson['date']),
       askedStartAt: parseDuration(parsedJson['askedStartAt']),
@@ -70,7 +72,8 @@ class Agent {
       email: parsedJson['email'],
       fromEmail: parsedJson['fromEmail'],
       watchedBy: parsedJson["watchedBy"]!=null?parsedJson["watchedBy"].map<String>((email)=>"$email").toList():null,
-      askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null
+      askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null,
+      staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
   }
 
@@ -78,7 +81,6 @@ class Agent {
     LatLng garage, 
     String friendlyGarage, 
     int places, 
-    String name, 
     DateTime date, 
     List<DateTime> queue, 
     List<DateTime> history, 
@@ -90,13 +92,13 @@ class Agent {
     List<String> askedPointIds, 
     LatLng position,
     List<String> watchedBy,
-    bool old
+    bool old,
+    Uint8List staticMap
   }) => Agent(
     garage: garage ?? this.garage,
     position: position ?? this.position,
     friendlyGarage: friendlyGarage ?? this.friendlyGarage,
     places: places ?? this.places,
-    name: name ?? this.name,
     route: route ?? this.route,
     date: date ?? this.date,
     queue: queue ?? this.queue,
@@ -107,7 +109,8 @@ class Agent {
     fromEmail: fromEmail ?? this.fromEmail,
     askedPointIds: askedPointIds ?? this.askedPointIds,
     watchedBy: watchedBy ?? this.watchedBy,
-    old: old ?? this.old
+    old: old ?? this.old,
+    staticMap: staticMap ?? this.staticMap
   );
 
   dynamic toJson() => {
@@ -115,7 +118,6 @@ class Agent {
     "position": position!=null?"${position.latitude}, ${position.longitude}":null,
     "places": places,
     "friendlyGarage": friendlyGarage,
-    "name": name,
     "route": route != null ? route.map<String>((Point point)=>point.toJson()).toList(): null,
     "queue": queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
     "history": history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
@@ -126,6 +128,7 @@ class Agent {
     "fromEmail": fromEmail,
     "askedPointIds": askedPointIds,
     "watchedBy": watchedBy,
-    "old": old
+    "old": old,
+    "staticMap": staticMap != null ? base64Encode(staticMap) : null
   };
 }

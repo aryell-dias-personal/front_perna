@@ -117,7 +117,6 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAskedPoint(AskedPoint askedPoint) {
     return <Widget>[
       SizedBox(height: 20),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: askedPoint.name ?? "NO_NAME"),
       askedPoint.askedStartAt != null ? 
         TitledValueWidget(title: AppLocalizations.of(context).translate("start_time"), value: parseDuration(askedPoint.askedStartAt, askedPoint.date)) : 
         SizedBox(),
@@ -133,7 +132,6 @@ class _HistoryPageState extends State<HistoryPage> {
   List<Widget> buildAgent(Agent agent) {
     return <Widget>[
       SizedBox(height: 20),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("name"), value: agent.name),
       TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_start"), value: parseDuration(agent.askedStartAt, agent.date)),
       TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_end"), value: parseDuration(agent.askedEndAt, agent.date)),
       TitledValueWidget(title: AppLocalizations.of(context).translate("garage"), value: parsePlace(agent.friendlyGarage)),
@@ -180,6 +178,35 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        brightness: Theme.of(context).brightness,
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children:<Widget>[
+            Text(
+              "Histórico",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,  
+                fontSize: 30.0
+              )
+            ),
+            SizedBox(width: 5),
+            Icon(Icons.timeline, size: 30),
+          ]
+        ),
+        backgroundColor: Theme.of(context).backgroundColor,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).primaryColor
+        ),
+        textTheme: TextTheme(
+          headline6: TextStyle(
+            color: Theme.of(context).primaryColor,
+            fontSize: 20,
+            fontFamily: Theme.of(context).textTheme.headline6.fontFamily
+          )
+        ),
+      ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: isLoadingAgents || isLoadingAskedPoints || !passedTime ? Center(
         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)

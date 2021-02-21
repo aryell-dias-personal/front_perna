@@ -1,21 +1,25 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/models/point.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/pages/userProfilePage.dart';
 import 'package:perna/services/driver.dart';
+import 'package:perna/services/staticMap.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/actionButtons.dart';
 import 'package:perna/widgets/addButton.dart';
-import 'package:perna/widgets/addHeader.dart';
 import 'package:perna/widgets/formContainer.dart';
 import 'package:perna/widgets/formDatePicker.dart';
 import 'package:perna/widgets/formTimePicker.dart';
@@ -55,7 +59,6 @@ class ExpedientPage extends StatefulWidget {
 }
 
 class _ExpedientState extends State<ExpedientPage> {
-  final Agent agent;
   final bool readOnly;
   final Function() accept;
   final Function() deny;
@@ -66,15 +69,16 @@ class _ExpedientState extends State<ExpedientPage> {
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
+  Agent agent;
   DateTime initialDateTime = DateTime.now();
   DateTime minTime;
   String date;
-  String name;
   String email;
   String places;
   String askedEndAt;
   String askedStartAt;
   bool isLoading = false;
+  StaticMapService staticMapService = new StaticMapService();
 
   _ExpedientState({
     @required this.driverService, 
@@ -88,6 +92,17 @@ class _ExpedientState extends State<ExpedientPage> {
     initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
     date = dateFormat.format(this.agent.date ?? minTime);
+    if(this.agent.staticMap == null) {
+      staticMapService.getUint8List(
+        markerA: agent.garage
+      ).then((Uint8List uint8List) {
+        setState(() {
+          this.agent = this.agent.copyWith(
+            staticMap: uint8List
+          );
+        });
+      });
+    }
   }
 
   void _askNewAgend(agent) async {
@@ -113,10 +128,9 @@ class _ExpedientState extends State<ExpedientPage> {
       DateTime askedStartAtTime = format.parse('${this.askedStartAt} ${this.date}');
       Agent agent = this.agent.copyWith(
         email: email,
-        name: this.name,
         date: dateTime,
-        askedEndAt: askedStartAtTime.difference(dateTime),
-        askedStartAt: askedEndAtTime.difference(dateTime),
+        askedStartAt: askedStartAtTime.difference(dateTime),
+        askedEndAt: askedEndAtTime.difference(dateTime),
         fromEmail: fromEmail != email ? fromEmail : null,
         places: int.parse(this.places)
       );
@@ -209,162 +223,202 @@ class _ExpedientState extends State<ExpedientPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: isLoading ? Center(
-        child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
-      ) : StoreConnector<StoreState, Map<String, dynamic>>(
-        converter: (store) => {
-          "email": store.state.user.email,
-          "firestore": store.state.firestore          
-        },
-        builder: (context, resources) => FormContainer(
-          formkey: this._formKey,
-          children: <Widget>[
-            AddHeader(
-              icon: Icons.work,
-              name: AppLocalizations.of(context).translate("expedient"),
-              readOnly: this.readOnly,
-              showMenu: this.readOnly,
-              child: PopupMenuButton(
-                tooltip: AppLocalizations.of(context).translate("open_menu"),
-                onSelected: (ExpedientOptions result) => this._onSelectedExpedientOptions(resources["firestore"], result),
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<ExpedientOptions>>[
-                  PopupMenuItem<ExpedientOptions>(
-                    value: ExpedientOptions.aboutDriver,
-                    child: Text(AppLocalizations.of(context).translate("about_driver"))
-                  ),
-                  this.agent.fromEmail != null ? PopupMenuItem<ExpedientOptions>(
-                    value: ExpedientOptions.aboutRequester,
-                    child: Text(AppLocalizations.of(context).translate("about_requester"))
-                  ): null
-                ],
-              )
-            ),
-            SizedBox(height: 26),
-            OutlinedTextFormField(
-              readOnly: this.readOnly,
-              initialValue: this.agent.name ?? "",
-              onChanged: (text){ this.name = text; },
-              labelText: AppLocalizations.of(context).translate("expedient_name"),
-              icon: Icons.short_text,
-              textInputAction: TextInputAction.next,
-              validatorMessage: AppLocalizations.of(context).translate("enter_expedient_name"),
-              onFieldSubmitted: (text){ FocusScope.of(context).nextFocus(); },
-            ),
-            SizedBox(height: 26),
-            OutlinedTextFormField(
-              readOnly: this.readOnly,
-              initialValue: this.agent.email ?? "",
-              onChanged: (text){ this.email = text; },
-              textInputType: TextInputType.emailAddress,
-              labelText: AppLocalizations.of(context).translate("driver_email"),
-              icon: Icons.email,
-              textInputAction: TextInputAction.next,
-              validatorMessage: AppLocalizations.of(context).translate("enter_driver_email"),
-              onFieldSubmitted: (text){ FocusScope.of(context).nextFocus(); },
+    return StoreConnector<StoreState, Map<String, dynamic>>(
+      converter: (store) => {
+        "email": store.state.user.email,
+        "firestore": store.state.firestore          
+      },
+      builder: (context, resources) => Scaffold(
+        appBar: AppBar(
+          brightness: Theme.of(context).brightness,
+          centerTitle: true,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children:<Widget>[
+              Text(
+                AppLocalizations.of(context).translate("expedient"),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,  
+                  fontSize: 30.0
+                )
+              ),
+              SizedBox(width: 5),
+              Icon(Icons.work, size: 30),
+            ]
+          ),
+          backgroundColor: Theme.of(context).backgroundColor,
+          iconTheme: IconThemeData(
+            color: Theme.of(context).primaryColor
+          ),
+          textTheme: TextTheme(
+            headline6: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 20,
+              fontFamily: Theme.of(context).textTheme.headline6.fontFamily
             )
-          ] + (this.agent.fromEmail!=null ? [
-            SizedBox(height: 26),
-            OutlinedTextFormField(
-              readOnly: true,
-              initialValue: this.agent.fromEmail,
-              textInputType: TextInputType.emailAddress,
-              labelText: AppLocalizations.of(context).translate("requester_email"),
-              icon: Icons.email
-            ),
-          ]: []) + [
-            SizedBox(height: 26),
-            FormDatePicker(
-              value: this.date,
-              isRequired: true,
-              initialValue: initialDateTime,
-              onChanged: _updateMinTime,
-              action: TextInputAction.next,
-              labelText: AppLocalizations.of(context).translate("date"),
-              icon: Icons.insert_invitation,
-              readOnly: this.readOnly,
-              onSubmit: (text){ FocusScope.of(context).nextFocus(); },
-              validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
-            ),
-            SizedBox(height: 26),
-            FormTimePicker(
-              isRequired: true,
-              minTime: initialDateTime,
-              onChanged: (text){
-                List<String> chuncks = text.split(" "); 
-                String minTimeString = this.dateFormat.format(initialDateTime);
-                if(chuncks.length == 2) {
-                  minTimeString = chuncks[1];
-                }
-                this._updateStartAt(chuncks[0]);
-                this._updateMinTime(minTimeString);
-              },
-              selectedDay: this.date,
-              value: this.askedStartAt,
-              lastDay: 31,
-              initialValue: this.agent?.date?.add(this.agent.askedStartAt),
-              action: TextInputAction.next,
-              labelText: AppLocalizations.of(context).translate("expedient_start"),
-              icon: Icons.access_time,
-              readOnly: this.readOnly,
-              onSubmit: (text){ FocusScope.of(context).nextFocus(); },
-              validatorMessage: AppLocalizations.of(context).translate("enter_start_expedient"),
-            ),
-            SizedBox(height: 26),
-            FormTimePicker(
-              isRequired: true,
-              minTime: minTime,
-              selectedDay: this.date,
-              value: this.askedEndAt,
-              initialValue: this.agent?.date?.add(this.agent.askedEndAt),
-              icon: Icons.access_time,
-              labelText: AppLocalizations.of(context).translate("expedient_end"),
-              onChanged: (text){ 
-                String minTimeString = this.dateFormat.format(this.minTime);
-                setState(() {
-                  if(RegExp(minTimeString).hasMatch(text)) {
-                    this.askedEndAt = text.split(" ")[0];
-                  } else {
-                    this.askedEndAt = text; 
-                  }
-                });
-              },
-              readOnly: this.readOnly,
-              validatorMessage: AppLocalizations.of(context).translate("enter_end_expedient"),
-              onSubmit: (text){ FocusScope.of(context).nextFocus(); }
-            ),
-            SizedBox(height: 26),
-            OutlinedTextFormField(
-              readOnly: this.readOnly,
-              initialValue: this.agent.places?.toString() ?? "",
-              onChanged: (text){ this.places = text; },
-              textInputType: TextInputType.number,
-              labelText: AppLocalizations.of(context).translate("seats_number"),
-              icon: Icons.airline_seat_legroom_normal,
-              textInputAction: TextInputAction.done,
-              validatorMessage: AppLocalizations.of(context).translate("enter_seats_number"),
-              onFieldSubmitted: (text){ this._onPressed(this.email, resources['email']); },
-            ),
-            SizedBox(height: 26),
-            OutlinedTextFormField(
-              readOnly: true,
-              initialValue: this.agent.friendlyGarage,
-              labelText: AppLocalizations.of(context).translate("garage"),
-              icon: Icons.pin_drop
-            ),
-            SizedBox(height: 26)
-          ] + ( this.accept != null && this.deny != null && this.readOnly ? [
-            ActionButtons(
-              accept: (){ _acceptOrDenny(true); },
-              deny: (){ _acceptOrDenny(false); }
+          ),
+          actions: this.readOnly ? <Widget>[
+            PopupMenuButton(
+              tooltip: AppLocalizations.of(context).translate("open_menu"),
+              onSelected: (ExpedientOptions result) => this._onSelectedExpedientOptions(resources["firestore"], result),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<ExpedientOptions>>[
+                PopupMenuItem<ExpedientOptions>(
+                  value: ExpedientOptions.aboutDriver,
+                  child: Text(AppLocalizations.of(context).translate("about_driver"))
+                ),
+                this.agent.fromEmail != null ? PopupMenuItem<ExpedientOptions>(
+                  value: ExpedientOptions.aboutRequester,
+                  child: Text(AppLocalizations.of(context).translate("about_requester"))
+                ): null
+              ],
+              offset: Offset(0, 50),
             )
-          ] : [
-            AddButton(
-              onPressed: () => this._onPressed(this.email, resources['email']),
-              readOnly: this.readOnly,
-            ),
-          ])
-        )
+          ] : null,
+        ),
+        body: Material(
+          child: isLoading ? Center(
+            child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+          ) : SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  height: 180,
+                  width: 600,
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+                      ),
+                      this.agent.staticMap != null ? Image.memory(this.agent.staticMap) : SizedBox()
+                    ],
+                  )
+                ),
+                FormContainer(
+                    formkey: this._formKey,
+                    children: <Widget>[
+                      OutlinedTextFormField(
+                        readOnly: this.readOnly,
+                        initialValue: this.agent.email ?? "",
+                        onChanged: (text){ this.email = text; },
+                        textInputType: TextInputType.emailAddress,
+                        labelText: AppLocalizations.of(context).translate("driver_email"),
+                        icon: Icons.email,
+                        textInputAction: TextInputAction.next,
+                        validatorMessage: AppLocalizations.of(context).translate("enter_driver_email"),
+                        onFieldSubmitted: (text){ FocusScope.of(context).nextFocus(); },
+                      )
+                    ] + (this.agent.fromEmail!=null ? [
+                      SizedBox(height: 26),
+                      OutlinedTextFormField(
+                        readOnly: true,
+                        initialValue: this.agent.fromEmail,
+                        textInputType: TextInputType.emailAddress,
+                        labelText: AppLocalizations.of(context).translate("requester_email"),
+                        icon: Icons.email
+                      ),
+                    ]: []) + [
+                      SizedBox(height: 26),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          FormDatePicker(
+                            value: this.date,
+                            isRequired: true,
+                            initialValue: initialDateTime,
+                            onChanged: _updateMinTime,
+                            action: TextInputAction.next,
+                            labelText: AppLocalizations.of(context).translate("date"),
+                            icon: Icons.insert_invitation,
+                            readOnly: this.readOnly,
+                            onSubmit: (text){ FocusScope.of(context).nextFocus(); },
+                            validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
+                          ),
+                          SizedBox(width: 10),
+                          FormTimePicker(
+                            isRequired: true,
+                            minTime: initialDateTime,
+                            onChanged: (text){
+                              List<String> chuncks = text.split(" "); 
+                              String minTimeString = this.dateFormat.format(initialDateTime);
+                              if(chuncks.length == 2) {
+                                minTimeString = chuncks[1];
+                              }
+                              this._updateStartAt(chuncks[0]);
+                              this._updateMinTime(minTimeString);
+                            },
+                            selectedDay: this.date,
+                            value: this.askedStartAt,
+                            lastDay: 31,
+                            initialValue: this.agent?.date?.add(this.agent.askedStartAt),
+                            action: TextInputAction.next,
+                            labelText: AppLocalizations.of(context).translate("expedient_start"),
+                            icon: Icons.access_time,
+                            readOnly: this.readOnly,
+                            onSubmit: (text){ FocusScope.of(context).nextFocus(); },
+                            validatorMessage: AppLocalizations.of(context).translate("enter_start_expedient"),
+                          ),
+                        ]
+                      ),
+                      SizedBox(height: 26),
+                      FormTimePicker(
+                        isRequired: true,
+                        minTime: minTime,
+                        selectedDay: this.date,
+                        value: this.askedEndAt,
+                        initialValue: this.agent?.date?.add(this.agent.askedEndAt),
+                        icon: Icons.access_time,
+                        labelText: AppLocalizations.of(context).translate("expedient_end"),
+                        onChanged: (text){ 
+                          String minTimeString = this.dateFormat.format(this.minTime);
+                          setState(() {
+                            if(RegExp(minTimeString).hasMatch(text)) {
+                              this.askedEndAt = text.split(" ")[0];
+                            } else {
+                              this.askedEndAt = text; 
+                            }
+                          });
+                        },
+                        readOnly: this.readOnly,
+                        validatorMessage: AppLocalizations.of(context).translate("enter_end_expedient"),
+                        onSubmit: (text){ FocusScope.of(context).nextFocus(); }
+                      ),
+                      SizedBox(height: 26),
+                      OutlinedTextFormField(
+                        readOnly: this.readOnly,
+                        initialValue: this.agent.places?.toString() ?? "",
+                        onChanged: (text){ this.places = text; },
+                        textInputType: TextInputType.number,
+                        labelText: AppLocalizations.of(context).translate("seats_number"),
+                        icon: Icons.airline_seat_legroom_normal,
+                        textInputAction: TextInputAction.done,
+                        validatorMessage: AppLocalizations.of(context).translate("enter_seats_number"),
+                        onFieldSubmitted: (text){ this._onPressed(this.email, resources['email']); },
+                      ),
+                      SizedBox(height: 26),
+                      OutlinedTextFormField(
+                        readOnly: true,
+                        initialValue: this.agent.friendlyGarage,
+                        labelText: AppLocalizations.of(context).translate("garage"),
+                        icon: Icons.pin_drop
+                      ),
+                      SizedBox(height: 26)
+                    ] + ( this.accept != null && this.deny != null && this.readOnly ? [
+                      ActionButtons(
+                        accept: (){ _acceptOrDenny(true); },
+                        deny: (){ _acceptOrDenny(false); }
+                      )
+                    ] : [
+                      AddButton(
+                        onPressed: () => this._onPressed(this.email, resources['email']),
+                        readOnly: this.readOnly,
+                      ),
+                    ])
+                  )
+              ]
+            )
+          )
+        ),
       )
     );
   }

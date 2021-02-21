@@ -31,45 +31,47 @@ class FormDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: TextEditingController(
-        text: this.value ?? this.format.format(this.initialValue)
-      ),
-      readOnly: true,
-      onTap: () async {
-        if(!this.readOnly) {
-          DateTime selectedDate = await showDatePicker(
-            context: context, 
-            initialDate: this.value != null ? this.format.parse(this.value) : this.initialValue, 
-            firstDate: this.initialValue, 
-            lastDate: this.initialValue.add(Duration(days: 31))
-          );
-          if(selectedDate != null) {
-            String date = DateFormat('dd/MM/yyyy').format(selectedDate);
-            this.onChanged(date);
+    return Flexible(
+      child: TextFormField(
+        controller: TextEditingController(
+          text: this.value ?? this.format.format(this.initialValue)
+        ),
+        readOnly: true,
+        onTap: () async {
+          if(!this.readOnly) {
+            DateTime selectedDate = await showDatePicker(
+              context: context, 
+              initialDate: this.value != null ? this.format.parse(this.value) : this.initialValue, 
+              firstDate: this.initialValue, 
+              lastDate: this.initialValue.add(Duration(days: 31))
+            );
+            if(selectedDate != null) {
+              String date = DateFormat('dd/MM/yyyy').format(selectedDate);
+              this.onChanged(date);
+            }
           }
-        }
-      },
-      keyboardType: TextInputType.datetime,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        labelText: this.labelText,
-        suffixIcon: Icon(icon),
-      ), 
-      textInputAction: action,
-      validator: (value) {
-        if (this.isRequired) {
-          if(value.isEmpty) {
-            return this.validatorMessage;
+        },
+        keyboardType: TextInputType.datetime,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: this.labelText,
+          suffixIcon: Icon(icon),
+        ), 
+        textInputAction: action,
+        validator: (value) {
+          if (this.isRequired) {
+            if(value.isEmpty) {
+              return this.validatorMessage;
+            }
+            DateTime dateTime = this.format.parse(value);
+            if(this.initialValue.isAfter(dateTime)) {
+              return this.validatorMessage;
+            }
           }
-          DateTime dateTime = this.format.parse(value);
-          if(this.initialValue.isAfter(dateTime)) {
-            return this.validatorMessage;
-          }
-        }
-        return null;
-      },
-      onFieldSubmitted: this.onSubmit
+          return null;
+        },
+        onFieldSubmitted: this.onSubmit
+      )
     );
   }
 }

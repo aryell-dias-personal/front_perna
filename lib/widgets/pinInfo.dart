@@ -56,15 +56,6 @@ class PinInfo extends StatelessWidget {
                         Container(
                           width: 230,
                           child: TitledValueWidget(
-                            title: AppLocalizations.of(context).translate("expedient"), 
-                            value: (this.agent?.name ?? ""),
-                            titleSize: 14,
-                            valueSize: 14,
-                          ),
-                        ),
-                        Container(
-                          width: 230,
-                          child: TitledValueWidget(
                             title: AppLocalizations.of(context).translate("driver"),  
                             value: (this.agent?.email ?? ""),
                             titleSize: 14,

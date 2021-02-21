@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,11 +13,11 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/services/driver.dart';
+import 'package:perna/services/staticMap.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/addButton.dart';
-import 'package:perna/widgets/addHeader.dart';
 import 'package:perna/widgets/formContainer.dart';
 import 'package:perna/widgets/formDatePicker.dart';
 import 'package:perna/widgets/formTimePicker.dart';
@@ -51,21 +53,21 @@ class AskedPointPage extends StatefulWidget {
 class _AskedPointPageState extends State<AskedPointPage> {
   final bool readOnly;
   final Function() clear;
-  final AskedPoint askedPoint;
   final _formKey = GlobalKey<FormState>();
   final UserService userService;
   final Future<IdTokenResult> Function() getRefreshToken;
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
+  AskedPoint askedPoint;
   DateTime initialDateTime = DateTime.now();
   DateTime now = DateTime.now();
   DateTime minTime;
   String date;
-  String name;
   String askedEndAt;
   String askedStartAt;
   bool isLoading = false;
+  StaticMapService staticMapService = new StaticMapService();
 
   _AskedPointPageState({
     @required this.userService, 
@@ -77,6 +79,22 @@ class _AskedPointPageState extends State<AskedPointPage> {
     initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
     date = dateFormat.format(this.askedPoint.date ?? minTime);
+    if(this.askedPoint.staticMap == null) {
+      staticMapService.getUint8List(
+        markerA: askedPoint.origin,
+        markerB: askedPoint.destiny,
+        route: [
+          askedPoint.origin,
+          askedPoint.destiny
+        ]
+      ).then((Uint8List uint8List) {
+        setState(() {
+          this.askedPoint = this.askedPoint.copyWith(
+            staticMap: uint8List
+          );
+        });
+      });
+    }
   }
 
   void _onPressed(String email) async {
@@ -92,10 +110,9 @@ class _AskedPointPageState extends State<AskedPointPage> {
       if(this.askedStartAt != null) askedStartAtTime = format.parse('${this.askedStartAt} ${this.date}');
       AskedPoint newAskedPoint =  this.askedPoint.copyWith(
         email: email,
-        name: this.name,
         date: dateTime,
-        askedEndAt: askedStartAtTime?.difference(dateTime),
-        askedStartAt: askedEndAtTime?.difference(dateTime),
+        askedEndAt: askedEndAtTime?.difference(dateTime),
+        askedStartAt: askedStartAtTime?.difference(dateTime),
       );
       int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
       if(statusCode==200){
@@ -184,23 +201,42 @@ class _AskedPointPageState extends State<AskedPointPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Material(
-    child: isLoading ? Center(
-      child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
-    ) : StoreConnector<StoreState, Map<String, dynamic>>(
+  Widget build(BuildContext context) => StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (store) => {
         "email": store.state.user.email,
         "firestore": store.state.firestore
       },
-      builder: (context, resources) => FormContainer(
-        formkey: this._formKey,
-        children: <Widget>[
-          AddHeader(
-            name: AppLocalizations.of(context).translate("order"),
-            readOnly: this.readOnly,
-            icon: Icons.scatter_plot,
-            showMenu: this.readOnly && this.askedPoint.agentId != null,
-            child: PopupMenuButton(
+      builder: (context, resources) => Scaffold( 
+        appBar: AppBar(
+          brightness: Theme.of(context).brightness,
+          centerTitle: true,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children:<Widget>[
+              Text(
+                AppLocalizations.of(context).translate("order"),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,  
+                  fontSize: 30.0
+                )
+              ),
+              SizedBox(width: 5),
+              Icon(Icons.scatter_plot, size: 30),
+            ]
+          ),
+          backgroundColor: Theme.of(context).backgroundColor,
+          iconTheme: IconThemeData(
+            color: Theme.of(context).primaryColor
+          ),
+          textTheme: TextTheme(
+            headline6: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 20,
+              fontFamily: Theme.of(context).textTheme.headline6.fontFamily
+            )
+          ),
+          actions: this.readOnly && this.askedPoint.agentId != null ? <Widget>[
+            PopupMenuButton(
               tooltip: AppLocalizations.of(context).translate("open_menu"),
               onSelected: (AskedPointOptions result) => this._onSelectedAskedPointOptions(resources["firestore"], result),
               itemBuilder:  (BuildContext context) => <PopupMenuEntry<AskedPointOptions>>[
@@ -208,118 +244,140 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   value: AskedPointOptions.aboutExpedient,
                   child: Text(AppLocalizations.of(context).translate("about_expedient"))
                 )
-              ]
+              ],
+              offset: Offset(0, 50),
             )
+          ] : null,
+        ),
+        body: Material(
+          child: isLoading ? Center(
+            child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+          ) : SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  height: 180,
+                  width: 600,
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+                      ),
+                      this.askedPoint.staticMap != null ? Image.memory(this.askedPoint.staticMap) : SizedBox()
+                    ],
+                  )
+                ),
+                FormContainer(
+                  formkey: this._formKey,
+                  children: <Widget>[
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        FormDatePicker(
+                          value: this.date,
+                          isRequired: true,
+                          initialValue: this.askedPoint.date ?? this.initialDateTime,
+                          onChanged: _updateMinTime,
+                          action: TextInputAction.next,
+                          labelText: AppLocalizations.of(context).translate("date"),
+                          icon: Icons.insert_invitation,
+                          readOnly: this.readOnly,
+                          onSubmit: (text){ FocusScope.of(context).nextFocus(); },
+                          validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
+                        ),
+                        SizedBox(height: 26),
+                      ] + (this.askedPoint.askedStartAt == null && this.readOnly ? [] : [
+                        SizedBox(width: 10),
+                        FormTimePicker(
+                          isRequired: false,
+                          value: this.askedStartAt,
+                          minTime: this.initialDateTime,
+                          initialValue: this.askedPoint?.date?.add(this.askedPoint.askedStartAt),
+                          icon: Icons.access_time,
+                          labelText: AppLocalizations.of(context).translate("desired_start"),
+                          onChanged: (text){
+                            List<String> chuncks = text.split(" "); 
+                            String minTimeString = this.dateFormat.format(this.initialDateTime);
+                            if(chuncks.length == 2) {
+                              minTimeString = chuncks[1];
+                            }
+                            this._updateStartAt(chuncks[0]);
+                            this._updateMinTime(minTimeString);
+                          },
+                          selectedDay: this.date,
+                          lastDay: 31,
+                          readOnly: this.readOnly,
+                          validatorMessage: AppLocalizations.of(context).translate("enter_desired_start"),
+                          onSubmit: (text) { FocusScope.of(context).nextFocus(); }
+                        )
+                      ])
+                    ),
+                    SizedBox(height: 26),
+                  ] + (this.askedPoint.askedEndAt == null && this.readOnly ? [] : [
+                    FormTimePicker(
+                      isRequired: false,
+                      value: this.askedEndAt,
+                      minTime: this.minTime,
+                      initialValue: this.askedPoint?.date?.add(this.askedPoint.askedEndAt),
+                      onChanged: (text){ 
+                        String minTimeString = this.dateFormat.format(this.minTime);
+                        setState(() {
+                          if(RegExp(minTimeString).hasMatch(text)) {
+                            this.askedEndAt = text.split(" ")[0];
+                          } else {
+                            this.askedEndAt = text; 
+                          }
+                        });
+                      },
+                      action: TextInputAction.done,
+                      selectedDay: this.date,
+                      labelText: AppLocalizations.of(context).translate("desired_end"),
+                      icon: Icons.access_time,
+                      readOnly: this.readOnly,
+                      onSubmit: (text) => _onPressed(resources["email"]),
+                      validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
+                    ),
+                    SizedBox(height: 26)
+                  ]) + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
+                    FormTimePicker(
+                      readOnly: true,
+                      initialValue: this.askedPoint.actualStartAt,
+                      labelText: AppLocalizations.of(context).translate("actual_start"),
+                      icon: Icons.access_time
+                    ),
+                    SizedBox(height: 26),
+                    FormTimePicker(
+                      readOnly: true,
+                      initialValue: this.askedPoint.actualEndAt,
+                      labelText: AppLocalizations.of(context).translate("actual_end"),
+                      icon: Icons.access_time
+                    ),
+                    SizedBox(height: 26)
+                  ]: []) + [
+                    OutlinedTextFormField(
+                      readOnly: true,
+                      initialValue: this.askedPoint.friendlyOrigin,
+                      labelText: AppLocalizations.of(context).translate("start_place"),
+                      icon: Icons.pin_drop
+                    ),
+                    SizedBox(height: 26),
+                    OutlinedTextFormField(
+                      readOnly: true,
+                      initialValue: this.askedPoint.friendlyDestiny,
+                      labelText: AppLocalizations.of(context).translate("end_place"),
+                      icon: Icons.flag
+                    ),
+                    SizedBox(height: 26),
+                    AddButton(
+                      onPressed: ()=>_onPressed(resources["email"]),
+                      readOnly: this.readOnly
+                    )
+                  ]
+                )
+            ]
           ),
-          SizedBox(height: 26),
-          OutlinedTextFormField(
-            readOnly: this.readOnly,
-            initialValue: this.askedPoint.name ?? "",
-            onChanged: (text){ this.name = text; },
-            textInputAction: TextInputAction.next,
-            labelText: AppLocalizations.of(context).translate("order_name"),
-            icon: Icons.short_text,
-            validatorMessage: AppLocalizations.of(context).translate("enter_order_name"),
-            onFieldSubmitted: (text) { FocusScope.of(context).nextFocus(); },
-          ),
-          SizedBox(height: 26),
-          FormDatePicker(
-            value: this.date,
-            isRequired: true,
-            initialValue: this.askedPoint.date ?? this.initialDateTime,
-            onChanged: _updateMinTime,
-            action: TextInputAction.next,
-            labelText: AppLocalizations.of(context).translate("date"),
-            icon: Icons.insert_invitation,
-            readOnly: this.readOnly,
-            onSubmit: (text){ FocusScope.of(context).nextFocus(); },
-            validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
-          ),
-          SizedBox(height: 26),
-        ] + (this.askedPoint.askedStartAt == null && this.readOnly ? [] : [
-          FormTimePicker(
-            isRequired: false,
-            value: this.askedStartAt,
-            minTime: this.initialDateTime,
-            initialValue: this.askedPoint?.date?.add(this.askedPoint.askedStartAt),
-            icon: Icons.access_time,
-            labelText: AppLocalizations.of(context).translate("desired_start"),
-            onChanged: (text){
-              List<String> chuncks = text.split(" "); 
-              String minTimeString = this.dateFormat.format(this.initialDateTime);
-              if(chuncks.length == 2) {
-                minTimeString = chuncks[1];
-              }
-              this._updateStartAt(chuncks[0]);
-              this._updateMinTime(minTimeString);
-            },
-            selectedDay: this.date,
-            lastDay: 31,
-            readOnly: this.readOnly,
-            validatorMessage: AppLocalizations.of(context).translate("enter_desired_start"),
-            onSubmit: (text) { FocusScope.of(context).nextFocus(); }
-          ),
-          SizedBox(height: 26),
-        ]) + (this.askedPoint.askedEndAt == null && this.readOnly ? [] : [
-          FormTimePicker(
-            isRequired: false,
-            value: this.askedEndAt,
-            minTime: this.minTime,
-            initialValue: this.askedPoint?.date?.add(this.askedPoint.askedEndAt),
-            onChanged: (text){ 
-              String minTimeString = this.dateFormat.format(this.minTime);
-              setState(() {
-                if(RegExp(minTimeString).hasMatch(text)) {
-                  this.askedEndAt = text.split(" ")[0];
-                } else {
-                  this.askedEndAt = text; 
-                }
-              });
-            },
-            action: TextInputAction.done,
-            selectedDay: this.date,
-            labelText: AppLocalizations.of(context).translate("desired_end"),
-            icon: Icons.access_time,
-            readOnly: this.readOnly,
-            onSubmit: (text) => _onPressed(resources["email"]),
-            validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
-          ),
-          SizedBox(height: 26)
-        ]) + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
-          FormTimePicker(
-            readOnly: true,
-            initialValue: this.askedPoint.actualStartAt,
-            labelText: AppLocalizations.of(context).translate("actual_start"),
-            icon: Icons.access_time
-          ),
-          SizedBox(height: 26),
-          FormTimePicker(
-            readOnly: true,
-            initialValue: this.askedPoint.actualEndAt,
-            labelText: AppLocalizations.of(context).translate("actual_end"),
-            icon: Icons.access_time
-          ),
-          SizedBox(height: 26)
-        ]: []) + [
-          OutlinedTextFormField(
-            readOnly: true,
-            initialValue: this.askedPoint.friendlyOrigin,
-            labelText: AppLocalizations.of(context).translate("start_place"),
-            icon: Icons.pin_drop
-          ),
-          SizedBox(height: 26),
-          OutlinedTextFormField(
-            readOnly: true,
-            initialValue: this.askedPoint.friendlyDestiny,
-            labelText: AppLocalizations.of(context).translate("end_place"),
-            icon: Icons.flag
-          ),
-          SizedBox(height: 26),
-          AddButton(
-            onPressed: ()=>_onPressed(resources["email"]),
-            readOnly: this.readOnly
-          )
-        ]
+        )
       )
     )
   );
