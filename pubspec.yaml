@@ -31,7 +31,6 @@ dependencies:
   app_settings: ^3.0.1
   cloud_firestore: ^0.13.4+2
   firebase_core: ^0.4.4
-  timeline_list: ^0.0.3
   firebase_messaging: ^6.0.13  
   flutter_local_notifications: ^1.4.1
   google_maps_webservice: ^0.0.16

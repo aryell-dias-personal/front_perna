@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color mainLightColor = Color(0xFF1c4966);
-    Color mainDarkColor = Color(0xFFb5f8ff);
+    Color mainDarkColor = Color(0xFFe0fcff);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

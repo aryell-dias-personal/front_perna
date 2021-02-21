@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,8 @@ import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/askedPointPage.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/store/state.dart';
+import 'package:intl/intl.dart';
 import 'package:perna/widgets/titledValueWidget.dart';
-import 'package:timeline_list/timeline.dart';
-import 'package:timeline_list/timeline_model.dart';
 
 class HistoryPage extends StatefulWidget {
   final String email;
@@ -26,6 +26,8 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  final DateFormat format = DateFormat('dd/MM/yyyy HH:mm');
+  final DateFormat formatDate = DateFormat('dd/MM/yyyy');
   final Firestore firestore;
   final String email;
 
@@ -90,15 +92,15 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  String parseDuration(Duration shift, DateTime date){
-    DateTime currTime = date.add(shift);
-    String cuttedDate = currTime.toString().substring(0,16);
-    List<String> datePieces = cuttedDate.split(' ');
-    return "${datePieces[1]} ${datePieces[0].split('-').reversed.join('/')}";
-  }
-
-  String parsePlace(String place){
-    return place;
+  String parseDuration(shiftStart, shiftEnd, date){
+    int shift = shiftStart ?? shiftEnd; 
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(date.round()*1000);
+    Duration duration = shift == null ? null : Duration(seconds: shift.round());
+    if(dateTime != null && duration != null) {
+      DateTime currTime = dateTime.add(duration);
+      return format.format(currTime);
+    }
+    return formatDate.format(dateTime);
   }
 
   List getHistory(){
@@ -107,72 +109,6 @@ class _HistoryPageState extends State<HistoryPage> {
       return -((first['askedEndAt'] ?? 0) - (second['askedEndAt'] ?? 0));
     });
     return history;
-  }
-
-  List<Widget> buildInfo(operation) {
-    assert(operation['origin'] != null || operation['garage'] != null);
-    return operation['origin'] != null ? buildAskedPoint(AskedPoint.fromJson(operation)) : buildAgent(Agent.fromJson(operation));
-  }
-
-  List<Widget> buildAskedPoint(AskedPoint askedPoint) {
-    return <Widget>[
-      SizedBox(height: 20),
-      askedPoint.askedStartAt != null ? 
-        TitledValueWidget(title: AppLocalizations.of(context).translate("start_time"), value: parseDuration(askedPoint.askedStartAt, askedPoint.date)) : 
-        SizedBox(),
-      askedPoint.askedEndAt != null ? 
-        TitledValueWidget(title: AppLocalizations.of(context).translate("end_time"), value: parseDuration(askedPoint.askedEndAt, askedPoint.date)) : 
-        SizedBox(),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("start_place"), value: parsePlace(askedPoint.friendlyOrigin)),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("end_place"), value: parsePlace(askedPoint.friendlyDestiny)),
-      SizedBox(height: 20)
-    ];
-  }
-
-  List<Widget> buildAgent(Agent agent) {
-    return <Widget>[
-      SizedBox(height: 20),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_start"), value: parseDuration(agent.askedStartAt, agent.date)),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("expedient_end"), value: parseDuration(agent.askedEndAt, agent.date)),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("garage"), value: parsePlace(agent.friendlyGarage)),
-      TitledValueWidget(title: AppLocalizations.of(context).translate("seats"), value: agent.places.toString()),
-      SizedBox(height: 20)
-    ];
-  }
-
-  List<TimelineModel> buildHistoryTiles() {
-    return getHistory().map<TimelineModel>((operation){
-      return TimelineModel(
-        FlatButton(
-          onPressed: (){
-            Navigator.push(context, 
-              MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  body: StoreConnector<StoreState, Map<String, dynamic>>(
-                    converter: (store) => {
-                      "userService": store.state.userService,
-                      "driverService": store.state.driverService
-                    },
-                    builder: (context, resources) => operation['origin'] != null?
-                      AskedPointPage(userService: resources['userService'], askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
-                      ExpedientPage(driverService: resources['driverService'], agent: Agent.fromJson(operation), readOnly: true, clear: (){})
-                  )
-                )
-              )
-            );
-          }, 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: buildInfo(operation)
-          ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20)))
-        ),
-        position: TimelineItemPosition.right,
-        iconBackground: operation['origin'] != null ? Colors.redAccent : Colors.greenAccent,
-        icon: Icon(operation['origin'] != null ? Icons.add_shopping_cart : Icons.directions_bus, color: Theme.of(context).backgroundColor)
-      );
-    }).toList();
   }
 
   @override
@@ -220,9 +156,80 @@ class _HistoryPageState extends State<HistoryPage> {
               Text(AppLocalizations.of(context).translate("no_operation"), style: TextStyle(fontSize: 17),)
             ],
           )
-        ) : Timeline(
-          position: TimelinePosition.Left,
-          children: this.buildHistoryTiles()
+        ) : Builder(
+          builder: (context) {
+            return ListView.separated(
+              itemCount: getHistory().length,
+              separatorBuilder: (context, index) {
+                return Divider();
+              },
+              itemBuilder: (context, index) {
+                List history = getHistory();
+                dynamic operation = history[index];
+                return FlatButton(
+                  onPressed: (){
+                    Navigator.push(context, 
+                      MaterialPageRoute(
+                        builder: (context) => StoreConnector<StoreState, Map<String, dynamic>>(
+                          converter: (store) => {
+                            "userService": store.state.userService,
+                            "driverService": store.state.driverService
+                          },
+                          builder: (context, resources) => operation['origin'] != null?
+                            AskedPointPage(userService: resources['userService'], askedPoint: AskedPoint.fromJson(operation), readOnly: true, clear: (){}):
+                            ExpedientPage(driverService: resources['driverService'], agent: Agent.fromJson(operation), readOnly: true, clear: (){})
+                        )
+                      )
+                    );
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              TitledValueWidget(
+                                title: AppLocalizations.of(context).translate(operation['origin'] == null ? "expedient" : "order"),
+                                value: parseDuration(operation['askedStartAt'], operation['askedEndAt'], operation['date']),
+                              ),
+                              operation['origin'] == null ? TitledValueWidget(
+                                title: AppLocalizations.of(context).translate("driver"),  
+                                value: operation['email'] ?? ""
+                              ) : SizedBox(),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              // TODO: inserir campo valor nos pedidos e expedientes
+                              // TitledValueWidget(
+                              //   title: "Valor",
+                              //   value: "100,00 R\$"
+                              // ),
+                              Icon(
+                                Icons.chevron_right,
+                                color: Theme.of(context).primaryColor,
+                              )
+                            ]
+                          )
+                        ]
+                      ),
+                      SizedBox(height: 10),
+                      Image.memory(base64Decode(operation['staticMap'])),
+                      SizedBox(height: 10),
+                    ],
+                  )
+                );
+              },
+            );
+          },
         )
       )
     );
