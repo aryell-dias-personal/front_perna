@@ -104,8 +104,12 @@ class _MapsContainerState extends State<MapsContainer> {
 
   void addNewExpedient() async {
     if(this.markers.length == 1){
+      List<String> snippet1 = markers.first.infoWindow.snippet.split('</>');
       Agent agent = Agent(
-        friendlyGarage: markers.first.infoWindow.snippet,
+        friendlyGarage: snippet1.first,
+        region: snippet1.length > 1 ? [
+          snippet1.last
+        ] : null,
         garage: markers.first.position
       );
       Navigator.push(context, 
@@ -132,9 +136,15 @@ class _MapsContainerState extends State<MapsContainer> {
 
   void addNewAsk() async {
     if(this.markers.length == 2){
+      List<String> snippet1 = markers.first.infoWindow.snippet.split('</>');
+      List<String> snippet2 = markers.last.infoWindow.snippet.split('</>');
       AskedPoint askedPoint = AskedPoint(
-        friendlyOrigin: markers.first.infoWindow.snippet,
-        friendlyDestiny: markers.last.infoWindow.snippet,
+        friendlyOrigin: snippet1.first,
+        friendlyDestiny: snippet2.first,
+        region: snippet1.length > 1 && snippet2.length > 1 ? [
+          snippet1.last,
+          snippet2.last
+        ] : null,
         origin: markers.first.position,
         destiny: markers.last.position
       );
@@ -160,7 +170,7 @@ class _MapsContainerState extends State<MapsContainer> {
     }
   }
 
-  void putMarker(LatLng location, String description, MarkerType type) async {
+  void putMarker(LatLng location, String description, MarkerType type, String region) async {
     preExecute();
     LatLng position = LatLng(location.latitude, location.longitude);
     String title = type == MarkerType.origin ? "Partida ou garagem" : "Chegada";
@@ -168,14 +178,24 @@ class _MapsContainerState extends State<MapsContainer> {
     Marker marker = Marker(
       markerId: markerId,
       icon: type == MarkerType.origin ? this.originPin : this.destinyPin,
-      infoWindow: InfoWindow(title: title, snippet: description),
+      infoWindow: InfoWindow(title: title, snippet: "$description</>$region"),
       consumeTapEvents: true,
       onTap: () => _onTapMarker(markerId, position), 
       position: position
     );
     setState(() {
-      this.markers.removeWhere((marker) => marker.infoWindow.title == title);
-      this.markers.add(marker);
+      if(this.markers.length > 1) {
+        Set<Marker> newMarkers = this.markers.map<Marker>((currMarker) {
+          if(currMarker.infoWindow.title == title) {
+            return marker;
+          }
+          return currMarker;
+        }).toSet();
+        this.markers.clear();
+        this.markers.addAll(newMarkers);
+      } else {
+        this.markers.add(marker);
+      }
     });
   }
 
@@ -219,8 +239,8 @@ class _MapsContainerState extends State<MapsContainer> {
         SearchLocation(
           preExecute: preExecute,
           markers: this.markers,
-          onStartPlaceSelected: (location, description) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.origin),
-          onEndPlaceSelected: (location, description) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.destiny)
+          onStartPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.origin, region),
+          onEndPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.destiny, region)
         )
       ]  + (this.points==null || this.points.length <= 1 ? [] : [
         FloatingAnimatedButton(

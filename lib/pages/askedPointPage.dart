@@ -342,6 +342,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   ]) + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
                     FormTimePicker(
                       readOnly: true,
+                      selectedDay: this.date,
                       initialValue: this.askedPoint.actualStartAt,
                       labelText: AppLocalizations.of(context).translate("actual_start"),
                       icon: Icons.access_time
@@ -349,6 +350,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                     SizedBox(height: 26),
                     FormTimePicker(
                       readOnly: true,
+                      selectedDay: this.date,
                       initialValue: this.askedPoint.actualEndAt,
                       labelText: AppLocalizations.of(context).translate("actual_end"),
                       icon: Icons.access_time

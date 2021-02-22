@@ -19,6 +19,7 @@ class AskedPoint {
   DateTime actualEndAt;
   String agentId;
   Uint8List staticMap;
+  List<String> region;
 
   AskedPoint({
     this.date,
@@ -33,6 +34,7 @@ class AskedPoint {
     this.askedEndAt,
     this.actualStartAt,
     this.actualEndAt,
+    this.region,
     this.agentId,
     this.staticMap
   });
@@ -65,6 +67,7 @@ class AskedPoint {
       history: parsedJson['history']?.map<DateTime>(parseDate)?.toList(),
       actualStartAt: parseDate(parsedJson['actualStartAt']),
       actualEndAt: parseDate(parsedJson['actualEndAt']),
+      region: parsedJson["region"]!=null?parsedJson["region"].map<String>((region)=>"$region").toList():null,
       agentId: parsedJson ['agentId'],
       staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
@@ -84,6 +87,7 @@ class AskedPoint {
     DateTime actualStartAt, 
     DateTime actualEndAt, 
     String agentId,
+    List<String> region,
     Uint8List staticMap
   }) => AskedPoint(
     email: email ?? this.email,
@@ -99,6 +103,7 @@ class AskedPoint {
     actualStartAt: actualStartAt ?? this.actualStartAt,
     actualEndAt: actualEndAt ?? this.actualEndAt,
     agentId: agentId ?? this.agentId,
+    region: region ?? this.region,
     staticMap: staticMap ?? this.staticMap
   );
 
@@ -116,6 +121,7 @@ class AskedPoint {
     "actualStartAt": actualStartAt != null ? actualStartAt.millisecondsSinceEpoch/1000: null,
     "actualEndAt": actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
     "agentId": agentId,
+    "region": region,
     "staticMap": staticMap != null ? base64Encode(staticMap) : null
   };
 }

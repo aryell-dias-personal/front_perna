@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -9,8 +10,8 @@ import 'package:perna/helpers/appLocalizations.dart';
 
 class SearchLocation extends StatefulWidget {
   final Function() preExecute;
-  final Function(Location, String) onStartPlaceSelected;
-  final Function(Location, String) onEndPlaceSelected;
+  final Function(Location, String, String) onStartPlaceSelected;
+  final Function(Location, String, String) onEndPlaceSelected;
   final Set<Marker> markers;
 
   const SearchLocation({
@@ -30,8 +31,8 @@ class SearchLocation extends StatefulWidget {
 class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin {
   bool showSecond = false;
   final Function() preExecute;
-  final Function(Location, String) onStartPlaceSelected;
-  final Function(Location, String) onEndPlaceSelected;
+  final Function(Location, String, String) onStartPlaceSelected;
+  final Function(Location, String, String) onEndPlaceSelected;
   final Set<Marker> markers;
   
   TextEditingController initialController = TextEditingController();
@@ -48,24 +49,29 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   Future _execute(String hint, int type) async {
     this.preExecute();
+    Locale current = AppLocalizations.of(context).locale;
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
       apiKey: apiKey,
       mode: Mode.overlay,
       hint: hint,
       overlayBorderRadius: BorderRadius.all(Radius.circular(15.0)),
-      language: "pt", components: [
-        Component(Component.country, "br")
+      language: current.languageCode, components: [
+        Component(Component.country, current.countryCode)
       ]
     );
     if(prediction!=null){
       PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
       Location location = placesDetailsResponse.result.geometry.location;
+      Coordinates coordinates = new Coordinates(location.lat, location.lng);
+      List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      Address address = addresses.first;
+      String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
       if(type == 0){
-        onStartPlaceSelected(location, prediction.description);
+        onStartPlaceSelected(location, prediction.description, region);
         this.initialController.text = prediction.description;
       }else{
-        onEndPlaceSelected(location, prediction.description);
+        onEndPlaceSelected(location, prediction.description, region);
         this.endControler.text = prediction.description;
       }
     }

@@ -19,7 +19,7 @@ class MapListener extends StatefulWidget {
   final String email;
   final Firestore firestore;
   final Function preExecute;
-  final Function(LatLng, String, MarkerType) putMarker;
+  final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
   final Set<Marker> markers;
   final Function setVisiblePin;
@@ -50,7 +50,7 @@ class _MapListenerState extends State<MapListener> {
   final String email;
   final Firestore firestore;
   final Function preExecute;
-  final Function(LatLng, String, MarkerType) putMarker;
+  final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
   final Set<Marker> markers;
   final Function setVisiblePin;

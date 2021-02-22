@@ -14,7 +14,7 @@ class MyGoogleMap extends StatefulWidget {
   final String email;
   final Firestore firestore;
   final Function preExecute;
-  final Function(LatLng, String, MarkerType) putMarker;
+  final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
   final Set<Marker> markers;
   final Set<Polyline> polyline;
@@ -54,7 +54,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
   final String email;
   final Firestore firestore;
   final Function preExecute;
-  final Function(LatLng, String, MarkerType) putMarker;
+  final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
   final Set<Marker> markers;
   final Set<Polyline> polyline;
@@ -90,8 +90,10 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     this.preExecute();
     Coordinates coordinates = new Coordinates(location.latitude, location.longitude);
     List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    String description = addresses.isNotEmpty?addresses.first.addressLine: "lat: ${location.latitude}, long: ${location.longitude}";
-    this.putMarker(location, description, this.markers.length == 0 ? MarkerType.origin : MarkerType.destiny);
+    Address address = addresses.first;
+    String description = address.addressLine;
+    String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
+    this.putMarker(location, description, this.markers.length == 0 ? MarkerType.origin : MarkerType.destiny, region);
   }
 
   onMapCreated(GoogleMapController googleMapController) async {

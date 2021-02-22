@@ -21,6 +21,7 @@ class Agent {
   String fromEmail;
   List<String> askedPointIds;
   List<String> watchedBy;
+  List<String> region;
   bool old;
   Uint8List staticMap;
 
@@ -40,6 +41,7 @@ class Agent {
     this.old=false,
     this.askedPointIds,
     this.watchedBy=const[],
+    this.region,
     this.staticMap
   });
   
@@ -72,6 +74,7 @@ class Agent {
       email: parsedJson['email'],
       fromEmail: parsedJson['fromEmail'],
       watchedBy: parsedJson["watchedBy"]!=null?parsedJson["watchedBy"].map<String>((email)=>"$email").toList():null,
+      region: parsedJson["region"]!=null?parsedJson["region"].map<String>((region)=>"$region").toList():null,
       askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null,
       staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
@@ -92,6 +95,7 @@ class Agent {
     List<String> askedPointIds, 
     LatLng position,
     List<String> watchedBy,
+    List<String> region,
     bool old,
     Uint8List staticMap
   }) => Agent(
@@ -109,6 +113,7 @@ class Agent {
     fromEmail: fromEmail ?? this.fromEmail,
     askedPointIds: askedPointIds ?? this.askedPointIds,
     watchedBy: watchedBy ?? this.watchedBy,
+    region: region ?? this.region,
     old: old ?? this.old,
     staticMap: staticMap ?? this.staticMap
   );
@@ -128,6 +133,7 @@ class Agent {
     "fromEmail": fromEmail,
     "askedPointIds": askedPointIds,
     "watchedBy": watchedBy,
+    "region": region,
     "old": old,
     "staticMap": staticMap != null ? base64Encode(staticMap) : null
   };
