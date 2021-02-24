@@ -8,18 +8,26 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:172739913177:android:669df5d67074a3404b25c8",
+        "mobilesdk_app_id": "1:172739913177:android:107ea96e084588be4b25c8",
         "android_client_info": {
-          "package_name": "com.bluehands.perna.app"
+          "package_name": "com.bluehands.perna"
         }
       },
       "oauth_client": [
         {
-          "client_id": "172739913177-v7pgnq819qsdnc1dr0hg6ukrblvckj94.apps.googleusercontent.com",
+          "client_id": "172739913177-42laa9dr0q5p954p6igu94uem0r869qd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bluehands.perna.app",
-            "certificate_hash": "7f8cc8c2a4feebdaeb0435e0b456accb68c75fb3"
+            "package_name": "com.bluehands.perna",
+            "certificate_hash": "050c5a94c874d25bed5959848c47229c2aa272f4"
+          }
+        },
+        {
+          "client_id": "172739913177-71n330fss849isjbdmgt2k43fs0fsh75.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bluehands.perna",
+            "certificate_hash": "1ac1b584ec9635869e9f30b6db2875c0e785c5cc"
           }
         },
         {
@@ -29,50 +37,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA_m-omyZa0xzhhzwCXxMvBA3r_JZcMsfY"
-        },
-        {
-          "current_key": "AIzaSyBgQnuVG3TfvrgSf3L_zyOX7uCq4FdFsEA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:172739913177:android:546c351975831a384b25c8",
-        "android_client_info": {
-          "package_name": "com.example.perna"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "172739913177-00dj3lssi1dajh524hu13tbf9pcsaqtt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.perna",
-            "certificate_hash": "7f8cc8c2a4feebdaeb0435e0b456accb68c75fb3"
-          }
-        },
-        {
-          "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA_m-omyZa0xzhhzwCXxMvBA3r_JZcMsfY"
-        },
-        {
-          "current_key": "AIzaSyBgQnuVG3TfvrgSf3L_zyOX7uCq4FdFsEA"
+          "current_key": "AIzaSyC5CkCG-a7M_PBClkoPsH-4KKMA9vxxt6g"
         }
       ],
       "services": {

@@ -31,7 +31,7 @@
 /build/
 release/
 */key.properties
-key.jks
+release.keystore
 
 # Web related
 lib/generated_plugin_registrant.dart

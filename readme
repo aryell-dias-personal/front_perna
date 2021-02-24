@@ -10,3 +10,18 @@ ao invés de
 List<String> myList = new ArrayList<String>();
 
 no Java.
+
+<path-to-keytool> -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000
+<path-to-keytool> -exportcert -alias release -keystore <path-to-keystore> -list -v
+
+para verificar
+
+./gradlew signingReport 
+
+obs.: path-to-keytool normalmente é dentro da pasta jre do android studio
+obs2.: gere em uma pasta que possua acesso a escrita
+obs3.: se liga na AndroidDebugKey, gerada pelo android studio, ela precisa tar no firebase pra testar
+
+para aryell, por exemplo:
+path-to-keytool= C:/Arquivos\ de\ Programas/Android/Android\ Studio/jre/bin/keytool.exe
+path-to-keystore= ~/release.keystore

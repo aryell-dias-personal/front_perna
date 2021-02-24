@@ -1,4 +1,4 @@
-package com.example.perna
+package com.bluehands.perna
 
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.PluginRegistry
