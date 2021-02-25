@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 
-// TODO: talvez trocar de AskedPoint para AskedPoints ou AskedRoute (inclusive no backend)
 class AskedPoint {
   DateTime date;
   List<DateTime> queue;

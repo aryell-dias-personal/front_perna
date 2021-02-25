@@ -208,7 +208,6 @@ class _HistoryPageState extends State<HistoryPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              // TODO: inserir campo valor nos pedidos e expedientes
                               // TitledValueWidget(
                               //   title: "Valor",
                               //   value: "100,00 R\$"

@@ -72,7 +72,6 @@ class SideMenu extends StatelessWidget {
                 showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
                   Colors.pinkAccent, context: context);
-                //TODO: cadastro de cartões de credito de forma segura, talvez uso do GPAY
               },
               icon: Icons.credit_card,
             ),
@@ -83,7 +82,6 @@ class SideMenu extends StatelessWidget {
                 showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
                   Colors.pinkAccent, context: context);
-                //TODO: Seleção se o tema deve acompanhar a tema do sistema ser light ou dark
               },
               icon: Icons.palette,
             ),
