@@ -1,4 +1,4 @@
-// TODO: Traduzir para inglês
+// TODO: Atualizar e traduzir para inglês
 final String markdownHelp = """
 # Manual da Aplicação
 
