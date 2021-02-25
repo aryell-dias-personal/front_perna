@@ -1,3 +1,4 @@
+// TODO: Traduzir para inglês
 final String markdownHelp = """
 # Manual da Aplicação
 

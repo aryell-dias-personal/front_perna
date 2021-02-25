@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:perna/models/user.dart';
 
 class SignInResponse{
