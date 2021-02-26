@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:perna/helpers/helpHelper.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/pages/helpPage.dart';
@@ -59,7 +60,9 @@ class SideMenu extends StatelessWidget {
               text: AppLocalizations.of(context).translate("help"),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => HelpPage()
+                    builder: (context) => HelpPage(
+                      helpItem: getHelpRoot(context),
+                    )
                   )
                 );
               },

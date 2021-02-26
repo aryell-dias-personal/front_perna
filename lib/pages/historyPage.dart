@@ -121,7 +121,7 @@ class _HistoryPageState extends State<HistoryPage> {
           mainAxisSize: MainAxisSize.min,
           children:<Widget>[
             Text(
-              "Histórico",
+              AppLocalizations.of(context).translate("history"),
               style: TextStyle(
                 fontWeight: FontWeight.bold,  
                 fontSize: 30.0
