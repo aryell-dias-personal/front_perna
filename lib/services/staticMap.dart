@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart';
-import 'package:perna/constants/constants.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class StaticMapService{
   final decoder = JsonDecoder();
   final baseUrl = "https://maps.googleapis.com/maps/api/directions/";
+  String apiKey = FlavorConfig.instance.variables['apiKey'];
 
   String mountStaticMapUrl({
     List<LatLng> route,

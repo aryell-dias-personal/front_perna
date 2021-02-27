@@ -14,6 +14,7 @@ import 'package:perna/models/askedPoint.dart';
 import 'package:perna/models/point.dart';
 import 'package:perna/pages/askedPointPage.dart';
 import 'package:random_color/random_color.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 
 class MapListener extends StatefulWidget {
   final String email;
@@ -86,7 +87,7 @@ class _MapListenerState extends State<MapListener> {
 
   _buildRouteCoords(List<LatLng> points) async {
     if(points.length >= 2){
-      List<LatLng> coords = await directionsService.getRouteBetweenCoordinates(apiKey, points);
+      List<LatLng> coords = await directionsService.getRouteBetweenCoordinates(FlavorConfig.instance.variables['apiKey'], points);
       if (coords.isNotEmpty) return coords;
     }
     return null;

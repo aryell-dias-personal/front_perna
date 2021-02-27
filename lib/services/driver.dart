@@ -1,10 +1,11 @@
-import 'package:perna/constants/constants.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:http/http.dart';
 import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/models/agent.dart';
 
 class DriverService {
   MyDecoder myDecoder;
+  String baseUrl = FlavorConfig.instance.variables['baseUrl'];
 
   DriverService({
     this.myDecoder

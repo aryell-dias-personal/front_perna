@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:perna/constants/constants.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:perna/helpers/myDecoder.dart';
@@ -10,6 +10,7 @@ class SignInService {
   GoogleSignIn googleSignIn;
   FirebaseAuth firebaseAuth;
   MyDecoder myDecoder;
+  String baseUrl = FlavorConfig.instance.variables['baseUrl'];
 
   SignInService({
     this.googleSignIn, 

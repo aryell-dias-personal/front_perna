@@ -20,6 +20,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_flavor/flutter_flavor.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
@@ -38,13 +39,25 @@ void main() async {
 
   final initialState = await persistor.load();
   
+  FlavorConfig(
+      name: "DEVELOP",
+      variables: {
+        'appName': 'perna-app',
+        'projectID': 'perna-app',
+        'gcmSenderID': '172739913177',
+        'baseUrl': 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-',
+        'apiKey': 'AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA',
+        'googleAppID': '1:172739913177:android:38f4c6eb4f67cb674b25c8'
+      },
+  );
+
   final FirebaseApp app = await FirebaseApp.configure(
-    name: 'perna-app',
-    options: const FirebaseOptions(
-      googleAppID: '1:172739913177:android:38f4c6eb4f67cb674b25c8',
-      apiKey: apiKey,
-      projectID: 'perna-app',
-      gcmSenderID: '172739913177'
+    name: FlavorConfig.instance.variables['appName'],
+    options: FirebaseOptions(
+      googleAppID: FlavorConfig.instance.variables['googleAppID'],
+      apiKey: FlavorConfig.instance.variables['apiKey'],
+      projectID: FlavorConfig.instance.variables['projectID'],
+      gcmSenderID: FlavorConfig.instance.variables['gcmSenderID'],
     )
   );
   final Firestore firestore = Firestore(app: app);
