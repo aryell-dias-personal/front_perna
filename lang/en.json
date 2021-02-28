@@ -108,5 +108,13 @@
     "helpConsultHistorySmallTitle": "Consult History",
     "helpConsultHistoryTitle": "How can I see my order and expedition history?",
     "helpConsultHistoryContent": "Just open the menu and click on the item \"History\" it will take you to a screen indicating all the operations (orders and expedients) made by you in the app.",
+    "creditCardNumber": "Credit Card Number",
+    "creditCardExpireDate": "Expire Date",
+    "cvvError": "Please input a valid CVV",
+    "cardHolderError": "Please input a card holder",
+    "cardDateError": "Please input a valid date",
+    "cardNumberError": "Please input a valid number",
+    "cvv": "CVV",
+    "cardHolder": "Card Holder",
     "date": "Date"
 }

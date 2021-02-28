@@ -108,5 +108,13 @@
     "helpConsultHistorySmallTitle": "Consultar Histórico",
     "helpConsultHistoryTitle": "Como posso ver meu histórico de pedidos e expedientes?",
     "helpConsultHistoryContent": "Basta abrir o menu e clicar no item \"Histórico\" ele lhe levará para uma tela indicando todas as operações (pedidos e expedientes) feitas por você no app.",
+    "creditCardNumber": "Número do Cartão",
+    "creditCardExpireDate": "Expiração do Cartão",
+    "cvvError": "Insira um CVC válido",
+    "cardHolderError": "Insira o titular do cartão",
+    "cardDateError": "Insira uma data válida",
+    "cardNumberError": "Insira um número válido",
+    "cvv": "CVC",
+    "cardHolder": "Titular do Cartão",
     "date": "Data"
 }

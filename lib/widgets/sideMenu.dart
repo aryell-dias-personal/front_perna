@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/helpHelper.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
+import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/store/state.dart';
@@ -18,7 +19,7 @@ class SideMenu extends StatelessWidget {
   final Function() logout;
   final Color textColor;
 
-  const SideMenu({Key key, this.email, this.name, this.photoUrl, this.logout, this.textColor}) : super(key: key);
+  SideMenu({Key key, this.email, this.name, this.photoUrl, this.logout, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +73,10 @@ class SideMenu extends StatelessWidget {
               textColor: textColor,
               text: AppLocalizations.of(context).translate("payment"),
               onPressed: (){
-                showSnackBar(
-                  AppLocalizations.of(context).translate("not_implemented"), 
-                  Colors.pinkAccent, context: context);
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => CreditCardPage()
+                  )
+                );
               },
               icon: Icons.credit_card,
             ),

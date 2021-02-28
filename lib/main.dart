@@ -42,6 +42,7 @@ void main() async {
   FlavorConfig(
       name: "DEVELOP",
       variables: {
+        'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
         'appName': 'perna-app',
         'projectID': 'perna-app',
         'gcmSenderID': '172739913177',
