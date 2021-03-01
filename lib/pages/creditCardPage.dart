@@ -34,6 +34,22 @@ class CreditCardPageState extends State<CreditCardPage> {
   CreditCard creditCardModel = CreditCard();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  void _onPressed(context) async {
+    if (formKey.currentState.validate()) {
+      setState(() { isLoading = true; });
+      int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
+      if(statusCode == 200) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        showSnackBar(AppLocalizations.of(context).translate("successfully_added_card"), 
+          Colors.greenAccent, isGlobal: true);
+      } else {
+        setState(() { isLoading = false; });
+        showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
+          Colors.redAccent, context: context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,63 +93,48 @@ class CreditCardPageState extends State<CreditCardPage> {
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomInset: true,
-      body: isLoading ? Center(
-        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+      body: Material(
+        child: isLoading ? Center(child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
       ) : SafeArea(
-        child: Column(
-          children: <Widget>[
-            CreditCardWidget(
-              isAmex: this.isAmex,
-              cardType: this.cardType,
-              cardNumber: this.creditCardModel.cardNumber ?? '',
-              expiryDate: this.creditCardModel.expiryDate ?? '',
-              cardHolderName: this.creditCardModel.cardHolderName ?? '',
-              cvvCode: this.creditCardModel.cvvCode ?? '',
-              showBackView: this.creditCardModel.isCvvFocused ?? false
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CreditCardForm(
-                      isAmex: this.isAmex,
-                      formKey: formKey,
-                      obscureCvv: true,
-                      obscureNumber: true,
-                      onCreditCardChange: onCreditCardChange,
-                    ),
-                    SizedBox(height: 26),
-                    AddButton(
-                      onPressed: () async {
-                        if (formKey.currentState.validate()) {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
-                          if(statusCode == 500) {
-                            setState(() {
-                              isLoading = false;
-                            });
-                            showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
-                              Colors.redAccent, context: context);
-                          } else {
-                            Navigator.popUntil(context, (route) => route.isFirst);
-                            showSnackBar( AppLocalizations.of(context).translate("successfully_added_card"), 
-                              Colors.greenAccent, isGlobal: true);
-                          }
-                        }
-                      },
-                      readOnly: false,
-                    )
-                  ],
+          child: Column(
+            children: <Widget>[
+              CreditCardWidget(
+                isAmex: this.isAmex,
+                cardType: this.cardType,
+                cardNumber: this.creditCardModel.cardNumber ?? '',
+                expiryDate: this.creditCardModel.expiryDate ?? '',
+                cardHolderName: this.creditCardModel.cardHolderName ?? '',
+                cvvCode: this.creditCardModel.cvvCode ?? '',
+                showBackView: this.creditCardModel.isCvvFocused ?? false
+              ),
+              SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CreditCardForm(
+                        isAmex: this.isAmex,
+                        formKey: formKey,
+                        obscureCvv: true,
+                        obscureNumber: true,
+                        onCreditCardChange: onCreditCardChange,
+                      ),
+                      SizedBox(height: 26),
+                      Builder(
+                        builder: (context) => AddButton(
+                          onPressed: () => _onPressed(context),
+                          readOnly: false,
+                        )
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 
