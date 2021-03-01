@@ -5,9 +5,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/helpHelper.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
-import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
+import 'package:perna/pages/walletPage.dart';
+import 'package:perna/services/signIn.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
 import 'package:perna/widgets/visibleRichText.dart';
@@ -71,14 +72,19 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: AppLocalizations.of(context).translate("payment"),
-              onPressed: (){
+              text: AppLocalizations.of(context).translate("wallet"),
+              onPressed: () async {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => CreditCardPage()
+                    builder: (context) => StoreConnector<StoreState, SignInService>(
+                      converter: (store) => store.state.signInService, 
+                      builder: (context, signInService) => WalletPage(
+                        getRefreshToken: signInService.getRefreshToken
+                      )
+                    )
                   )
                 );
               },
-              icon: Icons.credit_card,
+              icon: Icons.account_balance_wallet_outlined,
             ),
             SideMenuButton(
               textColor: textColor,

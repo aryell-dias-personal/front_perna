@@ -1,5 +1,5 @@
 class CreditCard {
-  CreditCard(this.cardNumber, this.expiryDate, this.cardHolderName, this.cvvCode, this.isCvvFocused);
+  CreditCard({this.cardNumber, this.expiryDate, this.cardHolderName, this.cvvCode, this.isCvvFocused});
 
   String cardNumber = '';
   String expiryDate = '';

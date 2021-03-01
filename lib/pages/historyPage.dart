@@ -152,8 +152,16 @@ class _HistoryPageState extends State<HistoryPage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Image.asset('assets/empty.png', scale: 2),
-              Text(AppLocalizations.of(context).translate("nothing_here"), style: TextStyle(fontSize: 20)),
-              Text(AppLocalizations.of(context).translate("no_operation"), style: TextStyle(fontSize: 17),)
+              Text(
+                AppLocalizations.of(context).translate("nothing_here"), 
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20)
+              ),
+              Text(
+                AppLocalizations.of(context).translate("no_operation"), 
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 17)
+              )
             ],
           )
         ) : Builder(

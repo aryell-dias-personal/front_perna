@@ -2,27 +2,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/creditCard.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/creditCard.dart';
+import 'package:perna/services/payments.dart';
 import 'package:perna/widgets/creditCardForm.dart';
 import 'package:perna/widgets/addButton.dart';
 import 'package:perna/widgets/creditCardWidget.dart';
 
 class CreditCardPage extends StatefulWidget {
+  final PaymentsService paymentsService;
+  final String userToken;
+  
+  CreditCardPage({
+    @required this.paymentsService,
+    @required this.userToken
+  });
+
   @override
   State<StatefulWidget> createState() => CreditCardPageState();
 }
 
 class CreditCardPageState extends State<CreditCardPage> {
-  String cardNumber = '';
-  String expiryDate = '';
-  String cardHolderName = '';
-  String cvvCode = '';
-  bool isCvvFocused = false;
   bool isAmex = false;
   Widget cardType = Container(
     height: 48,
     width: 48,
   );
+  CreditCard creditCardModel = CreditCard();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
@@ -43,7 +49,7 @@ class CreditCardPageState extends State<CreditCardPage> {
                 ),
                 children:  <TextSpan>[
                   TextSpan(
-                    text: AppLocalizations.of(context).translate("payment"), 
+                    text: AppLocalizations.of(context).translate("creditCard"), 
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
                   ),
                 ],
@@ -74,11 +80,11 @@ class CreditCardPageState extends State<CreditCardPage> {
             CreditCardWidget(
               isAmex: this.isAmex,
               cardType: this.cardType,
-              cardNumber: cardNumber,
-              expiryDate: expiryDate,
-              cardHolderName: cardHolderName,
-              cvvCode: cvvCode,
-              showBackView: isCvvFocused
+              cardNumber: this.creditCardModel.cardNumber ?? '',
+              expiryDate: this.creditCardModel.expiryDate ?? '',
+              cardHolderName: this.creditCardModel.cardHolderName ?? '',
+              cvvCode: this.creditCardModel.cvvCode ?? '',
+              showBackView: this.creditCardModel.isCvvFocused ?? false
             ),
             SizedBox(height: 16),
             Expanded(
@@ -95,11 +101,14 @@ class CreditCardPageState extends State<CreditCardPage> {
                     ),
                     SizedBox(height: 26),
                     AddButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (formKey.currentState.validate()) {
-                          print('valid!');
-                        } else {
-                          print('invalid!');
+                          try {
+                            widget.paymentsService.addCard(creditCardModel, widget.userToken);
+                          } catch(e) {
+                            showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
+                              Colors.redAccent, context: context);
+                          }
                         }
                       },
                       readOnly: false,
@@ -114,14 +123,10 @@ class CreditCardPageState extends State<CreditCardPage> {
     );
   }
 
-  void onCreditCardChange(CreditCard creditCardModel) {
+  void onCreditCardChange(CreditCard newCreditCardModel) {
     setState(() {
-      cardNumber = creditCardModel.cardNumber;
-      expiryDate = creditCardModel.expiryDate;
-      cardHolderName = creditCardModel.cardHolderName;
-      cvvCode = creditCardModel.cvvCode;
-      isCvvFocused = creditCardModel.isCvvFocused;
-      cardType = getCardTypeIcon(cardNumber, (willBeAmex) {
+      this.creditCardModel = newCreditCardModel;
+      this.cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (willBeAmex) {
         setState(() {
           isAmex = willBeAmex; 
         });
