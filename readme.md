@@ -10,7 +10,9 @@ PATH-TO-KEYTOOL -exportcert -alias release -keystore PATH-TO-KEYSTORE -list -v
 ```
 
 > PATH-TO-KEYTOOL normalmente é dentro da pasta jre do android studio
+
 > gere em uma pasta que possua acesso a escrita
+
 > se liga na AndroidDebugKey, gerada pelo android studio, ela precisa tar no firebase pra testar
 
 para aryell, por exemplo:
