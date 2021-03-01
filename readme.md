@@ -16,7 +16,9 @@ PATH-TO-KEYTOOL -exportcert -alias release -keystore PATH-TO-KEYSTORE -list -v
 > se liga na AndroidDebugKey, gerada pelo android studio, ela precisa tar no firebase pra testar
 
 para aryell, por exemplo:
+
 PATH-TO-KEYTOOL= C:/Arquivos\ de\ Programas/Android/Android\ Studio/jre/bin/keytool.exe
+
 PATH-TO-KEYSTORE= ~/release.keystore
 
 - use do android studio e chave gerada para um buddle assinado;
