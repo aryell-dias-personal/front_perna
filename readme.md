@@ -30,7 +30,7 @@ PATH-TO-KEYSTORE= ~/release.keystore
 - Não esquece que os icones são do https://www.flaticon.com/authors/smashicons e do https://www.flaticon.com/authors/freepik.
 - uses unchecked or unsafe operations warnings durante a compilação são causados pelo uso de 
 
-```List myList = new ArrayList();``
+```List myList = new ArrayList();```
 
 ao invés de
 
