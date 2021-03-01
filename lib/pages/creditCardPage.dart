@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/creditCard.dart';
 import 'package:perna/helpers/showSnackBar.dart';
@@ -23,6 +25,7 @@ class CreditCardPage extends StatefulWidget {
 }
 
 class CreditCardPageState extends State<CreditCardPage> {
+  bool isLoading = false;
   bool isAmex = false;
   Widget cardType = Container(
     height: 48,
@@ -74,7 +77,9 @@ class CreditCardPageState extends State<CreditCardPage> {
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomInset: true,
-      body: SafeArea(
+      body: isLoading ? Center(
+        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+      ) : SafeArea(
         child: Column(
           children: <Widget>[
             CreditCardWidget(
@@ -103,11 +108,20 @@ class CreditCardPageState extends State<CreditCardPage> {
                     AddButton(
                       onPressed: () async {
                         if (formKey.currentState.validate()) {
-                          try {
-                            widget.paymentsService.addCard(creditCardModel, widget.userToken);
-                          } catch(e) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
+                          if(statusCode == 500) {
+                            setState(() {
+                              isLoading = false;
+                            });
                             showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
                               Colors.redAccent, context: context);
+                          } else {
+                            Navigator.popUntil(context, (route) => route.isFirst);
+                            showSnackBar( AppLocalizations.of(context).translate("successfully_added_card"), 
+                              Colors.greenAccent, isGlobal: true);
                           }
                         }
                       },

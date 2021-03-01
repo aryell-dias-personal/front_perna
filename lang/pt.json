@@ -62,6 +62,7 @@
     "successfully_added_order": "O pedido foi adicionado com sucesso",
     "unsuccessfully_added_order": "Não foi possivel adicionar o pedido",
     "unsuccessfully_added_card": "Não foi possivel adicionar o cartão de crédito",
+    "successfully_added_card": "O cartão de crédito foi adicionado com sucesso",
     "not_found_expedient": "Não foi possivel encontrar o expediente que atende este pedido",
     "order": "Pedido",
     "about_expedient": "Sobre o expediente",

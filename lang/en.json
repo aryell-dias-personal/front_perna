@@ -62,6 +62,7 @@
     "successfully_added_order": "The order was successfully added",
     "unsuccessfully_added_order": "Unable to place order",
     "unsuccessfully_added_card": "Unable to place credit card",
+    "successfully_added_card": "The credit card was successfully added",
     "not_found_expedient": "Can't find expedient that fulfills this request",
     "order": "Order",
     "about_expedient": "About expedient",

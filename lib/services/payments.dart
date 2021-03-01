@@ -8,7 +8,9 @@ class PaymentsService{
   MyDecoder myDecoder;
   String baseUrl = FlavorConfig.instance.variables['baseUrl'];
   
-  PaymentsService() {
+  PaymentsService({
+    this.myDecoder
+  }) {
     StripePayment.setOptions(
       StripeOptions(
         publishableKey: FlavorConfig.instance.variables['paymentPublishableKey'],

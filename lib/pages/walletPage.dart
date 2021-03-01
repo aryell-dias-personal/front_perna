@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/services/payments.dart';
 
@@ -15,7 +16,7 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-  final PaymentsService paymentsService = PaymentsService();
+  final PaymentsService paymentsService = PaymentsService(myDecoder: MyDecoder());
   bool isLoading = true;
   String userToken;
 
