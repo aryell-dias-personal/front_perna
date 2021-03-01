@@ -15,22 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "172739913177-42laa9dr0q5p954p6igu94uem0r869qd.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.bluehands.perna",
-            "certificate_hash": "050c5a94c874d25bed5959848c47229c2aa272f4"
-          }
-        },
-        {
-          "client_id": "172739913177-71n330fss849isjbdmgt2k43fs0fsh75.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.bluehands.perna",
-            "certificate_hash": "1ac1b584ec9635869e9f30b6db2875c0e785c5cc"
-          }
-        },
-        {
           "client_id": "172739913177-m3fm5s171el9353i5tbcktdlb61eqt2b.apps.googleusercontent.com",
           "client_type": 3
         }

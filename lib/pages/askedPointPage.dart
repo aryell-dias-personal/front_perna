@@ -121,12 +121,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
           Colors.greenAccent, isGlobal: true);
       }else{
-        setState(() { 
-          isLoading = false; 
-          date = null;
-          askedEndAt = null;
-          askedStartAt = null;
-        });
+        setState(() { isLoading = false; });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
           Colors.redAccent, context: context);
       }
