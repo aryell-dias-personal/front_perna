@@ -1,5 +1,22 @@
 # Bem vindo ao FRONT_PERNA
 
+## Antes de rodar
+
+- Garanta que o Firestore esteja ativo
+
+- Garanta que o Authentication esteja ativo
+
+> Nota: `googleAppID` é o `ID do aplicativo` no firestore
+
+> Nota: `googleAppID` é o `ID do Número` do projeto
+
+- Dê acesso a apiKey gerada pelo firebase a apis necessárias: *Token Service API*, *Directions API*, *Places API*, *Maps SDK for Android*, *Legacy Cloud Source Repositories API*, *Identity Toolkit API*, *Maps Static API*
+
+- colocar key de `Chave de API da Web` em `apiKey` do FlavorConfig
+
+- colocar key de `Chave de API da Web` em `app/src/main/AndroidManifest.xml`
+
+> Nota: se você já tiver rodado e quiser trocar as credenciais lembre de rodar um `flutter clean` primeiro
 ## Gerencia de ambientes
 
 para gerar/testar o app de um ambiente especifico mude o `FlavorConfig` no `main.dart` na pasta raiz.

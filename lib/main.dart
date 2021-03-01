@@ -43,12 +43,12 @@ void main() async {
       name: "DEVELOP",
       variables: {
         'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
-        'appName': 'perna-app',
-        'projectID': 'perna-app',
-        'gcmSenderID': '172739913177',
+        'appName': 'aryell-test',
+        'projectID': 'aryell-test',
+        'gcmSenderID': '376560728219',
         'baseUrl': 'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-',
-        'apiKey': 'AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA',
-        'googleAppID': '1:172739913177:android:38f4c6eb4f67cb674b25c8',
+        'apiKey': 'AIzaSyC_d-ntsVtnwyO6VhG2qHmDA4pCyFYP0gY',
+        'googleAppID': '1:376560728219:android:82633609a640175003ee3e',
         'merchantId': 'Test',
         'androidPayMode': 'test'
       },
