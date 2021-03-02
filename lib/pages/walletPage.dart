@@ -19,11 +19,12 @@ class WalletPage extends StatefulWidget {
   _WalletPageState createState() => _WalletPageState();
 }
 
-class _WalletPageState extends State<WalletPage> {
+class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
   final PaymentsService paymentsService = PaymentsService(myDecoder: MyDecoder());
   List<CreditCard> creditCards = [];
   bool isLoading = true;
   String userToken;
+  String selectedCardId;
 
   @override
   void initState() {
@@ -118,71 +119,135 @@ class _WalletPageState extends State<WalletPage> {
               },
               itemBuilder: (context, index) {
                 CreditCard currCreditCard = creditCards[index];
-                return Container(
-                  padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
-                  child: Material(
-                    elevation: 3,
-                    color: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))
-                    ),
-                    child: InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  currCreditCard.cardHolderName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).backgroundColor
-                                  ),
-                                ),  
-                                (!BrandToCardType.containsKey(currCreditCard.brand) ? Container(
-                                  height: 48,
-                                  width: 48,
-                                ) : Image.asset(
-                                  CardTypeIconAsset[BrandToCardType[currCreditCard.brand]],
-                                    height: 48,
-                                    width: 48
+                return AnimatedSize(
+                  vsync: this,
+                  curve: Curves.linear,
+                  duration: Duration(milliseconds: 200),
+                  child: Container(
+                    padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+                    child: Material(
+                      elevation: 3,
+                      color: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))
+                      ),
+                      child: InkWell(
+                        onLongPress: () {
+                          setState(() {
+                            selectedCardId = selectedCardId != currCreditCard.id ? currCreditCard.id : null;
+                          });
+                        },
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  (index != 0 ? SizedBox() 
+                                  : Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                                      color: Theme.of(context).backgroundColor
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Icon(
+                                          Icons.star_border, 
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                        SizedBox(width: 2),
+                                        Text(
+                                          "Padrão",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context).primaryColor
+                                          ),
+                                        ),  
+                                      ],
+                                    )
+                                  )),
+                                  (selectedCardId != currCreditCard.id ? SizedBox() 
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_outline, 
+                                          color: Theme.of(context).backgroundColor,
+                                        ),
+                                        SizedBox(width: 2),
+                                        Text(
+                                          "Selecionado",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Theme.of(context).backgroundColor
+                                          ),
+                                        ),  
+                                      ],
+                                    )
                                   )
-                                ),
-                              ]
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  currCreditCard.cardNumber,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).backgroundColor
+                                ]
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    currCreditCard.cardHolderName,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).backgroundColor
+                                    ),
+                                  ),  
+                                  (!BrandToCardType.containsKey(currCreditCard.brand) ? Container(
+                                    height: 48,
+                                    width: 48,
+                                  ) : Image.asset(
+                                    CardTypeIconAsset[BrandToCardType[currCreditCard.brand]],
+                                      height: 48,
+                                      width: 48
+                                    )
                                   ),
-                                ),
-                                Text(
-                                  currCreditCard.expiryDate,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).backgroundColor
+                                ]
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    currCreditCard.cardNumber,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).backgroundColor
+                                    ),
                                   ),
-                                ),
-                              ]
-                            ),
-                            SizedBox(height: 10),
-                          ]
+                                  Text(
+                                    currCreditCard.expiryDate,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).backgroundColor
+                                    ),
+                                  ),
+                                ]
+                              ),
+                              SizedBox(height: 10),
+                            ]
+                          )
                         )
-                      )
-                    ),
+                      ),
+                    )
                   )
                 );
               }
