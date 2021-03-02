@@ -47,14 +47,14 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     @required this.preExecute
   });
 
-  Future _execute(String hint, int type) async {
+  Future _execute(int position) async {
     this.preExecute();
     Locale current = AppLocalizations.of(context).locale;
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
       apiKey: FlavorConfig.instance.variables['apiKey'],
       mode: Mode.overlay,
-      hint: hint,
+      hint: AppLocalizations.of(context).translate(position == 0 ? "search_start" : "search_end"),
       overlayBorderRadius: BorderRadius.all(Radius.circular(15.0)),
       language: current.languageCode, components: [
         Component(Component.country, current.countryCode)
@@ -67,7 +67,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
       List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
       Address address = addresses.first;
       String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
-      if(type == 0){
+      if(position == 0){
         onStartPlaceSelected(location, prediction.description, region);
         this.initialController.text = prediction.description;
       }else{
@@ -118,7 +118,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   readOnly: true,
                   showCursor: false,
                   onTap: () async {
-                    await this._execute(AppLocalizations.of(context).translate("search_start"), 0);
+                    await this._execute(0);
                   }
                 ),
                 AnimatedSize(
@@ -143,9 +143,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       readOnly: true,
                       showCursor: false,
                       onTap: () async {
-                        if(this.markers.length > 0) {
-                          await this._execute(AppLocalizations.of(context).translate("search_end"), 1);
-                        }
+                        await this._execute(this.markers.length);
                       }
                     ): SizedBox()
                   )
