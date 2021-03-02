@@ -9,6 +9,7 @@ import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/models/creditCard.dart';
 import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/services/payments.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class WalletPage extends StatefulWidget {
   final Future<IdTokenResult> Function() getRefreshToken;
@@ -151,7 +152,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                 children: [
                                   (index != 0 ? SizedBox() 
                                   : Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                                    padding: EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 3),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.all(Radius.circular(50)),
                                       color: Theme.of(context).backgroundColor
@@ -167,7 +168,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),
                                         SizedBox(width: 2),
                                         Text(
-                                          "Padrão",
+                                          AppLocalizations.of(context).translate("defaultCreditCard"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).primaryColor
@@ -188,7 +189,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),
                                         SizedBox(width: 2),
                                         Text(
-                                          "Selecionado",
+                                          AppLocalizations.of(context).translate("selected"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).backgroundColor
@@ -255,11 +256,11 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           }
         ))
       ),
-      floatingActionButton: isLoading ? null : FloatingActionButton(
+      floatingActionButton: isLoading ? null : (selectedCardId == null ? FloatingActionButton(
         heroTag: "3",
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
-        tooltip: AppLocalizations.of(context).translate("creditCard"),
+        tooltip: AppLocalizations.of(context).translate("addCreditCard"),
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(
             builder: (context) => CreditCardPage(
@@ -269,7 +270,37 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             )
           );
         },
-      )
+      ) : SpeedDial(
+        icon: Icons.edit_outlined,
+        marginEnd: 14,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).backgroundColor,
+          opacity: 1,
+        ),
+        heroTag: "3",
+        backgroundColor: Theme.of(context).primaryColor,
+        children: (creditCards?.first?.id == selectedCardId ? <SpeedDialChild>[] : [
+          SpeedDialChild(
+            child: Icon(
+              Icons.star_border, 
+              color: Theme.of(context).backgroundColor
+            ),
+            label: AppLocalizations.of(context).translate("turnCreditCardDefault"),
+            backgroundColor: Colors.amberAccent
+          )
+        ]) + [
+          SpeedDialChild(
+            child: Icon(
+              Icons.delete_outline, 
+              color: Theme.of(context).backgroundColor
+            ),
+            label: AppLocalizations.of(context).translate("deleteCreditCard"),
+            backgroundColor: Colors.redAccent
+          )
+        ],
+        // icon: Icon(Icons.mode_outlined, color: Theme.of(context).backgroundColor),
+        tooltip: AppLocalizations.of(context).translate("editCreditCard"),
+      ))
     );
   }
 }

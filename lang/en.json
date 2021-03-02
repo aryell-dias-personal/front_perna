@@ -121,5 +121,11 @@
     "date": "Date",
     "noCreditCard": "Empty wallet",
     "noCreditCardDescription": "You haven't entered any payment information yet 😬",
-    "creditCard": "Credit Card"
+    "creditCard": "Credit Card",
+    "addCreditCard": "Add Credit Card",
+    "selectedCreditCard": "Selected",
+    "deleteCreditCard": "Delete",
+    "turnCreditCardDefault": "Turn Default",
+    "defaultCreditCard": "Default",
+    "editCreditCard": "Edit"
 }

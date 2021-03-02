@@ -121,5 +121,11 @@
     "date": "Data",
     "noCreditCard": "Carteira vazia",
     "noCreditCardDescription": "Você ainda não cadastrou nenhuma informação de pagamento ainda 😬",
-    "creditCard": "Cartão"
+    "creditCard": "Cartão",
+    "addCreditCard": "Adicionar Cartão",
+    "selectedCreditCard": "Selecionado",
+    "deleteCreditCard": "Deletar",
+    "turnCreditCardDefault": "Tornar Padrão",
+    "defaultCreditCard": "Padrão",
+    "editCreditCard": "Editar"
 }
