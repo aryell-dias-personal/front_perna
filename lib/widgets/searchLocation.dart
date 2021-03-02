@@ -143,7 +143,9 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       readOnly: true,
                       showCursor: false,
                       onTap: () async {
-                        await this._execute(AppLocalizations.of(context).translate("search_end"), 1);
+                        if(this.markers.length > 0) {
+                          await this._execute(AppLocalizations.of(context).translate("search_end"), 1);
+                        }
                       }
                     ): SizedBox()
                   )
