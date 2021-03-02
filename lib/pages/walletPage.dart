@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/models/creditCard.dart';
 import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/services/payments.dart';
 
@@ -17,6 +21,7 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPageState extends State<WalletPage> {
   final PaymentsService paymentsService = PaymentsService(myDecoder: MyDecoder());
+  List<CreditCard> creditCards = [];
   bool isLoading = true;
   String userToken;
 
@@ -25,9 +30,16 @@ class _WalletPageState extends State<WalletPage> {
     super.initState();
     widget.getRefreshToken().then((IdTokenResult idTokenResult) {
       setState(() {
-        isLoading = false;
         userToken = idTokenResult.token;
       });
+      paymentsService.listCard(userToken).then(
+        (creditCards) {
+          setState(() {
+            this.creditCards = creditCards;
+            isLoading = false;
+          });
+        }
+      );
     });
   }
 
@@ -73,8 +85,12 @@ class _WalletPageState extends State<WalletPage> {
         ),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
-      //TODO: Montar lista de cartões de créditos e contas para recebimento destacando selecionado(s)
-      body: true ? Center(
+      body: isLoading ? Center(
+        child: Loading(
+          indicator: BallPulseIndicator(), 
+          size: 100.0, color: Theme.of(context).primaryColor
+        )
+      ) : (creditCards.isEmpty ? Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -91,18 +107,88 @@ class _WalletPageState extends State<WalletPage> {
             )
           ],
         )
-      ) : Builder(
-        builder: (context) {
-          return ListView.separated(
-            itemCount: 0,
-            separatorBuilder: (context, index) {
-              return Divider();
-            },
-            itemBuilder: (context, index) {
-              return SizedBox();
-            }
-          );
-        }
+      ) : Container(
+        margin: EdgeInsets.only(top: 10),
+        child: Builder(
+          builder: (context) {
+            return ListView.separated(
+              itemCount: creditCards.length,
+              separatorBuilder: (context, index) {
+                return Divider();
+              },
+              itemBuilder: (context, index) {
+                CreditCard currCreditCard = creditCards[index];
+                return Container(
+                  padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+                  child: Material(
+                    elevation: 3,
+                    color: Theme.of(context).primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10))
+                    ),
+                    child: InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  currCreditCard.cardHolderName,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).backgroundColor
+                                  ),
+                                ),  
+                                (!BrandToCardType.containsKey(currCreditCard.brand) ? Container(
+                                  height: 48,
+                                  width: 48,
+                                ) : Image.asset(
+                                  CardTypeIconAsset[BrandToCardType[currCreditCard.brand]],
+                                    height: 48,
+                                    width: 48
+                                  )
+                                ),
+                              ]
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  currCreditCard.cardNumber,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).backgroundColor
+                                  ),
+                                ),
+                                Text(
+                                  currCreditCard.expiryDate,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).backgroundColor
+                                  ),
+                                ),
+                              ]
+                            ),
+                            SizedBox(height: 10),
+                          ]
+                        )
+                      )
+                    ),
+                  )
+                );
+              }
+            );
+          }
+        ))
       ),
       floatingActionButton: isLoading ? null : FloatingActionButton(
         heroTag: "3",

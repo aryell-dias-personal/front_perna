@@ -147,49 +147,22 @@ CardType detectCCType(String cardNumber) {
   return cardType;
 }
 
-Widget getCardTypeIcon(String cardNumber, Function(bool) isAmexCallback) {
+Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback) {
   Widget icon;
-  switch (detectCCType(cardNumber)) {
-    case CardType.visa:
-      icon = Image.asset(
-        'icons/visa.png',
-        height: 48,
-        width: 48
-      );
-      isAmexCallback(false);
-      break;
-    case CardType.americanExpress:
-      icon = Image.asset(
-        'icons/amex.png',
-        height: 48,
-        width: 48
-      );
-      isAmexCallback(true);
-      break;
-    case CardType.mastercard:
-      icon = Image.asset(
-        'icons/mastercard.png',
-        height: 48,
-        width: 48
-      );
-      isAmexCallback(false);
-      break;
-    case CardType.discover:
-      icon = Image.asset(
-        'icons/discover.png',
-        height: 48,
-        width: 48
-      );
-      isAmexCallback(false);
-      break;
-    default:
-      icon = Container(
-        height: 48,
-        width: 48,
-      );
-      isAmexCallback(false);
-      break;
+  CardType cardType = detectCCType(cardNumber);
+  if (cardType == CardType.otherBrand) {
+    icon = Container(
+      height: 48,
+      width: 48,
+    );
+    isAmexCallback(false, '');
+  } else {
+    icon = Image.asset(
+      CardTypeIconAsset[cardType],
+      height: 48,
+      width: 48
+    );
+    isAmexCallback(cardType == CardType.americanExpress, CardTypeToBrand[cardType]);
   }
-
   return icon;
 }

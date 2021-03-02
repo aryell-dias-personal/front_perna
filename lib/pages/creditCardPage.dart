@@ -43,9 +43,13 @@ class CreditCardPageState extends State<CreditCardPage> {
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_card"), 
           Colors.greenAccent, isGlobal: true);
       } else {
-        setState(() { 
-          isLoading = false;
+        setState(() {
+          this.cardType = Container(
+            height: 48,
+            width: 48,
+          );
           creditCardModel = CreditCard();
+          isLoading = false;
         });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
           Colors.redAccent, context: context);
@@ -146,9 +150,10 @@ class CreditCardPageState extends State<CreditCardPage> {
   void onCreditCardChange(CreditCard newCreditCardModel) {
     setState(() {
       this.creditCardModel = newCreditCardModel;
-      this.cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (willBeAmex) {
+      this.cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (willBeAmex, cardBrand) {
         setState(() {
           isAmex = willBeAmex; 
+          this.creditCardModel.brand = cardBrand;
         });
       });
     });

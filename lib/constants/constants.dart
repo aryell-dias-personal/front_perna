@@ -9,6 +9,20 @@ enum CardType {
   discover,
 }
 
+const Map<CardType, String> CardTypeToBrand = {
+  CardType.visa: 'Visa',
+  CardType.americanExpress: 'American Express',
+  CardType.mastercard: 'MasterCard',
+  CardType.discover: 'Discover',
+};
+
+const Map<String, CardType> BrandToCardType = {
+  'Visa': CardType.visa,
+  'American Express': CardType.americanExpress,
+  'MasterCard': CardType.mastercard,
+  'Discover': CardType.discover,
+};
+
 const Map<CardType, String> CardTypeIconAsset = {
   CardType.visa: 'icons/visa.png',
   CardType.americanExpress: 'icons/amex.png',

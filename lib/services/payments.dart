@@ -20,6 +20,23 @@ class PaymentsService{
     );
   }
 
+  Future<List<model.CreditCard>> listCard(String token) async { 
+    Response res = await post(
+      "${baseUrl}listCreditCard",
+      body: await myDecoder.encode({}),
+      headers: {
+        'Authorization': token
+      }
+    );
+    if(res.statusCode == 200) {
+      dynamic response = await myDecoder.decode(res.body);
+      return response['retrivedCards'].map<model.CreditCard>(
+        (parsedJson) => model.CreditCard.fromJson(parsedJson)
+      ).toList();
+    }
+    return <model.CreditCard>[];
+  }
+
   Future<int> addCard(model.CreditCard creditCard, String token) async { 
     try {
       String cardNumber = creditCard.cardNumber.replaceAll(" ", "");
