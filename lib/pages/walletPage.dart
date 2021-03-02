@@ -189,7 +189,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),
                                         SizedBox(width: 2),
                                         Text(
-                                          AppLocalizations.of(context).translate("selected"),
+                                          AppLocalizations.of(context).translate("selectedCreditCard"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).backgroundColor
