@@ -3,7 +3,7 @@
     "welcome": "Bem vindo ao Perna!",
     "first_time": "Primeira vez por aqui",
     "have_been_here": "Já estive aqui",
-    "unrecognized_user": "Não foi possivel reconhecer o usuário",
+    "unrecognized_user": "O usuário já existe ou não foi reconhecido",
     "expedient_name": "Nome do Expediente",
     "driver": "Motorista",
     "driver_email": "Email do Motorista",

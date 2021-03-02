@@ -3,7 +3,7 @@
     "welcome": "Welcome to perna!",
     "first_time": "First time in here",
     "have_been_here": "I have been here",
-    "unrecognized_user": "Unable to recognize the user",
+    "unrecognized_user": "The user already exists or has not been recognized",
     "expedient_name": "Expedient name",
     "driver": "Driver",
     "driver_email": "Driver's email",
