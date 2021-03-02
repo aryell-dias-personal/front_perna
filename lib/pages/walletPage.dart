@@ -6,6 +6,7 @@ import 'package:loading/loading.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/creditCard.dart';
 import 'package:perna/pages/creditCardPage.dart';
 import 'package:perna/services/payments.dart';
@@ -256,51 +257,88 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           }
         ))
       ),
-      floatingActionButton: isLoading ? null : (selectedCardId == null ? FloatingActionButton(
-        heroTag: "3",
-        backgroundColor: Theme.of(context).primaryColor,
-        child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
-        tooltip: AppLocalizations.of(context).translate("addCreditCard"),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => CreditCardPage(
-                paymentsService: paymentsService,
-                userToken: userToken,
+      floatingActionButton: Builder(
+        builder: (context) => (
+          isLoading ? SizedBox() : (selectedCardId == null ? FloatingActionButton(
+            heroTag: "3",
+            backgroundColor: Theme.of(context).primaryColor,
+            child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
+            tooltip: AppLocalizations.of(context).translate("addCreditCard"),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => CreditCardPage(
+                    paymentsService: paymentsService,
+                    userToken: userToken,
+                  )
+                )
+              );
+            },
+          ) : SpeedDial(
+            icon: Icons.edit_outlined,
+            marginEnd: 14,
+            iconTheme: IconThemeData(
+              color: Theme.of(context).backgroundColor,
+              opacity: 1,
+            ),
+            heroTag: "3",
+            backgroundColor: Theme.of(context).primaryColor,
+            children: (creditCards?.first?.id == selectedCardId ? <SpeedDialChild>[] : [
+              SpeedDialChild(
+                onTap: () async {
+                  setState(() { isLoading = true; });
+                  int statusCode = await paymentsService.turnCardDefault(selectedCardId, userToken);
+                  if(statusCode == 200) {
+                    List<CreditCard> creditCards = await paymentsService.listCard(userToken);
+                    setState(() { this.creditCards = creditCards; });
+                    showSnackBar(AppLocalizations.of(context).translate("successfully_turned_card_default"), 
+                      Colors.greenAccent, context: context);
+                  } else {
+                    showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_turned_card_default"), 
+                      Colors.redAccent, context: context);
+                  }
+                  setState(() { 
+                    isLoading = false;
+                    selectedCardId = null;
+                  });
+                },
+                child: Icon(
+                  Icons.star_border, 
+                  color: Theme.of(context).backgroundColor
+                ),
+                label: AppLocalizations.of(context).translate("turnCreditCardDefault"),
+                backgroundColor: Colors.amberAccent,
               )
-            )
-          );
-        },
-      ) : SpeedDial(
-        icon: Icons.edit_outlined,
-        marginEnd: 14,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).backgroundColor,
-          opacity: 1,
-        ),
-        heroTag: "3",
-        backgroundColor: Theme.of(context).primaryColor,
-        children: (creditCards?.first?.id == selectedCardId ? <SpeedDialChild>[] : [
-          SpeedDialChild(
-            child: Icon(
-              Icons.star_border, 
-              color: Theme.of(context).backgroundColor
-            ),
-            label: AppLocalizations.of(context).translate("turnCreditCardDefault"),
-            backgroundColor: Colors.amberAccent
-          )
-        ]) + [
-          SpeedDialChild(
-            child: Icon(
-              Icons.delete_outline, 
-              color: Theme.of(context).backgroundColor
-            ),
-            label: AppLocalizations.of(context).translate("deleteCreditCard"),
-            backgroundColor: Colors.redAccent
-          )
-        ],
-        // icon: Icon(Icons.mode_outlined, color: Theme.of(context).backgroundColor),
-        tooltip: AppLocalizations.of(context).translate("editCreditCard"),
-      ))
+            ]) + [
+              SpeedDialChild(
+                onTap: () async {
+                  setState(() { isLoading = true; });
+                  int statusCode = await paymentsService.deleteCard(selectedCardId, userToken);
+                  if(statusCode == 200) {
+                    List<CreditCard> creditCards = await paymentsService.listCard(userToken);
+                    setState(() { this.creditCards = creditCards; });
+                    showSnackBar(AppLocalizations.of(context).translate("successfully_delete_card"), 
+                      Colors.greenAccent, context: context);
+                  } else {
+                    showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_delete_card"), 
+                      Colors.redAccent, context: context);
+                  }
+                  setState(() { 
+                    isLoading = false;
+                    selectedCardId = null;
+                  });
+                },
+                child: Icon(
+                  Icons.delete_outline, 
+                  color: Theme.of(context).backgroundColor
+                ),
+                label: AppLocalizations.of(context).translate("deleteCreditCard"),
+                backgroundColor: Colors.redAccent
+              )
+            ],
+            tooltip: AppLocalizations.of(context).translate("editCreditCard"),
+          ))
+        )
+      )
     );
   }
 }

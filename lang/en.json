@@ -127,5 +127,9 @@
     "deleteCreditCard": "Delete",
     "turnCreditCardDefault": "Turn Default",
     "defaultCreditCard": "Default",
+    "successfully_turned_card_default": "Turned card default successfully",
+    "unsuccessfully_turned_card_default": "Couldn't turn card default",
+    "successfully_delete_card": "card deleted successfully",
+    "unsuccessfully_delete_card": "Couldn't delete card",
     "editCreditCard": "Edit"
 }

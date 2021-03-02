@@ -37,6 +37,40 @@ class PaymentsService{
     return <model.CreditCard>[];
   }
 
+  Future<int> deleteCard(String creditCardId, String token) async { 
+    dynamic body = await myDecoder.encode({
+      'creditCardId': creditCardId
+    });
+    Response res = await post(
+      "${baseUrl}deleteCreditCard",
+      body: body,
+      headers: {
+        'Authorization': token
+      }
+    );
+    if(res.statusCode == 200) {
+      dynamic response = await myDecoder.decode(res.body);
+      if(response['deleted']) {
+        return res.statusCode; 
+      }
+    }
+    return 500;
+  }
+  
+  Future<int> turnCardDefault(String creditCardId, String token) async {
+    dynamic body = await myDecoder.encode({
+      'creditCardId': creditCardId
+    });
+    Response res = await post(
+      "${baseUrl}turnDefaultCreditCard",
+      body: body,
+      headers: {
+        'Authorization': token
+      }
+    );
+    return res.statusCode;
+  }
+
   Future<int> addCard(model.CreditCard creditCard, String token) async { 
     try {
       String cardNumber = creditCard.cardNumber.replaceAll(" ", "");

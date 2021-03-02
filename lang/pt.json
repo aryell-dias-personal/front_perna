@@ -127,5 +127,9 @@
     "deleteCreditCard": "Deletar",
     "turnCreditCardDefault": "Tornar Padrão",
     "defaultCreditCard": "Padrão",
+    "successfully_turned_card_default": "Cartão transformado em padrão com sucesso",
+    "unsuccessfully_turned_card_default": "Não foi possível tornar o cartão padrão",
+    "successfully_delete_card": "Cartão deletado com sucesso",
+    "unsuccessfully_delete_card": "Não foi possível deletar o cartão",
     "editCreditCard": "Editar"
 }
