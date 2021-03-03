@@ -97,6 +97,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
     }
   }
 
+  //TODO: mudar onPressed para chamar uma tela nova na qual o usuário poderá confirmar a compra ou voltar e mudar os destinos
   void _onPressed(String email) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
@@ -368,7 +369,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
                     SizedBox(height: 26),
                     AddButton(
                       onPressed: ()=>_onPressed(resources["email"]),
-                      readOnly: this.readOnly
+                      readOnly: this.readOnly,
+                      addAndcontinue: true
                     )
                   ]
                 )

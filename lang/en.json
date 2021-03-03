@@ -131,5 +131,6 @@
     "unsuccessfully_turned_card_default": "Couldn't turn card default",
     "successfully_delete_card": "card deleted successfully",
     "unsuccessfully_delete_card": "Couldn't delete card",
+    "continue": "Continue",
     "editCreditCard": "Edit"
 }

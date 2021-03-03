@@ -135,6 +135,9 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         Agent oldAgent = Agent.fromJson(documentSnapshot.data);
         DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
         bool endHasPassed = DateTime.now().isAfter(askedEndAtTime);
+        // TODO: mudar modelo de dados do agente para não permitir alteração por parte do usuário 
+        // de dados sensiveis como email do responsável e route e tal. Uma forma seria criar um model
+        // `Position` que seria referenciado pelo agent, mas e a fila e o histórico?? analisar com calma
         if(oldAgent?.queue?.isEmpty == null || oldAgent.queue.isEmpty) {
           await ref.updateData({
             'position': "${locationData.latitude}, ${locationData.longitude}",
