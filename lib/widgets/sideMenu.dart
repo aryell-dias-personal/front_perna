@@ -8,7 +8,6 @@ import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/pages/helpPage.dart';
 import 'package:perna/pages/historyPage.dart';
 import 'package:perna/pages/walletPage.dart';
-import 'package:perna/services/signIn.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/sideMenuButton.dart';
 import 'package:perna/widgets/visibleRichText.dart';
@@ -75,10 +74,14 @@ class SideMenu extends StatelessWidget {
               text: AppLocalizations.of(context).translate("wallet"),
               onPressed: () async {
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => StoreConnector<StoreState, SignInService>(
-                      converter: (store) => store.state.signInService, 
-                      builder: (context, signInService) => WalletPage(
-                        getRefreshToken: signInService.getRefreshToken
+                    builder: (context) => StoreConnector<StoreState, Map<String, dynamic>>(
+                      converter: (store) => {
+                        "getRefreshToken": store.state.signInService.getRefreshToken,
+                        "paymentsService": store.state.paymentsService 
+                      },
+                      builder: (context, resources) => WalletPage(
+                        getRefreshToken: resources["getRefreshToken"],
+                        paymentsService: resources["paymentsService"]
                       )
                     )
                   )

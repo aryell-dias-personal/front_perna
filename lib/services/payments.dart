@@ -1,6 +1,7 @@
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:http/http.dart';
 import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/models/askedPoint.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:perna/models/creditCard.dart' as model;
 
@@ -35,6 +36,24 @@ class PaymentsService{
       ).toList();
     }
     return <model.CreditCard>[];
+  }
+
+  Future<int> confirmAskedPointPayment(AskedPoint askedPoint, String token) async { 
+    dynamic body = await myDecoder.encode(askedPoint.toJson());
+    Response res = await post(
+      "${baseUrl}confirmAskedPointPayment",
+      body: body,
+      headers: {
+        'Authorization': token
+      }
+    );
+    if(res.statusCode == 200) {
+      dynamic response = await myDecoder.decode(res.body);
+      if(response['paid']) {
+        return res.statusCode; 
+      }
+    }
+    return 500;
   }
 
   Future<int> deleteCard(String creditCardId, String token) async { 

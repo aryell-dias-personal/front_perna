@@ -7,6 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/creditCard.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:perna/pages/askedPointPage.dart';
@@ -216,10 +217,10 @@ class _HistoryPageState extends State<HistoryPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              // TitledValueWidget(
-                              //   title: "Valor",
-                              //   value: "100,00 R\$"
-                              // ),
+                              operation['amount'] != null ? TitledValueWidget(
+                                title: AppLocalizations.of(context).translate("price"),
+                                value: formatAmount(operation['amount'], operation['currency'], AppLocalizations.of(context).locale)
+                              ): SizedBox(),
                               Icon(
                                 Icons.chevron_right,
                                 color: Theme.of(context).primaryColor,

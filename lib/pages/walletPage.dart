@@ -5,7 +5,6 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
-import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/creditCard.dart';
 import 'package:perna/pages/creditCardPage.dart';
@@ -14,15 +13,18 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class WalletPage extends StatefulWidget {
   final Future<IdTokenResult> Function() getRefreshToken;
+  final PaymentsService paymentsService;
  
-  const WalletPage({@required this.getRefreshToken});
+  const WalletPage({
+    @required this.getRefreshToken,
+    @required this.paymentsService
+  });
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
 
 class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
-  final PaymentsService paymentsService = PaymentsService(myDecoder: MyDecoder());
   List<CreditCard> creditCards = [];
   bool isLoading = true;
   String userToken;
@@ -35,7 +37,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
       setState(() {
         userToken = idTokenResult.token;
       });
-      paymentsService.listCard(userToken).then(
+      widget.paymentsService.listCard(userToken).then(
         (creditCards) {
           setState(() {
             this.creditCards = creditCards;
@@ -267,7 +269,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) => CreditCardPage(
-                    paymentsService: paymentsService,
+                    paymentsService: widget.paymentsService,
                     userToken: userToken,
                   )
                 )
@@ -286,9 +288,9 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
               SpeedDialChild(
                 onTap: () async {
                   setState(() { isLoading = true; });
-                  int statusCode = await paymentsService.turnCardDefault(selectedCardId, userToken);
+                  int statusCode = await widget.paymentsService.turnCardDefault(selectedCardId, userToken);
                   if(statusCode == 200) {
-                    List<CreditCard> creditCards = await paymentsService.listCard(userToken);
+                    List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate("successfully_turned_card_default"), 
                       Colors.greenAccent, context: context);
@@ -312,9 +314,9 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
               SpeedDialChild(
                 onTap: () async {
                   setState(() { isLoading = true; });
-                  int statusCode = await paymentsService.deleteCard(selectedCardId, userToken);
+                  int statusCode = await widget.paymentsService.deleteCard(selectedCardId, userToken);
                   if(statusCode == 200) {
-                    List<CreditCard> creditCards = await paymentsService.listCard(userToken);
+                    List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate("successfully_delete_card"), 
                       Colors.greenAccent, context: context);

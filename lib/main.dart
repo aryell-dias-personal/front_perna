@@ -7,6 +7,7 @@ import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
+import 'package:perna/services/payments.dart';
 import 'package:perna/services/signIn.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
@@ -80,6 +81,9 @@ void main() async {
       signInService: SignInService(
         firebaseAuth: firebaseAuth,
         googleSignIn: googleSignIn,
+        myDecoder: myDecoder
+      ),
+      paymentsService: PaymentsService(
         myDecoder: myDecoder
       )
     ),

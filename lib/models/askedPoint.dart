@@ -14,6 +14,8 @@ class AskedPoint {
   String email;
   String friendlyOrigin;
   String friendlyDestiny;
+  String currency;
+  int amount;
   DateTime actualStartAt;
   DateTime actualEndAt;
   String agentId;
@@ -27,6 +29,8 @@ class AskedPoint {
     this.email, 
     this.origin, 
     this.destiny,
+    this.currency, 
+    this.amount, 
     this.friendlyOrigin, 
     this.friendlyDestiny, 
     this.askedStartAt, 
@@ -55,6 +59,8 @@ class AskedPoint {
       return null;
     return AskedPoint(
       email: parsedJson['email'],
+      currency: parsedJson['currency'],
+      amount: parsedJson['amount'],
       origin: decodeLatLng(parsedJson['origin']),
       destiny: decodeLatLng(parsedJson['destiny']),
       friendlyOrigin: parsedJson['friendlyOrigin'],
@@ -87,7 +93,9 @@ class AskedPoint {
     DateTime actualEndAt, 
     String agentId,
     List<String> region,
-    Uint8List staticMap
+    Uint8List staticMap,
+    String currency,
+    String amount
   }) => AskedPoint(
     email: email ?? this.email,
     origin: origin ?? this.origin,
@@ -103,6 +111,8 @@ class AskedPoint {
     actualEndAt: actualEndAt ?? this.actualEndAt,
     agentId: agentId ?? this.agentId,
     region: region ?? this.region,
+    currency: currency ?? this.currency,
+    amount: amount ?? this.amount,
     staticMap: staticMap ?? this.staticMap
   );
 
@@ -121,6 +131,8 @@ class AskedPoint {
     "actualEndAt": actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
     "agentId": agentId,
     "region": region,
+    "currency": currency,
+    "amount": amount,
     "staticMap": staticMap != null ? base64Encode(staticMap) : null
   };
 }

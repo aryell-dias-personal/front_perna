@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:intl/intl.dart';
 
 class MaskedTextController extends TextEditingController {
   MaskedTextController({String text, this.mask, Map<String, RegExp> translator}) : super(text: text) {
@@ -165,4 +166,10 @@ Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback)
     isAmexCallback(cardType == CardType.americanExpress, CardTypeToBrand[cardType]);
   }
   return icon;
+}
+
+String formatAmount(int amount, String currency, Locale locale) {
+  String localeName = "${locale.languageCode}_${locale.countryCode.toUpperCase()}";
+  NumberFormat format = NumberFormat.simpleCurrency(locale: localeName);
+  return format.format(amount/100);
 }

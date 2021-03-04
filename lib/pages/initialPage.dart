@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/widgets/logAndSignInButton.dart';
+import 'package:intl/intl.dart';
 
 enum SignLogin { sign, login}
 
@@ -35,8 +36,11 @@ class _InitialPageState extends State<InitialPage> {
       child: isLoading ? Loading(indicator: BallPulseIndicator(), color: Theme.of(context).primaryColor, size: 100.0) : 
       StoreConnector<StoreState, Function(SignLogin)>(
         converter: (store) => (SignLogin choice) async {
+          Locale locale = AppLocalizations.of(context).locale;
+          String localeName = "${locale.languageCode}_${locale.countryCode.toUpperCase()}";
+          String currencyName = NumberFormat.simpleCurrency(locale: localeName).currencyName.toLowerCase();
           SignInResponse signInResponse = choice == SignLogin.sign ? 
-            await signInService.signIn(this.messagingToken) : 
+            await signInService.signIn(this.messagingToken, currencyName) : 
             await signInService.logIn(this.messagingToken);
           User user = signInResponse?.user;
           if(user==null){

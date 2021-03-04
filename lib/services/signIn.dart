@@ -44,10 +44,10 @@ class SignInService {
     return await this.logOut();
   }
 
-  Future<SignInResponse> signIn(String messagingToken) async {
+  Future<SignInResponse> signIn(String messagingToken, String currency) async {
     GoogleSignInAccount user = await this.googleSignIn.signIn();
     if(user != null){
-      SignInResponse signInResponse = await this._creatUser(user, messagingToken, true);
+      SignInResponse signInResponse = await this._creatUser(user, messagingToken, true, currency);
       if (signInResponse != null){
         await _authFirebase(user);
         return signInResponse;
@@ -56,12 +56,13 @@ class SignInService {
     return await this.logOut();
   }
 
-  Future<SignInResponse> _creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider) async {
+  Future<SignInResponse> _creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider, String currency) async {
     final body = await myDecoder.encode({
       'email': user?.email,
       'isProvider': isProvider,
       'photoUrl': user?.photoUrl,
       'name': user?.displayName,
+      'currency': currency,
       'messagingTokens': [ messagingToken ]
     });
     Response res = await post("${baseUrl}insertUser", body: body);

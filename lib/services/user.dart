@@ -11,14 +11,18 @@ class UserService {
     this.myDecoder
   });
 
-  Future<int> postNewAskedPoint(AskedPoint askedPoint, String token) async {
+  Future<AskedPoint> simulateAskedPoint(AskedPoint askedPoint, String token) async {
     Response res = await post(
-      "${baseUrl}insertAskedPoint", 
+      "${baseUrl}simulateAskedPoint", 
       body: await myDecoder.encode(askedPoint.toJson()),
       headers: {
         'Authorization': token
       }
     );
-    return res.statusCode;
+    if(res.statusCode == 200) {
+      dynamic response = await myDecoder.decode(res.body);
+      return AskedPoint.fromJson(response['simulatedAskedPoint']);
+    }
+    return null;
   }
 }

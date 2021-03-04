@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/services/driver.dart';
+import 'package:perna/services/payments.dart';
 import 'package:perna/services/signIn.dart';
 import 'package:perna/services/user.dart';
 
@@ -12,6 +13,7 @@ class StoreState{
   UserService userService;
   DriverService driverService;
   SignInService signInService;
+  PaymentsService paymentsService;
 
   StoreState({
     this.logedIn,
@@ -20,7 +22,8 @@ class StoreState{
     this.messagingToken,
     this.userService,
     this.driverService,
-    this.signInService
+    this.signInService,
+    this.paymentsService
   });
 
   static StoreState fromJson(dynamic json) {
@@ -30,14 +33,15 @@ class StoreState{
     );
   }
 
-  StoreState copyWith({user, logedIn, firestore, messagingToken, userService, driverService, signInService}) => StoreState(
+  StoreState copyWith({user, logedIn, firestore, messagingToken, userService, driverService, signInService, paymentsService}) => StoreState(
     user: user ?? this.user,
     logedIn: logedIn ?? this.logedIn,
     firestore: firestore ?? this.firestore,
     messagingToken: messagingToken ?? this.messagingToken,
     userService: userService ?? this.userService,
     driverService: driverService ?? this.driverService,
-    signInService: signInService ?? this.signInService
+    signInService: signInService ?? this.signInService,
+    paymentsService: paymentsService ?? this.paymentsService
   );
 
   dynamic toJson(){

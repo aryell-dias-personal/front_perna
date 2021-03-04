@@ -8,11 +8,15 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/creditCard.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/askedPoint.dart';
+import 'package:perna/models/creditCard.dart';
+import 'package:perna/pages/askedPointConfirmationPAge.dart';
 import 'package:perna/pages/expedientPage.dart';
 import 'package:perna/services/driver.dart';
+import 'package:perna/services/payments.dart';
 import 'package:perna/services/staticMap.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
@@ -97,11 +101,17 @@ class _AskedPointPageState extends State<AskedPointPage> {
     }
   }
 
-  //TODO: mudar onPressed para chamar uma tela nova na qual o usuário poderá confirmar a compra ou voltar e mudar os destinos
-  void _onPressed(String email) async {
+  void _onPressed(String email, PaymentsService paymentsService) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
       IdTokenResult idTokenResult = await this.getRefreshToken();
+      List<CreditCard> creditCards = await paymentsService.listCard(idTokenResult.token);
+      if(creditCards.isEmpty) {
+        setState(() { isLoading = false; });
+        showSnackBar(AppLocalizations.of(context).translate("at_least_one_credit_card"), 
+          Colors.redAccent, context: context);
+        return;
+      }    
       DateTime dateTime = dateFormat.parse(this.date);
       DateTime askedEndAtTime, askedStartAtTime;
       if(this.askedEndAt != null) {
@@ -115,15 +125,22 @@ class _AskedPointPageState extends State<AskedPointPage> {
         askedEndAt: askedEndAtTime?.difference(dateTime),
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
-      int statusCode = await userService.postNewAskedPoint(newAskedPoint, idTokenResult.token);
-      if(statusCode==200){
-        this.clear();
-        Navigator.pop(context);
-        showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
-          Colors.greenAccent, isGlobal: true);
+      AskedPoint simulatedAskedPoint = await userService.simulateAskedPoint(newAskedPoint, idTokenResult.token);
+      
+      if(simulatedAskedPoint != null){
+        await Navigator.push(context, MaterialPageRoute(
+          builder: (context) => AskedPointConfirmationPage(
+            askedPoint: simulatedAskedPoint,
+            userToken: idTokenResult.token,
+            paymentsService: paymentsService,
+            defaultCreditCard: creditCards.first,
+            clear: clear
+          )
+        ));
+        setState(() { isLoading = false; });
       }else{
         setState(() { isLoading = false; });
-        showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
+        showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_simutale_order"), 
           Colors.redAccent, context: context);
       }
     }
@@ -200,7 +217,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
   Widget build(BuildContext context) => StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (store) => {
         "email": store.state.user.email,
-        "firestore": store.state.firestore
+        "firestore": store.state.firestore,
+        "paymentsService": store.state.paymentsService 
       },
       builder: (context, resources) => Scaffold( 
         appBar: AppBar(
@@ -331,7 +349,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       labelText: AppLocalizations.of(context).translate("desired_end"),
                       icon: Icons.access_time,
                       readOnly: this.readOnly,
-                      onSubmit: (text) => _onPressed(resources["email"]),
+                      onSubmit: (text) => _onPressed(resources["email"], resources["paymentsService"]),
                       validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
                     ),
                     SizedBox(height: 26)
@@ -367,9 +385,18 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       icon: Icons.flag
                     ),
                     SizedBox(height: 26),
+                  ] + (this.askedPoint.amount != null ? [
+                    OutlinedTextFormField(
+                      readOnly: true,
+                      initialValue: formatAmount(this.askedPoint.amount, this.askedPoint.currency, AppLocalizations.of(context).locale),
+                      labelText: AppLocalizations.of(context).translate("price"),
+                      icon: Icons.payments_outlined
+                    ),
+                    SizedBox(height: 26),
+                  ] : []) + [
                     AddButton(
-                      onPressed: ()=>_onPressed(resources["email"]),
-                      readOnly: this.readOnly,
+                      onPressed: ()=>_onPressed(resources["email"], resources["paymentsService"]),
+                      readOnly: this.readOnly || this.askedPoint.staticMap == null,
                       addAndcontinue: true
                     )
                   ]
