@@ -408,7 +408,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     ] : [
                       AddButton(
                         onPressed: () => this._onPressed(this.email, resources['email']),
-                        readOnly: this.readOnly,
+                        readOnly: this.readOnly || this.agent.staticMap != null,
                       ),
                     ])
                   )
