@@ -261,7 +261,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
       ),
       floatingActionButton: Builder(
         builder: (context) => (
-          isLoading ? SizedBox() : (selectedCardId == null ? FloatingActionButton(
+          isLoading || creditCards.length == maxCardNumber ? SizedBox() : (selectedCardId == null ? FloatingActionButton(
             heroTag: "3",
             backgroundColor: Theme.of(context).primaryColor,
             child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),

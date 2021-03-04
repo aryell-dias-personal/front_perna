@@ -7,6 +7,7 @@ import 'package:perna/models/creditCard.dart';
 class CreditCardForm extends StatefulWidget {
   const CreditCardForm({
     Key key,
+    this.onSubmit,
     this.cardNumber,
     this.expiryDate,
     this.cardHolderName,
@@ -18,6 +19,7 @@ class CreditCardForm extends StatefulWidget {
     @required this.onCreditCardChange
   }) : super(key: key);
 
+  final Function() onSubmit;
   final bool isAmex;
   final String cardNumber;
   final String expiryDate;
@@ -244,6 +246,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
               onEditingComplete: () {
                 onCreditCardChange(creditCardModel);
               },
+              onFieldSubmitted: (_) => widget.onSubmit(),
               validator: (value) {
                 if (value.isEmpty) {
                   return AppLocalizations.of(context).translate("cardHolderError");

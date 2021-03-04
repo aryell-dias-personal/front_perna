@@ -130,6 +130,7 @@ class CreditCardPageState extends State<CreditCardPage> {
                       obscureCvv: true,
                       obscureNumber: true,
                       onCreditCardChange: onCreditCardChange,
+                      onSubmit: () => _onPressed(context),
                     ),
                     SizedBox(height: 26),
                     AddButton(

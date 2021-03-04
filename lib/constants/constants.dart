@@ -1,3 +1,4 @@
+final int maxCardNumber = 10;
 final String emailUserInfo = 'https://www.googleapis.com/auth/userinfo.email';
 final String encodedNamesSeparetor = '<{*_-_*}>';
 
