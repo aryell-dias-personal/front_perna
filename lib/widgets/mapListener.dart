@@ -56,9 +56,9 @@ class _MapListenerState extends State<MapListener> {
   @override
   void dispose() {
     super.dispose();
-    this.watchAskedPointSubscription.cancel();
-    this.watchAgentsSubscription.cancel();
-    this.agentIdsSubscription.cancel();
+    watchAskedPointSubscription.cancel();
+    watchAgentsSubscription.cancel();
+    agentIdsSubscription.cancel();
   }
 
   _buildRouteCoords(List<LatLng> points) async {
