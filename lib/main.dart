@@ -4,7 +4,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/myDecoder.dart';
-import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
@@ -30,7 +29,7 @@ GoogleSignIn googleSignIn = GoogleSignIn(
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   final String messagingToken = await firebaseMessaging.getToken();
 
   final persistor = Persistor<StoreState>(
@@ -55,17 +54,17 @@ void main() async {
       },
   );
 
-  final FirebaseApp app = await FirebaseApp.configure(
+  final FirebaseApp app = await Firebase.initializeApp(
     name: FlavorConfig.instance.variables['appName'],
     options: FirebaseOptions(
-      googleAppID: FlavorConfig.instance.variables['googleAppID'],
+      appId: FlavorConfig.instance.variables['googleAppID'],
       apiKey: FlavorConfig.instance.variables['apiKey'],
-      projectID: FlavorConfig.instance.variables['projectID'],
-      gcmSenderID: FlavorConfig.instance.variables['gcmSenderID'],
+      projectId: FlavorConfig.instance.variables['projectID'],
+      messagingSenderId: FlavorConfig.instance.variables['gcmSenderID'],
     )
   );
-  final Firestore firestore = Firestore(app: app);
-  final FirebaseAuth firebaseAuth = FirebaseAuth.fromApp(app);
+  final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
 
   MyDecoder myDecoder = MyDecoder();
   final store = new Store<StoreState>(
@@ -112,7 +111,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: Builder(
           builder: (context) => Scaffold(
-            key: scaffoldKey,
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(
               firebaseMessaging: this.firebaseMessaging, 

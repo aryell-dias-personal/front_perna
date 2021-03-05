@@ -43,11 +43,11 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
       widget.clear();
       Navigator.popUntil(context, (route) => route.isFirst);
       showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
-        Colors.greenAccent, isGlobal: true);
+        Colors.greenAccent, context);
     } else {
       setState(() { isLoading = false; });
       showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
   }
 

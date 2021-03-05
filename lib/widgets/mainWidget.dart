@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/models/agent.dart';
@@ -13,9 +12,9 @@ class MainWidget extends StatefulWidget {
   final String name;
   final String email;
   final String photoUrl;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Function logout;
-  final Future<IdTokenResult> Function() getRefreshToken;
+  final Future<String> Function() getRefreshToken;
 
   const MainWidget({
     Key key, 
@@ -44,9 +43,9 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   final String name;
   final String email;
   final String photoUrl;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Function logout;  
-  final Future<IdTokenResult> Function() getRefreshToken;
+  final Future<String> Function() getRefreshToken;
   Agent visiblePin;
   bool isSideMenuOpen = false;
   bool isPinVisible = false;

@@ -54,14 +54,15 @@ class UserProfilePage extends StatelessWidget {
                   itemCount: 5,
                   itemSize: 50.0,
                   itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: Colors.amber,
+                  ratingWidget: RatingWidget(
+                    empty: Icon(Icons.star, color: Colors.amber),
+                    full: Icon(Icons.star, color: Colors.amber),
+                    half: Icon(Icons.star, color: Colors.amber)
                   ),
                   onRatingUpdate: (rating) {
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      Colors.pinkAccent, context: context);
+                      Colors.pinkAccent, context);
                   },
                 ),
               ),
@@ -91,7 +92,7 @@ class UserProfilePage extends StatelessWidget {
                   onPressed: (){
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      Colors.pinkAccent, context: context);
+                      Colors.pinkAccent, context);
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

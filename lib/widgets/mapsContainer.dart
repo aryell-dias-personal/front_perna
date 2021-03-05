@@ -23,7 +23,7 @@ import 'package:perna/pages/expedientPage.dart';
 class MapsContainer extends StatefulWidget {
   final Function preExecute;
   final String email;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Function changeSideMenuState;
   final Function setVisiblePin;
   final Function getRefreshToken;
@@ -105,7 +105,7 @@ class _MapsContainerState extends State<MapsContainer> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("select_one_point"), 
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
   }
 
@@ -141,7 +141,7 @@ class _MapsContainerState extends State<MapsContainer> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("select_two_points"),
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
   }
 
@@ -245,8 +245,8 @@ class _MapsContainerState extends State<MapsContainer> {
       .where('processed', isEqualTo: true)
       .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
       .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
-        if(agentSnapshot.documents.isNotEmpty){
-          Agent agent = Agent.fromJson(agentSnapshot.documents.first.data);
+        if(agentSnapshot.docs.isNotEmpty){
+          Agent agent = Agent.fromJson(agentSnapshot.docs.first.data());
           if(agent.route != null){
             List<LatLng> points = agent.route.map<LatLng>((point)=>point.local).toList();
             setState(() {

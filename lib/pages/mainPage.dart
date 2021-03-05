@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/mainWidget.dart';
@@ -10,8 +9,8 @@ import 'dart:async';
 class MainPage extends StatelessWidget {
   final String email;
   final Function onLogout;
-  final Future<IdTokenResult> Function() getRefreshToken;
-  final Firestore firestore;
+  final Future<String> Function() getRefreshToken;
+  final FirebaseFirestore firestore;
 
   MainPage({@required this.email, @required this.onLogout,  @required this.getRefreshToken, @required this.firestore});
 

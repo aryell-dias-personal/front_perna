@@ -82,3 +82,12 @@ ao invés de
 ```List<String> myList = new ArrayList<String>();```
 
 no Java.
+
+<!-- oq é isso:
+E/mali.instrumentation.graph.work( 8352): key already added: 0x76785d95f8
+F/libc    ( 8352): Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 10972 (1.raster), pid 8352 (bluehands.perna)
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Build fingerprint: 'samsung/x1sxx/x1s:11/RP1A.200720.012/G980FXXS5CTL5:user/release-keys'
+?????????????????
+acontece aleatoriamente com o app de debug... vi no devtools e não parece memory leak... o que será?
+será que acontece em prd? -->

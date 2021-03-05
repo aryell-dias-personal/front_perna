@@ -12,7 +12,7 @@ import 'package:perna/models/agent.dart';
 
 class MyGoogleMap extends StatefulWidget {
   final String email;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Function preExecute;
   final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
@@ -69,7 +69,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     if (enabled) {  
       setState(() {
         this.mapsController = googleMapController;
-        locationStream = location.onLocationChanged().listen((LocationData currentLocation) {
+        locationStream = location.onLocationChanged.listen((LocationData currentLocation) {
           setState(() {
             this.currentLocation = currentLocation;
           });
@@ -96,9 +96,9 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         this.previousLatLng = currLatLng;
       });
       widget.agentIds.forEach((documentID) async {
-        DocumentReference ref = widget.firestore.collection("agent").document(documentID);
+        DocumentReference ref = widget.firestore.collection("agent").doc(documentID);
         DocumentSnapshot documentSnapshot = await ref.get();
-        Agent oldAgent = Agent.fromJson(documentSnapshot.data);
+        Agent oldAgent = Agent.fromJson(documentSnapshot.data());
         DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
         bool endHasPassed = DateTime.now().isAfter(askedEndAtTime);
         // TODO: mudar modelo de dados do agente para não permitir alteração por parte do usuário 
@@ -106,7 +106,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         // `Position` que seria referenciado pelo agent, mas e a fila e o histórico?? analisar com calma, 
         // talvez um endpoint para update de queue 🤔
         if(oldAgent?.queue?.isEmpty == null || oldAgent.queue.isEmpty) {
-          await ref.updateData({
+          await ref.update({
             'position': "${locationData.latitude}, ${locationData.longitude}",
             'old': endHasPassed
           });
@@ -117,7 +117,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
             date: oldAgent.queue.first,
             position: LatLng(locationData.latitude, locationData.longitude)
           );
-          await ref.updateData(newAgent.toJson());
+          await ref.update(newAgent.toJson());
         }
       });
     }
@@ -131,10 +131,10 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     }
     PermissionStatus _permissionGranted;
     _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.DENIED) {
+    if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
     }
-    return _serviceEnabled && _permissionGranted != PermissionStatus.DENIED;
+    return _serviceEnabled && _permissionGranted != PermissionStatus.denied;
   }
 
   void _centralize(LatLng latLng) async {

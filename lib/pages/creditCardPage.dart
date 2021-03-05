@@ -41,7 +41,7 @@ class CreditCardPageState extends State<CreditCardPage> {
       if(statusCode == 200) {
         Navigator.popUntil(context, (route) => route.isFirst);
         showSnackBar(AppLocalizations.of(context).translate("successfully_added_card"), 
-          Colors.greenAccent, isGlobal: true);
+          Colors.greenAccent, context);
       } else {
         setState(() {
           this.cardType = Container(
@@ -52,7 +52,7 @@ class CreditCardPageState extends State<CreditCardPage> {
           isLoading = false;
         });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_card"), 
-          Colors.redAccent, context: context);
+          Colors.redAccent, context);
       }
     }
   }

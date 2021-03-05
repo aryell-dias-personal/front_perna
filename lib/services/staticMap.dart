@@ -36,7 +36,7 @@ class StaticMapService{
     LatLng markerA, LatLng markerB 
   }) async {
     String url = mountStaticMapUrl(markerA: markerA, markerB: markerB, route: route);
-    Response response = await get(url);   
+    Response response = await get(Uri(path: url));   
     return Uint8List.fromList(response.bodyBytes);
   }
 

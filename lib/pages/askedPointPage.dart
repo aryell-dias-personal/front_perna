@@ -1,7 +1,5 @@
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -34,7 +32,7 @@ class AskedPointPage extends StatefulWidget {
   final Function() clear;
   final AskedPoint askedPoint;
   final UserService userService;
-  final Future<IdTokenResult> Function() getRefreshToken;
+  final Future<String> Function() getRefreshToken;
 
   const AskedPointPage({
     @required this.userService, 
@@ -92,12 +90,12 @@ class _AskedPointPageState extends State<AskedPointPage> {
   void _onPressed(String email, PaymentsService paymentsService) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
-      IdTokenResult idTokenResult = await widget.getRefreshToken();
-      List<CreditCard> creditCards = await paymentsService.listCard(idTokenResult.token);
+      String token = await widget.getRefreshToken();
+      List<CreditCard> creditCards = await paymentsService.listCard(token);
       if(creditCards.isEmpty) {
         setState(() { isLoading = false; });
         showSnackBar(AppLocalizations.of(context).translate("at_least_one_credit_card"), 
-          Colors.redAccent, context: context);
+          Colors.redAccent, context);
         return;
       }    
       DateTime dateTime = dateFormat.parse(this.date);
@@ -113,13 +111,13 @@ class _AskedPointPageState extends State<AskedPointPage> {
         askedEndAt: askedEndAtTime?.difference(dateTime),
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
-      AskedPoint simulatedAskedPoint = await widget.userService.simulateAskedPoint(newAskedPoint, idTokenResult.token);
+      AskedPoint simulatedAskedPoint = await widget.userService.simulateAskedPoint(newAskedPoint, token);
       
       if(simulatedAskedPoint != null){
         await Navigator.push(context, MaterialPageRoute(
           builder: (context) => AskedPointConfirmationPage(
             askedPoint: simulatedAskedPoint,
-            userToken: idTokenResult.token,
+            userToken: token,
             paymentsService: paymentsService,
             defaultCreditCard: creditCards.first,
             clear: widget.clear
@@ -129,16 +127,16 @@ class _AskedPointPageState extends State<AskedPointPage> {
       }else{
         setState(() { isLoading = false; });
         showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_simutale_order"), 
-          Colors.redAccent, context: context);
+          Colors.redAccent, context);
       }
     }
   }
 
-  void _onSelectedAskedPointOptions(Firestore firestore, AskedPointOptions result) async {
+  void _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
     setState(() { this.isLoading = true; });
-    DocumentSnapshot documentSnapshot = await firestore.collection("agent").document(this.askedPoint.agentId).get();
-    if (documentSnapshot.data.isNotEmpty) {
-      Agent agent = Agent.fromJson(documentSnapshot.data);
+    DocumentSnapshot documentSnapshot = await firestore.collection("agent").doc(this.askedPoint.agentId).get();
+    if (documentSnapshot.data().isNotEmpty) {
+      Agent agent = Agent.fromJson(documentSnapshot.data());
       await Navigator.push(context, MaterialPageRoute(
         builder: (context) => Scaffold(
           body: StoreConnector<StoreState, DriverService>(
@@ -154,7 +152,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
       ));
     } else {
       showSnackBar(AppLocalizations.of(context).translate("not_found_expedient"), 
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
     setState(() { this.isLoading = false; });
   }

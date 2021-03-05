@@ -13,7 +13,7 @@ class UserService {
 
   Future<AskedPoint> simulateAskedPoint(AskedPoint askedPoint, String token) async {
     Response res = await post(
-      "${baseUrl}simulateAskedPoint", 
+      Uri(path:"${baseUrl}simulateAskedPoint"),
       body: await myDecoder.encode(askedPoint.toJson()),
       headers: {
         'Authorization': token

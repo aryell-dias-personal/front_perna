@@ -18,7 +18,7 @@ import 'package:flutter_flavor/flutter_flavor.dart';
 
 class MapListener extends StatefulWidget {
   final String email;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
   final Function preExecute;
   final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
@@ -130,11 +130,11 @@ class _MapListenerState extends State<MapListener> {
           DateTime now = DateTime.now();
           setState(() {
             this.agentIds.clear();
-            this.agentIds.addAll(agentSnapshot.documents.fold<List<String>>(<String>[], (List<String> acc, DocumentSnapshot document) {
-              Agent agent = Agent.fromJson(document.data);
+            this.agentIds.addAll(agentSnapshot.docs.fold<List<String>>(<String>[], (List<String> acc, DocumentSnapshot document) {
+              Agent agent = Agent.fromJson(document.data());
               DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
               if(askedStartAtTime.isBefore(now)){
-                acc.add(document.documentID);
+                acc.add(document.id);
               }
               return acc;
             }));
@@ -144,8 +144,8 @@ class _MapListenerState extends State<MapListener> {
         .where('processed', isEqualTo: true)
         .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
         .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
-          if(askedPointSnapshot.documents.isNotEmpty){
-            AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.documents.first.data);
+          if(askedPointSnapshot.docs.isNotEmpty){
+            AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.docs.first.data());
             if(askedPoint.origin != null)
               this._addNextPlace(askedPoint);
           }
@@ -156,8 +156,8 @@ class _MapListenerState extends State<MapListener> {
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
           DateTime now = DateTime.now();
-          List<Agent> agents =  agentSnapshot.documents.fold(<Agent>[], (List<Agent> acc, DocumentSnapshot document) {
-            Agent agent = Agent.fromJson(document.data);
+          List<Agent> agents =  agentSnapshot.docs.fold(<Agent>[], (List<Agent> acc, DocumentSnapshot document) {
+            Agent agent = Agent.fromJson(document.data());
             DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
             if(askedStartAtTime.isBefore(now)){
               if(agent.position!=null) _addAgentMarker(agent);

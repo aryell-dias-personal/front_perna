@@ -4,7 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:perna/helpers/myDecoder.dart';
 import 'package:perna/models/signInResponse.dart';
-import 'package:perna/models/user.dart';
+import 'package:perna/models/user.dart' as model;
 
 class SignInService {
   GoogleSignIn googleSignIn;
@@ -18,10 +18,10 @@ class SignInService {
     this.myDecoder,
   });
 
-  Future<IdTokenResult> getRefreshToken() async {
-    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
-    IdTokenResult idTokenResult = await firebaseUser.getIdToken(refresh: true);
-    return idTokenResult;
+  Future<String> getRefreshToken() async {
+    User firebaseUser = firebaseAuth.currentUser;
+    String token = await firebaseUser.getIdToken();
+    return token;
   }
 
   Future<SignInResponse> logOut({dynamic user, String messagingToken}) async {
@@ -65,7 +65,7 @@ class SignInService {
       'currency': currency,
       'messagingTokens': [ messagingToken ]
     });
-    Response res = await post("${baseUrl}insertUser", body: body);
+    Response res = await post(Uri(path: "${baseUrl}insertUser"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
@@ -74,22 +74,22 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post("${baseUrl}getUser", body: body);
+    Response res = await post(Uri(path: "${baseUrl}getUser"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
-  Future<SignInResponse> _logoutService(User user, String messagingToken) async {
+  Future<SignInResponse> _logoutService(model.User user, String messagingToken) async {
     final body = await myDecoder.encode({
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post("${baseUrl}logout", body: body);
+    Response res = await post(Uri(path: "${baseUrl}logout"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
   Future _authFirebase(GoogleSignInAccount user) async {
     GoogleSignInAuthentication googleAuth = await user.authentication;
-    AuthCredential credential = GoogleAuthProvider.getCredential(
+    AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
@@ -12,7 +11,7 @@ import 'package:perna/services/payments.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class WalletPage extends StatefulWidget {
-  final Future<IdTokenResult> Function() getRefreshToken;
+  final Future<String> Function() getRefreshToken;
   final PaymentsService paymentsService;
  
   const WalletPage({
@@ -33,9 +32,9 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    widget.getRefreshToken().then((IdTokenResult idTokenResult) {
+    widget.getRefreshToken().then((String token) {
       setState(() {
-        userToken = idTokenResult.token;
+        userToken = token;
       });
       widget.paymentsService.listCard(userToken).then(
         (creditCards) {
@@ -293,10 +292,10 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                     List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate("successfully_turned_card_default"), 
-                      Colors.greenAccent, context: context);
+                      Colors.greenAccent, context);
                   } else {
                     showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_turned_card_default"), 
-                      Colors.redAccent, context: context);
+                      Colors.redAccent, context);
                   }
                   setState(() { 
                     isLoading = false;
@@ -319,10 +318,10 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                     List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate("successfully_delete_card"), 
-                      Colors.greenAccent, context: context);
+                      Colors.greenAccent, context);
                   } else {
                     showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_delete_card"), 
-                      Colors.redAccent, context: context);
+                      Colors.redAccent, context);
                   }
                   setState(() { 
                     isLoading = false;
