@@ -146,14 +146,14 @@ class _CreditCardFormState extends State<CreditCardForm> {
               },
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: AppLocalizations.of(context).translate("creditCardNumber"),
+                labelText: AppLocalizations.of(context).translate("credit_card_number"),
                 hintText: 'XXXX XXXX XXXX XXXX',
               ),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
               validator: (String value) {
                 if (value.isEmpty || value.length < 16) {
-                  return AppLocalizations.of(context).translate("cardNumberError");
+                  return AppLocalizations.of(context).translate("card_number_error");
                 }
                 return null;
               },
@@ -173,14 +173,14 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: AppLocalizations.of(context).translate("creditCardExpireDate"),
+                      labelText: AppLocalizations.of(context).translate("credit_card_expire_date"),
                       hintText: 'XX/XX',
                     ),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return AppLocalizations.of(context).translate("cardDateError");
+                        return AppLocalizations.of(context).translate("card_date_error");
                       }
 
                       final DateTime now = DateTime.now();
@@ -190,7 +190,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       final DateTime cardDate = DateTime(year, month);
 
                       if (cardDate.isBefore(now) || month > 12 || month == 0) {
-                        return AppLocalizations.of(context).translate("cardDateError");
+                        return AppLocalizations.of(context).translate("card_date_error");
                       }
                       return null;
                     },
@@ -222,7 +222,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     },
                     validator: (value) {
                       if (value.isEmpty || value.length != (widget.isAmex ? 4 : 3)) {
-                        return AppLocalizations.of(context).translate("cvvError");
+                        return AppLocalizations.of(context).translate("cvv_error");
                       }
                       return null;
                     },
@@ -239,7 +239,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
               focusNode: cardHolderNode,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: AppLocalizations.of(context).translate("cardHolder"),
+                labelText: AppLocalizations.of(context).translate("card_holder"),
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.done,
@@ -249,7 +249,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
               onFieldSubmitted: (_) => widget.onSubmit(),
               validator: (value) {
                 if (value.isEmpty) {
-                  return AppLocalizations.of(context).translate("cardHolderError");
+                  return AppLocalizations.of(context).translate("card_holder_error");
                 }
                 return null;
               },

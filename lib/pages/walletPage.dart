@@ -101,12 +101,12 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           children: <Widget>[
             Image.asset('assets/empty_wallet.png', scale: 2),
             Text(
-              AppLocalizations.of(context).translate("noCreditCard"),
+              AppLocalizations.of(context).translate("no_credit_card"),
               textAlign: TextAlign.center, 
               style: TextStyle(fontSize: 20)
             ),
             Text(
-              AppLocalizations.of(context).translate("noCreditCardDescription"),
+              AppLocalizations.of(context).translate("no_credit_card_description"),
               textAlign: TextAlign.center, 
               style: TextStyle(fontSize: 17),
             )
@@ -171,7 +171,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),
                                         SizedBox(width: 2),
                                         Text(
-                                          AppLocalizations.of(context).translate("defaultCreditCard"),
+                                          AppLocalizations.of(context).translate("default_credit_card"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).primaryColor
@@ -192,7 +192,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),
                                         SizedBox(width: 2),
                                         Text(
-                                          AppLocalizations.of(context).translate("selectedCreditCard"),
+                                          AppLocalizations.of(context).translate("selected_credit_card"),
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).backgroundColor
@@ -265,7 +265,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             heroTag: "3",
             backgroundColor: Theme.of(context).primaryColor,
             child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
-            tooltip: AppLocalizations.of(context).translate("addCreditCard"),
+            tooltip: AppLocalizations.of(context).translate("add_credit_card"),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) => CreditCardPage(
@@ -307,7 +307,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                   Icons.star_border, 
                   color: Theme.of(context).backgroundColor
                 ),
-                label: AppLocalizations.of(context).translate("turnCreditCardDefault"),
+                label: AppLocalizations.of(context).translate("turn_credit_card_default"),
                 backgroundColor: Colors.amberAccent,
               )
             ]) + [
@@ -333,11 +333,11 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                   Icons.delete_outline, 
                   color: Theme.of(context).backgroundColor
                 ),
-                label: AppLocalizations.of(context).translate("deleteCreditCard"),
+                label: AppLocalizations.of(context).translate("delete_credit_card"),
                 backgroundColor: Colors.redAccent
               )
             ],
-            tooltip: AppLocalizations.of(context).translate("editCreditCard"),
+            tooltip: AppLocalizations.of(context).translate("edit_credit_card"),
           ))
         )
       )

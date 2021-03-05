@@ -75,7 +75,7 @@ class CreditCardPageState extends State<CreditCardPage> {
                 ),
                 children:  <TextSpan>[
                   TextSpan(
-                    text: AppLocalizations.of(context).translate("creditCard"), 
+                    text: AppLocalizations.of(context).translate("credit_card"), 
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
                   ),
                 ],

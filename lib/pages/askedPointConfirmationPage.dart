@@ -153,7 +153,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                                     ),
                                     SizedBox(width: 2),
                                     Text(
-                                      AppLocalizations.of(context).translate("defaultCreditCard"),
+                                      AppLocalizations.of(context).translate("default_credit_card"),
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Theme.of(context).primaryColor
