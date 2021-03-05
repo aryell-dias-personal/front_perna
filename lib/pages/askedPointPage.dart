@@ -46,20 +46,12 @@ class AskedPointPage extends StatefulWidget {
 
   @override
   _AskedPointPageState createState() => _AskedPointPageState(
-    clear: this.clear, 
-    readOnly: this.readOnly, 
-    askedPoint: this.askedPoint, 
-    getRefreshToken: this.getRefreshToken,
-    userService: this.userService
+    askedPoint: this.askedPoint
   );
 }
 
 class _AskedPointPageState extends State<AskedPointPage> {
-  final bool readOnly;
-  final Function() clear;
   final _formKey = GlobalKey<FormState>();
-  final UserService userService;
-  final Future<IdTokenResult> Function() getRefreshToken;
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -74,11 +66,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   StaticMapService staticMapService = new StaticMapService();
 
   _AskedPointPageState({
-    @required this.userService, 
-    @required this.readOnly, 
     @required this.askedPoint, 
-    @required this.clear,
-    this.getRefreshToken
   }) {
     initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
@@ -104,7 +92,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   void _onPressed(String email, PaymentsService paymentsService) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
-      IdTokenResult idTokenResult = await this.getRefreshToken();
+      IdTokenResult idTokenResult = await widget.getRefreshToken();
       List<CreditCard> creditCards = await paymentsService.listCard(idTokenResult.token);
       if(creditCards.isEmpty) {
         setState(() { isLoading = false; });
@@ -125,7 +113,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
         askedEndAt: askedEndAtTime?.difference(dateTime),
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
-      AskedPoint simulatedAskedPoint = await userService.simulateAskedPoint(newAskedPoint, idTokenResult.token);
+      AskedPoint simulatedAskedPoint = await widget.userService.simulateAskedPoint(newAskedPoint, idTokenResult.token);
       
       if(simulatedAskedPoint != null){
         await Navigator.push(context, MaterialPageRoute(
@@ -134,7 +122,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
             userToken: idTokenResult.token,
             paymentsService: paymentsService,
             defaultCreditCard: creditCards.first,
-            clear: clear
+            clear: widget.clear
           )
         ));
         setState(() { isLoading = false; });
@@ -249,7 +237,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
               fontFamily: Theme.of(context).textTheme.headline6.fontFamily
             )
           ),
-          actions: this.readOnly && this.askedPoint.agentId != null ? <Widget>[
+          actions: widget.readOnly && this.askedPoint.agentId != null ? <Widget>[
             PopupMenuButton(
               tooltip: AppLocalizations.of(context).translate("open_menu"),
               onSelected: (AskedPointOptions result) => this._onSelectedAskedPointOptions(resources["firestore"], result),
@@ -296,12 +284,12 @@ class _AskedPointPageState extends State<AskedPointPage> {
                           action: TextInputAction.next,
                           labelText: AppLocalizations.of(context).translate("date"),
                           icon: Icons.insert_invitation,
-                          readOnly: this.readOnly,
+                          readOnly: widget.readOnly,
                           onSubmit: (text){ FocusScope.of(context).nextFocus(); },
                           validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
                         ),
                         SizedBox(height: 26),
-                      ] + (this.askedPoint.askedStartAt == null && this.readOnly ? [] : [
+                      ] + (this.askedPoint.askedStartAt == null && widget.readOnly ? [] : [
                         SizedBox(width: 10),
                         FormTimePicker(
                           isRequired: false,
@@ -321,14 +309,14 @@ class _AskedPointPageState extends State<AskedPointPage> {
                           },
                           selectedDay: this.date,
                           lastDay: 31,
-                          readOnly: this.readOnly,
+                          readOnly: widget.readOnly,
                           validatorMessage: AppLocalizations.of(context).translate("enter_desired_start"),
                           onSubmit: (text) { FocusScope.of(context).nextFocus(); }
                         )
                       ])
                     ),
                     SizedBox(height: 26),
-                  ] + (this.askedPoint.askedEndAt == null && this.readOnly ? [] : [
+                  ] + (this.askedPoint.askedEndAt == null && widget.readOnly ? [] : [
                     FormTimePicker(
                       isRequired: false,
                       value: this.askedEndAt,
@@ -348,7 +336,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       selectedDay: this.date,
                       labelText: AppLocalizations.of(context).translate("desired_end"),
                       icon: Icons.access_time,
-                      readOnly: this.readOnly,
+                      readOnly: widget.readOnly,
                       onSubmit: (text) => _onPressed(resources["email"], resources["paymentsService"]),
                       validatorMessage: AppLocalizations.of(context).translate("enter_desired_end"),
                     ),
@@ -396,7 +384,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   ] : []) + [
                     AddButton(
                       onPressed: ()=>_onPressed(resources["email"], resources["paymentsService"]),
-                      readOnly: this.readOnly || this.askedPoint.staticMap == null,
+                      readOnly: widget.readOnly || this.askedPoint.staticMap == null,
                       addAndcontinue: true
                     )
                   ]

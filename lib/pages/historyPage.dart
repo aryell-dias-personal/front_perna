@@ -23,27 +23,22 @@ class HistoryPage extends StatefulWidget {
   HistoryPage({@required this.email, @required this.firestore});
 
   @override
-  _HistoryPageState createState() => _HistoryPageState(email: this.email, firestore: this.firestore);
+  _HistoryPageState createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage> {
   final DateFormat format = DateFormat('dd/MM/yyyy HH:mm');
   final DateFormat formatDate = DateFormat('dd/MM/yyyy');
-  final Firestore firestore;
-  final String email;
 
-  List agents;
-  StreamSubscription<QuerySnapshot> agentsListener;
-  bool isLoadingAgents = false;
-
-  List askedPoints;
-  StreamSubscription<QuerySnapshot> askedPointsListener;
   bool isLoadingAskedPoints = false;
-
-  Timer timer;
+  bool isLoadingAgents = false;
   bool passedTime = false;
 
-  _HistoryPageState({@required this.email, @required this.firestore});
+  StreamSubscription<QuerySnapshot> askedPointsListener;
+  StreamSubscription<QuerySnapshot> agentsListener;
+  List askedPoints;
+  List agents;
+  Timer timer;
 
   @override
   void dispose() {
@@ -54,7 +49,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   StreamSubscription<QuerySnapshot> initAgentsListner(){
-    return firestore.collection("agent").where('email', isEqualTo: email)
+    return widget.firestore.collection("agent").where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot agentsSnapshot){
         setState(() {
           this.agents = agentsSnapshot.documents.map((agent){
@@ -66,7 +61,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   StreamSubscription<QuerySnapshot> initAskedPointsListener(){
-    return firestore.collection("askedPoint").where('email', isEqualTo: email)
+    return widget.firestore.collection("askedPoint").where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot askedPointsSnapshot){
         setState(() {
           this.askedPoints = askedPointsSnapshot.documents.map((askedPoint){

@@ -44,25 +44,13 @@ class ExpedientPage extends StatefulWidget {
   });
 
   @override
-  _ExpedientState createState() => _ExpedientState(
-    driverService: this.driverService, 
-    clear: this.clear, 
-    agent: this.agent, 
-    accept: this.accept, 
-    readOnly: this.readOnly, 
-    getRefreshToken: this.getRefreshToken, 
-    deny: this.deny
+  _ExpedientState createState() => _ExpedientState( 
+    agent: this.agent,
   );
 }
 
 class _ExpedientState extends State<ExpedientPage> {
-  final bool readOnly;
-  final Function() accept;
-  final Function() deny;
-  final Function() clear;
   final _formKey = GlobalKey<FormState>();
-  final Future<IdTokenResult> Function() getRefreshToken;
-  final DriverService driverService;
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -78,13 +66,7 @@ class _ExpedientState extends State<ExpedientPage> {
   StaticMapService staticMapService = new StaticMapService();
 
   _ExpedientState({
-    @required this.driverService, 
-    @required this.readOnly, 
     @required this.agent, 
-    @required this.clear, 
-    this.getRefreshToken, 
-    this.accept, 
-    this.deny
   }) {
     initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
@@ -103,9 +85,9 @@ class _ExpedientState extends State<ExpedientPage> {
   }
 
   void _askNewAgend(agent) async {
-    int statusCode = await driverService.askNewAgent(agent);
+    int statusCode = await widget.driverService.askNewAgent(agent);
     if(statusCode == 200){
-      this.clear();
+      widget.clear();
       Navigator.pop(context);
       showSnackBar(AppLocalizations.of(context).translate("successful_work_order"), 
         Colors.greenAccent, isGlobal: true);
@@ -134,10 +116,10 @@ class _ExpedientState extends State<ExpedientPage> {
       if(fromEmail != email) {
         this._askNewAgend(agent);
       } else {
-        IdTokenResult idTokenResult = await this.getRefreshToken();
-        int statusCode = await driverService.postNewAgent(agent, idTokenResult.token);
+        IdTokenResult idTokenResult = await widget.getRefreshToken();
+        int statusCode = await widget.driverService.postNewAgent(agent, idTokenResult.token);
         if(statusCode==200){
-          this.clear();
+          widget.clear();
           Navigator.pop(context);
           showSnackBar( AppLocalizations.of(context).translate("successfully_added_expedient"), 
             Colors.greenAccent, isGlobal: true);
@@ -152,7 +134,7 @@ class _ExpedientState extends State<ExpedientPage> {
 
   void _acceptOrDenny(accept){
     setState(() { isLoading=true; });
-    (accept? this.accept(): this.deny()).then((_){ setState(() { isLoading=false; }); });
+    (accept? widget.accept(): widget.deny()).then((_){ setState(() { isLoading=false; }); });
   }
   
   void _onSelectedExpedientOptions(Firestore firestore, ExpedientOptions result) async {
@@ -254,7 +236,7 @@ class _ExpedientState extends State<ExpedientPage> {
               fontFamily: Theme.of(context).textTheme.headline6.fontFamily
             )
           ),
-          actions: this.readOnly ? <Widget>[
+          actions: widget.readOnly ? <Widget>[
             PopupMenuButton(
               tooltip: AppLocalizations.of(context).translate("open_menu"),
               onSelected: (ExpedientOptions result) => this._onSelectedExpedientOptions(resources["firestore"], result),
@@ -295,7 +277,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     formkey: this._formKey,
                     children: <Widget>[
                       OutlinedTextFormField(
-                        readOnly: this.readOnly,
+                        readOnly: widget.readOnly,
                         initialValue: this.agent.email ?? "",
                         onChanged: (text){ this.email = text; },
                         textInputType: TextInputType.emailAddress,
@@ -327,7 +309,7 @@ class _ExpedientState extends State<ExpedientPage> {
                             action: TextInputAction.next,
                             labelText: AppLocalizations.of(context).translate("date"),
                             icon: Icons.insert_invitation,
-                            readOnly: this.readOnly,
+                            readOnly: widget.readOnly,
                             onSubmit: (text){ FocusScope.of(context).nextFocus(); },
                             validatorMessage: AppLocalizations.of(context).translate("select_a_date"),
                           ),
@@ -351,7 +333,7 @@ class _ExpedientState extends State<ExpedientPage> {
                             action: TextInputAction.next,
                             labelText: AppLocalizations.of(context).translate("expedient_start"),
                             icon: Icons.access_time,
-                            readOnly: this.readOnly,
+                            readOnly: widget.readOnly,
                             onSubmit: (text){ FocusScope.of(context).nextFocus(); },
                             validatorMessage: AppLocalizations.of(context).translate("enter_start_expedient"),
                           ),
@@ -376,13 +358,13 @@ class _ExpedientState extends State<ExpedientPage> {
                             }
                           });
                         },
-                        readOnly: this.readOnly,
+                        readOnly: widget.readOnly,
                         validatorMessage: AppLocalizations.of(context).translate("enter_end_expedient"),
                         onSubmit: (text){ FocusScope.of(context).nextFocus(); }
                       ),
                       SizedBox(height: 26),
                       OutlinedTextFormField(
-                        readOnly: this.readOnly,
+                        readOnly: widget.readOnly,
                         initialValue: this.agent.places?.toString() ?? "",
                         onChanged: (text){ this.places = text; },
                         textInputType: TextInputType.number,
@@ -400,7 +382,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         icon: Icons.pin_drop
                       ),
                       SizedBox(height: 26)
-                    ] + ( this.accept != null && this.deny != null && this.readOnly ? [
+                    ] + ( widget.accept != null && widget.deny != null && widget.readOnly ? [
                       ActionButtons(
                         accept: (){ _acceptOrDenny(true); },
                         deny: (){ _acceptOrDenny(false); }
@@ -408,7 +390,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     ] : [
                       AddButton(
                         onPressed: () => this._onPressed(this.email, resources['email']),
-                        readOnly: this.readOnly || this.agent.staticMap == null,
+                        readOnly: widget.readOnly || this.agent.staticMap == null,
                       ),
                     ])
                   )

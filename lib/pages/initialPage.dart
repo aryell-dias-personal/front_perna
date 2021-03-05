@@ -21,14 +21,11 @@ class InitialPage extends StatefulWidget {
   InitialPage({@required this.signInService, @required this.messagingToken});
 
   @override
-  _InitialPageState createState() => _InitialPageState(signInService: signInService, messagingToken: messagingToken);
+  _InitialPageState createState() => _InitialPageState();
 }
 
 class _InitialPageState extends State<InitialPage> {
   bool isLoading = false;
-  final String messagingToken;
-  final SignInService signInService;
-  _InitialPageState({@required this.signInService, @required this.messagingToken});
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +37,8 @@ class _InitialPageState extends State<InitialPage> {
           String localeName = "${locale.languageCode}_${locale.countryCode.toUpperCase()}";
           String currencyName = NumberFormat.simpleCurrency(locale: localeName).currencyName.toLowerCase();
           SignInResponse signInResponse = choice == SignLogin.sign ? 
-            await signInService.signIn(this.messagingToken, currencyName) : 
-            await signInService.logIn(this.messagingToken);
+            await widget.signInService.signIn(widget.messagingToken, currencyName) : 
+            await widget.signInService.logIn(widget.messagingToken);
           User user = signInResponse?.user;
           if(user==null){
             showSnackBar(
