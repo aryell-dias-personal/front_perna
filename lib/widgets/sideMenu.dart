@@ -58,19 +58,6 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: AppLocalizations.of(context).translate("help"),
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => HelpPage(
-                      helpItem: getHelpRoot(context),
-                    )
-                  )
-                );
-              },
-              icon: Icons.help_outline,
-            ),
-            SideMenuButton(
-              textColor: textColor,
               text: AppLocalizations.of(context).translate("wallet"),
               onPressed: () async {
                 Navigator.push(context, MaterialPageRoute(
@@ -91,6 +78,16 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
+              text: "Empresa",
+              onPressed: () {
+                showSnackBar(
+                  AppLocalizations.of(context).translate("not_implemented"), 
+                  Colors.pinkAccent, context: context);
+              },
+              icon: Icons.business,
+            ),
+            SideMenuButton(
+              textColor: textColor,
               text: AppLocalizations.of(context).translate("theme"),
               onPressed: (){
                 showSnackBar(
@@ -98,6 +95,19 @@ class SideMenu extends StatelessWidget {
                   Colors.pinkAccent, context: context);
               },
               icon: Icons.palette,
+            ),
+            SideMenuButton(
+              textColor: textColor,
+              text: AppLocalizations.of(context).translate("help"),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => HelpPage(
+                      helpItem: getHelpRoot(context),
+                    )
+                  )
+                );
+              },
+              icon: Icons.help_outline,
             ),
             SideMenuButton(
               textColor: textColor,
