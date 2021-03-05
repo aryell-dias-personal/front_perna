@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/models/helpItem.dart';
 
-HelpItem getHelpRoot(context) {
+HelpItem getHelpRoot(BuildContext context) {
   return HelpItem(
     content: AppLocalizations.of(context).translate("helpRootContent"),
     subItems: <HelpItem>[

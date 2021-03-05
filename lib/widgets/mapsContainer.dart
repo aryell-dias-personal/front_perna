@@ -40,41 +40,16 @@ class MapsContainer extends StatefulWidget {
   });
 
   @override
-  _MapsContainerState createState() => _MapsContainerState(
-    setVisiblePin: this.setVisiblePin,
-    preExecute: this.preExecute,
-    changeSideMenuState: this.changeSideMenuState,
-    controller: this.controller,
-    email: this.email,
-    firestore: this.firestore,
-    getRefreshToken: this.getRefreshToken
-  );
+  _MapsContainerState createState() => _MapsContainerState();
 }
 
 class _MapsContainerState extends State<MapsContainer> {
-  final Function preExecute;
-  final String email;
-  final Firestore firestore;
-  final Function changeSideMenuState;
-  final Function getRefreshToken;
-  final Function setVisiblePin;
-  final AnimationController controller;
   bool isPinVisible = false;
   BitmapDescriptor originPin;
   BitmapDescriptor destinyPin;
   List<LatLng> points = [];
   Set<Marker> markers = Set();
   StreamSubscription<QuerySnapshot> agentsListener;
-
-  _MapsContainerState({
-    @required this.setVisiblePin, 
-    @required this.email, 
-    @required this.firestore, 
-    @required this.getRefreshToken, 
-    @required this.changeSideMenuState, 
-    @required this.controller, 
-    @required this.preExecute, 
-  });
   
   @override
   void dispose() {
@@ -121,7 +96,7 @@ class _MapsContainerState extends State<MapsContainer> {
                 readOnly: false,
                 driverService: driverService, 
                 clear: this.markers.clear, 
-                getRefreshToken: this.getRefreshToken
+                getRefreshToken: widget.getRefreshToken
               ),
               converter: (store)=>store.state.driverService
             )
@@ -157,7 +132,7 @@ class _MapsContainerState extends State<MapsContainer> {
                 askedPoint: askedPoint, 
                 readOnly: false, 
                 clear: this.markers.clear, 
-                getRefreshToken: this.getRefreshToken
+                getRefreshToken: widget.getRefreshToken
               ),
               converter: (store)=>store.state.userService
             )
@@ -171,7 +146,7 @@ class _MapsContainerState extends State<MapsContainer> {
   }
 
   void putMarker(LatLng location, String description, MarkerType type, String region) async {
-    preExecute();
+    widget.preExecute();
     LatLng position = LatLng(location.latitude, location.longitude);
     String title = type == MarkerType.origin ? "Partida ou garagem" : "Chegada";
     MarkerId markerId =  MarkerId(position.toString());
@@ -200,7 +175,7 @@ class _MapsContainerState extends State<MapsContainer> {
   }
 
   void navigate() {
-    preExecute();
+    widget.preExecute();
     String origin = "${this.points.first.latitude},${this.points.first.longitude}";
     List<LatLng> latLngWayPoints = this.points.sublist(1,this.points.length-1);
     String waypoints = latLngWayPoints.fold<String>("",(String acc, LatLng curr){
@@ -223,21 +198,21 @@ class _MapsContainerState extends State<MapsContainer> {
     return Stack(
       children: <Widget>[
         MapListener(
-          email: this.email,
-          firestore: this.firestore,
+          email: widget.email,
+          firestore: widget.firestore,
           markers: this.markers,
           points: this.points,
           putMarker: this.putMarker,
-          preExecute: preExecute,
+          preExecute: widget.preExecute,
           setVisiblePin: (Agent agent, Polyline oldPolyline) {
             setState(() {
               this.isPinVisible = !oldPolyline.visible;
             });
-            this.setVisiblePin(agent, oldPolyline);
+            widget.setVisiblePin(agent, oldPolyline);
           }
         ),
         SearchLocation(
-          preExecute: preExecute,
+          preExecute: widget.preExecute,
           markers: this.markers,
           onStartPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.origin, region),
           onEndPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.destiny, region)
@@ -255,8 +230,8 @@ class _MapsContainerState extends State<MapsContainer> {
       ]) + [
         ReactiveFloatingButton(
           bottom: this.isPinVisible? 115 : 15,
-          controller: this.controller,
-          defaultFunction: this.changeSideMenuState,
+          controller: widget.controller,
+          defaultFunction: widget.changeSideMenuState,
           length: this.markers.length,
           addNewExpedient: this.addNewExpedient,
           addNewAsk: this.addNewAsk
@@ -266,7 +241,7 @@ class _MapsContainerState extends State<MapsContainer> {
   }
 
   StreamSubscription<QuerySnapshot> _initAgentListener(){
-    return this.firestore.collection("agent").where('email', isEqualTo: this.email)
+    return widget.firestore.collection("agent").where('email', isEqualTo: widget.email)
       .where('processed', isEqualTo: true)
       .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
       .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){

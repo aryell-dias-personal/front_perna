@@ -9,7 +9,7 @@ class MyDecoder{
     return toBeEncoded;
   }
 
-  Future<dynamic> decode(toBeDecoded) async {
+  Future<dynamic> decode(String toBeDecoded) async {
     String decodedBody = toBeDecoded;
     dynamic body = decoder.convert(decodedBody);
     return body;

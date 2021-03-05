@@ -49,18 +49,10 @@ class Home extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState(
-    firebaseMessaging: this.firebaseMessaging, 
-    driverService: this.driverService,
-    signInService: this.signInService
-  );
+  _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  final FirebaseMessaging firebaseMessaging;
-  final DriverService driverService;
-  final SignInService signInService;
-
   bool isConnected = true;
 
   Future askNewAgentHandler(Map<String, dynamic> message) async {
@@ -70,8 +62,8 @@ class _HomeState extends State<Home> {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           body: ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
-            getRefreshToken: this.signInService.getRefreshToken,
-            driverService: this.driverService,
+            getRefreshToken: widget.signInService.getRefreshToken,
+            driverService: widget.driverService,
             accept: () async { await answerNewAgentHandler(agent, true); },
             deny: () async { await answerNewAgentHandler(agent, false); }
           )
@@ -82,8 +74,8 @@ class _HomeState extends State<Home> {
 
   Future answerNewAgentHandler(Agent agent, bool accepted) async {
     if(accepted){
-      IdTokenResult idTokenResult =  await this.signInService.getRefreshToken();
-      int statusCodeNewAgent = await driverService.postNewAgent(agent, idTokenResult.token);
+      IdTokenResult idTokenResult =  await widget.signInService.getRefreshToken();
+      int statusCodeNewAgent = await widget.driverService.postNewAgent(agent, idTokenResult.token);
       if(statusCodeNewAgent !=200){
         showSnackBar(
           AppLocalizations.of(context).translateFormat("accept_not_possible", [agent.fromEmail]),
@@ -92,7 +84,7 @@ class _HomeState extends State<Home> {
         return;
       }
     }
-    int statusCodeAnswer = await driverService.answerNewAgent(agent.fromEmail, agent.email, accepted);
+    int statusCodeAnswer = await widget.driverService.answerNewAgent(agent.fromEmail, agent.email, accepted);
     if(statusCodeAnswer == 200){
       String answer = AppLocalizations.of(context).translate(accepted? "accepted" : "denied");
       showSnackBar(
@@ -153,7 +145,7 @@ class _HomeState extends State<Home> {
       }
     );
 
-    this.firebaseMessaging.configure(
+    widget.firebaseMessaging.configure(
       onMessage: onMessage,
       onBackgroundMessage: onMessage, 
       onLaunch: onLaunch,
@@ -167,12 +159,6 @@ class _HomeState extends State<Home> {
     });
 
   }
-
-  _HomeState({
-    @required this.firebaseMessaging, 
-    @required this.driverService, 
-    @required this.signInService
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -188,9 +174,17 @@ class _HomeState extends State<Home> {
       },
       builder: (context, resources) {
         if(resources['logedIn'] == null || !resources['logedIn']){
-          return InitialPage(signInService: signInService, messagingToken: resources['messagingToken']);
+          return InitialPage(
+            signInService: widget.signInService, 
+            messagingToken: resources['messagingToken']
+          );
         } else {
-          return MainPage(getRefreshToken: signInService.getRefreshToken, onLogout: signInService.logOut, email: resources['email'], firestore: resources['firestore']);
+          return MainPage(
+            getRefreshToken: widget.signInService.getRefreshToken, 
+            onLogout: widget.signInService.logOut, 
+            email: resources['email'], 
+            firestore: resources['firestore']
+          );
         }
       }
     );

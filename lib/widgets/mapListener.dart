@@ -36,65 +36,41 @@ class MapListener extends StatefulWidget {
   });
 
   @override
-  _MapListenerState createState() => _MapListenerState(
-    email: this.email,
-    firestore: this.firestore, 
-    preExecute: this.preExecute, 
-    putMarker: this.putMarker, 
-    points: this.points, 
-    markers: this.markers,
-    setVisiblePin: this.setVisiblePin
-  );
+  _MapListenerState createState() => _MapListenerState();
 }
 
 class _MapListenerState extends State<MapListener> {
-  final String email;
-  final Firestore firestore;
-  final Function preExecute;
-  final Function(LatLng, String, MarkerType, String) putMarker;
-  final List<LatLng> points;
-  final Set<Marker> markers;
-  final Function setVisiblePin;
   Function hidePin =() {};
+  List<String> agentIds = [];
   Set<Polyline> polyline = Set();
   Set<Marker> nextPlaces = Set();
   Set<Marker> watchedMarkers = Set();
-  DirectionsService directionsService = DirectionsService();
   Map<String, List<LatLng>> pointsPerRoute = {};
   Map<List<LatLng>, List<LatLng>> routeCoordsCache = {};
-  List<String> agentIds = [];
   StreamSubscription<QuerySnapshot> agentIdsSubscription;
   StreamSubscription<QuerySnapshot> watchAskedPointSubscription;
   StreamSubscription<QuerySnapshot> watchAgentsSubscription;
 
-  _MapListenerState({
-    @required this.email, 
-    @required this.firestore, 
-    @required this.preExecute, 
-    @required this.putMarker, 
-    @required this.points, 
-    @required this.markers, 
-    @required this.setVisiblePin
-  });
+  DirectionsService directionsService = DirectionsService();
 
   @override
   void dispose() {
     super.dispose();
-    watchAskedPointSubscription.cancel();
-    watchAgentsSubscription.cancel();
-    agentIdsSubscription.cancel();
+    this.watchAskedPointSubscription.cancel();
+    this.watchAgentsSubscription.cancel();
+    this.agentIdsSubscription.cancel();
   }
 
   _buildRouteCoords(List<LatLng> points) async {
     if(points.length >= 2){
-      List<LatLng> coords = await directionsService.getRouteBetweenCoordinates(FlavorConfig.instance.variables['apiKey'], points);
+      List<LatLng> coords = await this.directionsService.getRouteBetweenCoordinates(FlavorConfig.instance.variables['apiKey'], points);
       if (coords.isNotEmpty) return coords;
     }
     return null;
   }  
 
   _addPolyline(List<LatLng> points, {String name}) async {
-    if(!routeCoordsCache.containsKey(points)){
+    if(!this.routeCoordsCache.containsKey(points)){
       List<LatLng> routeCoords = await this._buildRouteCoords(points);
       if(routeCoords != null) {
         PolylineId polylineId = PolylineId(name ?? "MyRoute");
@@ -147,7 +123,7 @@ class _MapListenerState extends State<MapListener> {
   void initState() {
     super.initState();
     setState(() {
-      agentIdsSubscription = this.firestore.collection("agent").where('email', isEqualTo: this.email)
+      this.agentIdsSubscription = widget.firestore.collection("agent").where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
@@ -164,7 +140,7 @@ class _MapListenerState extends State<MapListener> {
             }));
           });
         });
-      watchAskedPointSubscription = firestore.collection("askedPoint").where('email', isEqualTo: email)
+      this.watchAskedPointSubscription = widget.firestore.collection("askedPoint").where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
         .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
         .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
@@ -174,9 +150,9 @@ class _MapListenerState extends State<MapListener> {
               this._addNextPlace(askedPoint);
           }
         });
-      watchAgentsSubscription = this.firestore.collection("agent")
+      this.watchAgentsSubscription = widget.firestore.collection("agent")
         .where('processed', isEqualTo: true)
-        .where('watchedBy', arrayContains: this.email)
+        .where('watchedBy', arrayContains: widget.email)
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
           DateTime now = DateTime.now();
@@ -186,9 +162,9 @@ class _MapListenerState extends State<MapListener> {
             if(askedStartAtTime.isBefore(now)){
               if(agent.position!=null) _addAgentMarker(agent);
               List<LatLng> points = agent.route.fold(<LatLng>[], (List<LatLng> acc, Point curr)=>acc+[curr.local]);
-              if(!_pointsPerRouteContains(points, this.email)){
-                this.pointsPerRoute[this.email] = points;
-                this._addPolyline(points, name: this.email);
+              if(!_pointsPerRouteContains(points, widget.email)){
+                this.pointsPerRoute[widget.email] = points;
+                this._addPolyline(points, name: widget.email);
               }
               acc.add(agent);
             }
@@ -202,18 +178,18 @@ class _MapListenerState extends State<MapListener> {
   }
 
   Future<Marker> _buildCarMarker(Agent agent) async {
-    MarkerId id = MarkerId(email);
+    MarkerId id = MarkerId(widget.email);
     Marker marker = Marker(
       markerId: id,
       position: agent.position,
       consumeTapEvents: true,
       onTap: () async {
-        Function(Polyline) findPolyline = (polyline)=>polyline.polylineId.value==email;
+        Function(Polyline) findPolyline = (polyline)=>polyline.polylineId.value==widget.email;
         Function(Polyline) findOldestPolyline = (polyline)=>polyline.visible && polyline.polylineId.value != "MyRoute";
         if(this.polyline.isNotEmpty){
           Polyline oldestPolyline = this.polyline.singleWhere(findPolyline, orElse: null);
           Polyline oldPolyline = this.polyline.singleWhere(findPolyline);
-          this.setVisiblePin(agent, oldPolyline);
+          widget.setVisiblePin(agent, oldPolyline);
           setState(() {
             if(oldestPolyline != null) {
               this.polyline.removeWhere(findOldestPolyline);
@@ -225,7 +201,7 @@ class _MapListenerState extends State<MapListener> {
             this.hidePin = () {
               if(newPolyline.visible) {
                 this.polyline.removeWhere(findPolyline);
-                this.setVisiblePin(agent, newPolyline);
+                widget.setVisiblePin(agent, newPolyline);
                 this.polyline.add(newPolyline.copyWith(visibleParam: !newPolyline.visible));
               }
             };
@@ -242,33 +218,33 @@ class _MapListenerState extends State<MapListener> {
   void _addAgentMarker(Agent agent) async {
     Marker _marker = await _buildCarMarker(agent);
     setState(() {
-      this.markers.removeWhere((marker)=> marker.markerId == _marker.markerId);
-      watchedMarkers.add(_marker);
+      widget.markers.removeWhere((marker)=> marker.markerId == _marker.markerId);
+      this.watchedMarkers.add(_marker);
     });
   }
 
   bool _pointsPerRouteContains(List<LatLng> points, String email){
     if(!this.pointsPerRoute.containsKey(email)) return false;
-    List<LatLng> previousPoints = this.pointsPerRoute[this.email];
+    List<LatLng> previousPoints = this.pointsPerRoute[widget.email];
     return previousPoints.toString() == points.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-    _addPolyline(this.points);
+    _addPolyline(widget.points);
     return MyGoogleMap(
       agentIds: this.agentIds,
-      email: this.email,
-      firestore: this.firestore,
-      markers: this.markers,
+      email: widget.email,
+      firestore: widget.firestore,
+      markers: widget.markers,
       nextPlaces: this.nextPlaces,
-      points: this.points,
+      points: widget.points,
       polyline: this.polyline,
       preExecute: () {
         this.hidePin();
-        this.preExecute();
+        widget.preExecute();
       },
-      putMarker: this.putMarker,
+      putMarker: widget.putMarker,
       watchedMarkers: this.watchedMarkers
     );
   }

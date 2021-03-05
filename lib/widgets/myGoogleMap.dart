@@ -36,31 +36,10 @@ class MyGoogleMap extends StatefulWidget {
   });
 
   @override
-  _MyGoogleMapState createState() => _MyGoogleMapState(
-    email: this.email,
-    firestore: this.firestore, 
-    preExecute: this.preExecute, 
-    putMarker: this.putMarker, 
-    points: this.points, 
-    markers: this.markers,
-    nextPlaces: this.nextPlaces,
-    polyline:  this.polyline,
-    watchedMarkers: this.watchedMarkers,
-    agentIds: this.agentIds
-  );
+  _MyGoogleMapState createState() => _MyGoogleMapState();
 }
 
 class _MyGoogleMapState extends State<MyGoogleMap> {
-  final String email;
-  final Firestore firestore;
-  final Function preExecute;
-  final Function(LatLng, String, MarkerType, String) putMarker;
-  final List<LatLng> points;
-  final Set<Marker> markers;
-  final Set<Polyline> polyline;
-  final Set<Marker> nextPlaces;
-  final Set<Marker> watchedMarkers;
-  final List<String> agentIds;
   Marker lastMarker;
   GoogleMapController mapsController;
   StreamSubscription<LocationData> locationStream;
@@ -73,27 +52,14 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     locationStream.cancel();
   }
 
-  _MyGoogleMapState({
-    @required this.polyline, 
-    @required this.nextPlaces, 
-    @required this.watchedMarkers, 
-    @required this.email, 
-    @required this.firestore,
-    @required this.preExecute, 
-    @required this.putMarker, 
-    @required this.points, 
-    @required this.markers,
-    @required this.agentIds
-  }); 
-
   onLongPress(location) async {
-    this.preExecute();
+    widget.preExecute();
     Coordinates coordinates = new Coordinates(location.latitude, location.longitude);
     List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     Address address = addresses.first;
     String description = address.addressLine;
     String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
-    this.putMarker(location, description, this.markers.length == 0 ? MarkerType.origin : MarkerType.destiny, region);
+    widget.putMarker(location, description, widget.markers.length == 0 ? MarkerType.origin : MarkerType.destiny, region);
   }
 
   onMapCreated(GoogleMapController googleMapController) async {
@@ -129,8 +95,8 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
       setState(() {
         this.previousLatLng = currLatLng;
       });
-      this.agentIds.forEach((documentID) async {
-        DocumentReference ref = firestore.collection("agent").document(documentID);
+      widget.agentIds.forEach((documentID) async {
+        DocumentReference ref = widget.firestore.collection("agent").document(documentID);
         DocumentSnapshot documentSnapshot = await ref.get();
         Agent oldAgent = Agent.fromJson(documentSnapshot.data);
         DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
@@ -189,15 +155,15 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         await this.mapsController.setMapStyle("[]"); 
       }
     }
-    if(this.polyline.isNotEmpty){
-      List<Polyline> oldPolylines = this.polyline.where(findFunction).toList();
+    if(widget.polyline.isNotEmpty){
+      List<Polyline> oldPolylines = widget.polyline.where(findFunction).toList();
       Polyline oldPolyline = oldPolylines.isEmpty ? null : oldPolylines.first;
       if(oldPolyline!=null && oldPolyline.color != Theme.of(context).primaryColor){
         Polyline newPolyline= oldPolyline.copyWith(
           colorParam: Theme.of(context).primaryColor
         );
-        this.polyline.remove(oldPolyline);
-        this.polyline.add(newPolyline);
+        widget.polyline.remove(oldPolyline);
+        widget.polyline.add(newPolyline);
       }
     }
   }
@@ -205,11 +171,11 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
   @override
   Widget build(BuildContext context) {
     _refreshMap();
-    if(this.markers.isNotEmpty && lastMarker != this.markers.last) {
+    if(widget.markers.isNotEmpty && lastMarker != widget.markers.last) {
       setState(() {
-        lastMarker = this.markers.last;
+        lastMarker = widget.markers.last;
       });
-      this._centralize(this.markers.last.position);
+      this._centralize(widget.markers.last.position);
     }
     return GoogleMap(
       onTap: (_) => this._centralize(LatLng(this.currentLocation.latitude, this.currentLocation.longitude)),
@@ -217,10 +183,10 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
       mapType: MapType.normal, 
       onLongPress: onLongPress,
       onCameraMove: (location){
-        this.preExecute();
+        widget.preExecute();
       },
-      polylines: this.polyline,
-      markers: this.markers.union(this.watchedMarkers).union(this.nextPlaces),
+      polylines: widget.polyline,
+      markers: widget.markers.union(widget.watchedMarkers).union(widget.nextPlaces),
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
       initialCameraPosition: CameraPosition(

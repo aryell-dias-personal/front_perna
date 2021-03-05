@@ -21,34 +21,18 @@ class SearchLocation extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SearchLocationState createState() => _SearchLocationState(
-    onStartPlaceSelected: this.onStartPlaceSelected, 
-    onEndPlaceSelected: this.onEndPlaceSelected, 
-    markers: this.markers, preExecute: this.preExecute
-  );
+  _SearchLocationState createState() => _SearchLocationState();
 }
 
 class _SearchLocationState extends State<SearchLocation> with TickerProviderStateMixin {
   bool showSecond = false;
-  final Function() preExecute;
-  final Function(Location, String, String) onStartPlaceSelected;
-  final Function(Location, String, String) onEndPlaceSelected;
-  final Set<Marker> markers;
-  
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
 
   GoogleMapsPlaces _places = new GoogleMapsPlaces(apiKey: FlavorConfig.instance.variables['apiKey']);
 
-  _SearchLocationState({
-    @required this.onStartPlaceSelected, 
-    @required this.onEndPlaceSelected, 
-    @required this.markers, 
-    @required this.preExecute
-  });
-
   Future _execute(int position) async {
-    this.preExecute();
+    widget.preExecute();
     Locale current = AppLocalizations.of(context).locale;
     Prediction prediction = await PlacesAutocomplete.show(
       context: context,
@@ -68,10 +52,10 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
       Address address = addresses.first;
       String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
       if(position == 0){
-        onStartPlaceSelected(location, prediction.description, region);
+        widget.onStartPlaceSelected(location, prediction.description, region);
         this.initialController.text = prediction.description;
       }else{
-        onEndPlaceSelected(location, prediction.description, region);
+        widget.onEndPlaceSelected(location, prediction.description, region);
         this.endControler.text = prediction.description;
       }
     }
@@ -80,13 +64,13 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     setState(() {
-      if(this.markers!=null && this.markers.length>0) { 
-        this.initialController.text = this.markers.first.infoWindow.snippet;
+      if(widget.markers!=null && widget.markers.length>0) { 
+        this.initialController.text = widget.markers.first.infoWindow.snippet;
       } else {
         this.initialController.text = "";
       }
-      if(this.markers!=null && this.markers.length>1) {
-        this.endControler.text = this.markers.last.infoWindow.snippet;
+      if(widget.markers!=null && widget.markers.length>1) {
+        this.endControler.text = widget.markers.last.infoWindow.snippet;
       } else {
         this.endControler.text = "";
       }
@@ -143,7 +127,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                       readOnly: true,
                       showCursor: false,
                       onTap: () async {
-                        await this._execute(this.markers.length);
+                        await this._execute(widget.markers.length);
                       }
                     ): SizedBox()
                   )
@@ -152,7 +136,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                   padding: EdgeInsets.symmetric(horizontal: 5),
                   child: FlatButton(
                     onPressed: endControler.text != ""? null: (){
-                      this.preExecute();
+                      widget.preExecute();
                       setState(() {
                         this.showSecond = !this.showSecond;
                       });
