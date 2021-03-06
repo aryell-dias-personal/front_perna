@@ -18,6 +18,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import 'package:timezone/data/latest.dart' as timezone;
+import 'package:timezone/timezone.dart' as timezone;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -108,7 +110,7 @@ class _HomeState extends State<Home> {
     int time = double.parse(message.data['time']).round();
     String content = AppLocalizations.of(context).translate(
       message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
+    timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).add(Duration(seconds: 10));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
     );
@@ -116,6 +118,9 @@ class _HomeState extends State<Home> {
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics
     );
+    timezone.initializeTimeZones();
+    // TODO: Gerenciar timezone para diferentes locais e configurações
+    timezone.setLocalLocation(timezone.getLocation('America/Araguaina'));
     await flutterLocalNotificationsPlugin.zonedSchedule(
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate("remind"), 
