@@ -112,7 +112,7 @@ class _HomeState extends State<Home> {
       message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
     timezone.initializeTimeZones();
     // TODO: Gerenciar timezone para diferentes locais e configurações
-    timezone.setLocalLocation(timezone.getLocation(DateTime.now().timeZoneName));
+    timezone.setLocalLocation(timezone.getLocation('America/Araguaina'));
     timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
