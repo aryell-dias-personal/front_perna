@@ -88,7 +88,7 @@ class UserProfilePage extends StatelessWidget {
               ),
               SizedBox(height: 26),
               Builder(
-                builder: (context)=> RaisedButton(
+                builder: (context)=> ElevatedButton(
                   onPressed: (){
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
@@ -102,8 +102,10 @@ class UserProfilePage extends StatelessWidget {
                       Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
                     ]
                   ),
-                  color: Theme.of(context).primaryColor,
-                  shape: StadiumBorder(),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                    shape: MaterialStateProperty.all(StadiumBorder()),
+                  )
                 )
               )
             ],

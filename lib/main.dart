@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:google_places_picker/google_places_picker.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/myDecoder.dart';
@@ -28,9 +29,6 @@ GoogleSignIn googleSignIn = GoogleSignIn(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  final String messagingToken = await firebaseMessaging.getToken();
 
   final persistor = Persistor<StoreState>(
     storage: FlutterStorage(),
@@ -65,6 +63,26 @@ void main() async {
   );
   final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
   final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  
+  NotificationSettings settings = await firebaseMessaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  String messagingToken;
+  if(settings.authorizationStatus == AuthorizationStatus.authorized) {
+    messagingToken = await firebaseMessaging.getToken();
+  }
+
+  PluginGooglePlacePicker.initialize(
+    androidApiKey: FlavorConfig.instance.variables['apiKey'],
+  );
 
   MyDecoder myDecoder = MyDecoder();
   final store = new Store<StoreState>(

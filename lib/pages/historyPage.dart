@@ -170,7 +170,7 @@ class _HistoryPageState extends State<HistoryPage> {
               itemBuilder: (context, index) {
                 List history = getHistory();
                 dynamic operation = history[index];
-                return FlatButton(
+                return TextButton(
                   onPressed: (){
                     Navigator.push(context, 
                       MaterialPageRoute(

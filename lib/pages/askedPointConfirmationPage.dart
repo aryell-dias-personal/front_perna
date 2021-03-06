@@ -215,7 +215,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                 )
               ),
               Divider(), 
-              FlatButton(
+              TextButton(
                 onPressed: (){
                   Navigator.of(context).pop();
                 },

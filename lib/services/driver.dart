@@ -13,7 +13,7 @@ class DriverService {
 
   Future<int> postNewAgent(Agent agent, String token) async {
     Response res = await post(
-      Uri(path: "${baseUrl}insertAgent"), 
+      Uri.parse("${baseUrl}insertAgent"), 
       body: await myDecoder.encode(agent.toJson()),
       headers: {
         'Authorization': token
@@ -28,12 +28,12 @@ class DriverService {
       "toEmail": toEmail,
       "accepted": accepted
     });
-    Response res = await post(Uri(path: "${baseUrl}answerNewAgent"), body: body);
+    Response res = await post(Uri.parse("${baseUrl}answerNewAgent"), body: body);
     return res.statusCode;
   }
 
   Future<int> askNewAgent(Agent agent) async {
-    Response res = await post(Uri(path: "${baseUrl}askNewAgent"), body: await myDecoder.encode(agent.toJson()));
+    Response res = await post(Uri.parse("${baseUrl}askNewAgent"), body: await myDecoder.encode(agent.toJson()));
     return res.statusCode;
   }
 }

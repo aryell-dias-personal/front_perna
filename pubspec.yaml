@@ -1,7 +1,7 @@
 name: perna
 description: A new Flutter project.
 
-version: 1.0.0+1
+version: 2.0.1
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -12,7 +12,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^0.1.2
-  google_maps_flutter: 0.5.25 #^1.2.0 (aparece o zoom no mapa)
   stripe_payment: ^1.0.10
   flutter_speed_dial: ^2.1.1
   flutter_datetime_picker: ^1.5.0
@@ -33,17 +32,13 @@ dependencies:
   cloud_firestore: ^1.0.0
   firebase_core: ^1.0.0
   firebase_messaging: ^9.0.0  
-  google_maps_webservice: ^0.0.19
-  flutter_google_places: ^0.2.8
   android_intent: ^2.0.0
   flutter_rating_bar: ^4.0.0
   firebase_auth: ^1.0.0
   http_parser: ^4.0.0
   redux_persist_flutter: ^0.8.2
-  # flutter_local_notifications: ^4.0.1+1 
-
-  # redux_persist_flutter: ^0.8.3
-  # flutter_local_notifications: ^1.4.1
+  google_places_picker: ^2.1.0+3
+  google_maps_flutter: ^2.0.1
 
 dev_dependencies:
   flutter_test:

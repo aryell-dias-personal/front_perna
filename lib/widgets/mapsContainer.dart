@@ -214,8 +214,8 @@ class _MapsContainerState extends State<MapsContainer> {
         SearchLocation(
           preExecute: widget.preExecute,
           markers: this.markers,
-          onStartPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.origin, region),
-          onEndPlaceSelected: (location, description, region) => putMarker(LatLng(location.lat, location.lng), description, MarkerType.destiny, region)
+          onStartPlaceSelected: (location, description, region) => putMarker(LatLng(location.latitude, location.longitude), description, MarkerType.origin, region),
+          onEndPlaceSelected: (location, description, region) => putMarker(LatLng(location.latitude, location.longitude), description, MarkerType.destiny, region)
         )
       ]  + (this.points==null || this.points.length <= 1 ? [] : [
         FloatingAnimatedButton(

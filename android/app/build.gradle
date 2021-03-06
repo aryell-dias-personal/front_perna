@@ -45,7 +45,7 @@ android {
 
     defaultConfig {
         applicationId "com.bluehands.perna"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 29
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()

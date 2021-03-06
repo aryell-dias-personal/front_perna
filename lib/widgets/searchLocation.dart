@@ -1,22 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/directions.dart';
-import 'package:google_maps_webservice/places.dart';
-import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:google_places_picker/google_places_picker.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 
 class SearchLocation extends StatefulWidget {
   final Function() preExecute;
-  final Function(Location, String, String) onStartPlaceSelected;
-  final Function(Location, String, String) onEndPlaceSelected;
+  final Function(Coordinates, String, String) onStartPlaceSelected;
+  final Function(Coordinates, String, String) onEndPlaceSelected;
   final Set<Marker> markers;
 
   const SearchLocation({
-    Key key, @required this.onStartPlaceSelected, 
-    @required this.onEndPlaceSelected, @required this.markers, 
+    Key key, 
+    @required this.onStartPlaceSelected, 
+    @required this.onEndPlaceSelected, 
+    @required this.markers, 
     @required this.preExecute
   }) : super(key: key);
 
@@ -29,34 +28,24 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
   TextEditingController initialController = TextEditingController();
   TextEditingController endControler = new TextEditingController();
 
-  GoogleMapsPlaces _places = new GoogleMapsPlaces(apiKey: FlavorConfig.instance.variables['apiKey']);
-
   Future _execute(int position) async {
     widget.preExecute();
-    Locale current = AppLocalizations.of(context).locale;
-    Prediction prediction = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: FlavorConfig.instance.variables['apiKey'],
-      mode: Mode.overlay,
-      hint: AppLocalizations.of(context).translate(position == 0 ? "search_start" : "search_end"),
-      overlayBorderRadius: BorderRadius.all(Radius.circular(15.0)),
-      language: current.languageCode, components: [
-        Component(Component.country, current.countryCode)
-      ]
+    Place place = await PluginGooglePlacePicker.showAutocomplete(
+      mode: PlaceAutocompleteMode.MODE_OVERLAY, 
+      countryCode: AppLocalizations.of(context).locale.countryCode, 
+      typeFilter: TypeFilter.ESTABLISHMENT
     );
-    if(prediction!=null){
-      PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
-      Location location = placesDetailsResponse.result.geometry.location;
-      Coordinates coordinates = new Coordinates(location.lat, location.lng);
+    if(place!=null){
+      Coordinates coordinates = new Coordinates(place.latitude, place.longitude);
       List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
       Address address = addresses.first;
       String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
       if(position == 0){
-        widget.onStartPlaceSelected(location, prediction.description, region);
-        this.initialController.text = prediction.description;
+        widget.onStartPlaceSelected(coordinates, place.name, region);
+        this.initialController.text = place.name;
       }else{
-        widget.onEndPlaceSelected(location, prediction.description, region);
-        this.endControler.text = prediction.description;
+        widget.onEndPlaceSelected(coordinates, place.name, region);
+        this.endControler.text = place.name;
       }
     }
   }
@@ -134,15 +123,17 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 5),
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: endControler.text != ""? null: (){
                       widget.preExecute();
                       setState(() {
                         this.showSecond = !this.showSecond;
                       });
                     },
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                    color: Colors.transparent,
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)))),
+                      backgroundColor: MaterialStateProperty.all(Colors.transparent)
+                    ),
                     child:  Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,

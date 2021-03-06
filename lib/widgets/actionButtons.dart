@@ -14,23 +14,27 @@ class ActionButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        RaisedButton(
+        ElevatedButton(
           onPressed: this.accept,
           child: Text(AppLocalizations.of(context).translate("accept"), style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).backgroundColor
           )),
-          color: Theme.of(context).primaryColor,
-          shape: StadiumBorder()
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+            shape: MaterialStateProperty.all(StadiumBorder())
+          )
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: this.deny,
           child: Text(AppLocalizations.of(context).translate("deny"), style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor
           )),
-          color: Theme.of(context).backgroundColor,
-          shape: StadiumBorder(),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Theme.of(context).backgroundColor),
+            shape: MaterialStateProperty.all(StadiumBorder()),
+          )
         )
       ],
     );

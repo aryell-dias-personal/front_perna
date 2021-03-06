@@ -63,9 +63,9 @@ class SignInService {
       'photoUrl': user?.photoUrl,
       'name': user?.displayName,
       'currency': currency,
-      'messagingTokens': [ messagingToken ]
+      'messagingTokens': messagingToken != null ? [ messagingToken ] : []
     });
-    Response res = await post(Uri(path: "${baseUrl}insertUser"), body: body);
+    Response res = await post(Uri.parse("${baseUrl}insertUser"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
@@ -74,7 +74,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post(Uri(path: "${baseUrl}getUser"), body: body);
+    Response res = await post(Uri.parse("${baseUrl}getUser"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
@@ -83,7 +83,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post(Uri(path: "${baseUrl}logout"), body: body);
+    Response res = await post(Uri.parse("${baseUrl}logout"), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 

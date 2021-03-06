@@ -10,7 +10,7 @@ class LogAndSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
+    return ElevatedButton(
       child: Text(
         this.text,
         style: TextStyle(
@@ -20,9 +20,11 @@ class LogAndSignInButton extends StatelessWidget {
         ),
       ),
       onPressed: this.onPressed,
-      color: !this.isSignIn? Theme.of(context).backgroundColor.withOpacity(1): Theme.of(context).primaryColor,
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-      shape: StadiumBorder()
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(!this.isSignIn? Theme.of(context).backgroundColor.withOpacity(1): Theme.of(context).primaryColor),
+        padding: MaterialStateProperty.all(EdgeInsets.fromLTRB(20, 10, 20, 10)),
+        shape: MaterialStateProperty.all(StadiumBorder())
+      )
     );
   }
 }

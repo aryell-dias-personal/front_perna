@@ -188,6 +188,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
       polylines: widget.polyline,
       markers: widget.markers.union(widget.watchedMarkers).union(widget.nextPlaces),
       myLocationEnabled: true,
+      zoomControlsEnabled: false,
       myLocationButtonEnabled: false,
       initialCameraPosition: CameraPosition(
         target: LatLng(-8.05428, -34.8813),

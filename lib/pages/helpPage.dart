@@ -88,7 +88,7 @@ class HelpPage extends StatelessWidget {
                 );
               }
               HelpItem subHelpItem = helpItem.subItems[index-1];
-              return FlatButton(
+              return TextButton(
                 onPressed: (){
                   Navigator.push(context, 
                     MaterialPageRoute(

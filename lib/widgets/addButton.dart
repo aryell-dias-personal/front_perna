@@ -11,7 +11,7 @@ class AddButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
+    return ElevatedButton(
       onPressed: this.readOnly? null : onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -23,8 +23,10 @@ class AddButton extends StatelessWidget {
           Icon(this.addAndcontinue ? Icons.chevron_right_rounded : Icons.add, color: Theme.of(context).backgroundColor, size: 20)
         ]
       ),
-      color: Theme.of(context).primaryColor,
-      shape: StadiumBorder(),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+        shape: MaterialStateProperty.all(StadiumBorder()),
+      )
     );
   }
 }
