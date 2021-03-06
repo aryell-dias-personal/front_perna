@@ -103,6 +103,7 @@ class _HomeState extends State<Home> {
   }
 
   Future scheduleMessage(RemoteMessage message) async {
+    JsonEncoder enc = JsonEncoder();
     Random rand = Random();
     int time = double.parse(message.data['time']).round();
     String content = AppLocalizations.of(context).translate(
@@ -119,7 +120,7 @@ class _HomeState extends State<Home> {
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate("remind"), 
       AppLocalizations.of(context).translateFormat("reminder_message", [format.format(date), content]), 
-      date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true,
+      date, platformChannelSpecifics, payload: enc.convert({ 'data': null }), androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
     );
   }
