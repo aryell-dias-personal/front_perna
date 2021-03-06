@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:google_places_picker/google_places_picker.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/myDecoder.dart';
@@ -82,10 +81,6 @@ void main() async {
         alert: true, badge: true, sound: true,
       );
   }
-
-  PluginGooglePlacePicker.initialize(
-    androidApiKey: FlavorConfig.instance.variables['apiKey'],
-  );
 
   MyDecoder myDecoder = MyDecoder();
   final store = new Store<StoreState>(

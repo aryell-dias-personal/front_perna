@@ -38,8 +38,8 @@ dependencies:
   http_parser: ^4.0.0
   redux_persist_flutter: ^0.8.2
   flutter_local_notifications: ^5.0.0-nullsafety.0
-  google_places_picker: ^2.1.0+3
-  # FIXME: flutter_google_places: ^0.2.8 retomar quando tiver com o google_maps_webservice na versão 0.0.20
+  google_maps_webservice: ^0.0.20-nullsafety.0
+  flutter_google_places: ^0.2.8
   google_maps_flutter: ^2.0.1
 
 dev_dependencies:

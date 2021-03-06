@@ -135,6 +135,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.all(Radius.circular(10))
                       ),
                       child: InkWell(
+                        overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                         onLongPress: () {
                           setState(() {
                             selectedCardId = selectedCardId != currCreditCard.id ? currCreditCard.id : null;

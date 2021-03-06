@@ -89,6 +89,9 @@ class HelpPage extends StatelessWidget {
               }
               HelpItem subHelpItem = helpItem.subItems[index-1];
               return TextButton(
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                ),
                 onPressed: (){
                   Navigator.push(context, 
                     MaterialPageRoute(

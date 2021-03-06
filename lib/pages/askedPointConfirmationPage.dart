@@ -122,6 +122,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                     onTap: ()  {},
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     child: Container(
@@ -215,6 +216,9 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
               ),
               Divider(), 
               TextButton(
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                ),
                 onPressed: (){
                   Navigator.of(context).pop();
                 },
@@ -252,6 +256,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                     onTap: ()  {},
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     child: Container(

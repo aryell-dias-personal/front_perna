@@ -171,6 +171,9 @@ class _HistoryPageState extends State<HistoryPage> {
                 List history = getHistory();
                 dynamic operation = history[index];
                 return TextButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                  ),
                   onPressed: (){
                     Navigator.push(context, 
                       MaterialPageRoute(

@@ -12,6 +12,11 @@ class SideMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
+      style: ButtonStyle(
+        overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
+        shape: MaterialStateProperty.all(StadiumBorder()),
+        backgroundColor: MaterialStateProperty.all(Colors.transparent)
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children:<Widget>[
@@ -21,10 +26,6 @@ class SideMenuButton extends StatelessWidget {
         ]
       ),
       onPressed: this.onPressed,
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(StadiumBorder()),
-        backgroundColor: MaterialStateProperty.all(Colors.transparent)
-      )
     );
   }
 }

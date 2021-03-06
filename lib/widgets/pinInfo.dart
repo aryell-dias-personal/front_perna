@@ -29,6 +29,7 @@ class PinInfo extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(50)),
           elevation: 5,
           child: InkWell(
+            overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
             onTap: (){
               Navigator.push(context, MaterialPageRoute(
                   builder: (context) => Scaffold(
