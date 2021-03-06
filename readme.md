@@ -83,5 +83,5 @@ ao invés de
 
 no Java.
 
-- Pode ser importante no futuro atividades em background checa esse link:
-> https://github.com/transistorsoft/flutter_background_geolocation/wiki/Android-Headless-Mode#flutter--112
+- Pode ser importante no futuro para fazer a bolha flutuante:
+> https://github.com/KohlsAdrian/bubble_overlay

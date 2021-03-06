@@ -37,12 +37,13 @@ dependencies:
   firebase_auth: ^1.0.0
   http_parser: ^4.0.0
   redux_persist_flutter: ^0.8.2
-  # flutter_local_notifications: ^4.0.1+1 retomar na versão mais nova quando tiver com o platform 2.0
-  # flutter_google_places: ^0.2.8 retomar quando tiver com o google_maps_webservice na versão 0.0.20
+  flutter_local_notifications: ^5.0.0-nullsafety.0
   google_places_picker: ^2.1.0+3
+  # FIXME: flutter_google_places: ^0.2.8 retomar quando tiver com o google_maps_webservice na versão 0.0.20
   google_maps_flutter: ^2.0.1
 
 dev_dependencies:
+  # TODO: adicionar lint https://pub.dev/packages/lint
   flutter_test:
     sdk: flutter
 

@@ -1,10 +1,9 @@
-// import 'dart:math';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:perna/constants/notification.dart';
+import 'package:perna/constants/notification.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
 import 'package:perna/models/agent.dart';
@@ -17,23 +16,26 @@ import 'package:perna/pages/noConnectionPage.dart';
 import 'package:perna/pages/initialPage.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
-// import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 import 'dart:convert';
 
-// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future onMessage(RemoteMessage message) async {
-  // JsonEncoder enc = JsonEncoder();
-  // Random rand = Random();
-  // AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-  //   updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
-  // );
-  // NotificationDetails platformChannelSpecifics = NotificationDetails(
-  //   androidPlatformChannelSpecifics, null);
-  // await flutterLocalNotificationsPlugin.show(
-  //   rand.nextInt(1000), message["notification"]["title"], message["notification"]["body"], platformChannelSpecifics,
-  //   payload: enc.convert(message)
-  // );
+  JsonEncoder enc = JsonEncoder();
+  Random rand = Random();
+  AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
+  );
+  NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics
+  );
+  await flutterLocalNotificationsPlugin.show(
+    rand.nextInt(1000), message.notification.title, message.notification.body, platformChannelSpecifics,
+    payload: enc.convert({
+      'data': message.data
+    })
+  );
 }
 
 class Home extends StatefulWidget {
@@ -101,23 +103,25 @@ class _HomeState extends State<Home> {
   }
 
   Future scheduleMessage(RemoteMessage message) async {
-    // Random rand = Random();
-    // int time = double.parse(message.data['time']).round();
-    // String content = AppLocalizations.of(context).translate(
-    //   message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
-    // DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
-    // AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    //   remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
-    // );
-    // DateFormat format = DateFormat('HH:mm');
-    // NotificationDetails platformChannelSpecifics = NotificationDetails(
-    //   androidPlatformChannelSpecifics, null);
-    // await flutterLocalNotificationsPlugin.schedule(
-    //   rand.nextInt(1000), 
-    //   AppLocalizations.of(context).translate("remind"), 
-    //   AppLocalizations.of(context).translateFormat("reminder_message", [format.format(date), content]), 
-    //   date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true
-    // );
+    Random rand = Random();
+    int time = double.parse(message.data['time']).round();
+    String content = AppLocalizations.of(context).translate(
+      message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
+    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
+    );
+    DateFormat format = DateFormat('HH:mm');
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics
+    );
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      rand.nextInt(1000), 
+      AppLocalizations.of(context).translate("remind"), 
+      AppLocalizations.of(context).translateFormat("reminder_message", [format.format(date), content]), 
+      date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+    );
   }
   
   Future onLaunch(RemoteMessage message) async {
@@ -133,20 +137,21 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    // AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
-    // InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
-    // flutterLocalNotificationsPlugin.initialize(initializationSettings,
-    //   onSelectNotification: (String payload) async { 
-    //     if(payload != "remember"){
-    //       JsonDecoder dec = JsonDecoder();
-    //       Map<String, dynamic> message = dec.convert(payload); 
-    //       await onLaunch(message);
-    //     }
-    //   }
-    // );
+    AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
+    InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid
+    );
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: (String payload) async { 
+        JsonDecoder dec = JsonDecoder();
+        RemoteMessage message = RemoteMessage.fromMap(dec.convert(payload)); 
+        await onLaunch(message);
+      }
+    );
 
     FirebaseMessaging.onMessage.listen(onMessage);
-    FirebaseMessaging.onBackgroundMessage(onMessage);
+    // HACK: não precisa configurar, já que o launch já tá por aqui
+    // FirebaseMessaging.onBackgroundMessage(onMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(onLaunch);
   
     Connectivity().onConnectivityChanged.listen((ConnectivityResult connection){

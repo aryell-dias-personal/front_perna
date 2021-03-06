@@ -30,6 +30,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   Future _execute(int position) async {
     widget.preExecute();
+    // NOTE: Será um código parecido aqui
     // Locale current = AppLocalizations.of(context).locale;
     // Prediction prediction = await PlacesAutocomplete.show(
     //   context: context,

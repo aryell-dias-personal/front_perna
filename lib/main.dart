@@ -78,10 +78,8 @@ void main() async {
   String messagingToken;
   if(settings.authorizationStatus == AuthorizationStatus.authorized) {
     messagingToken = await firebaseMessaging.getToken();
-      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-        alert: true,
-        badge: true,
-        sound: true,
+      await firebaseMessaging.setForegroundNotificationPresentationOptions(
+        alert: true, badge: true, sound: true,
       );
   }
 

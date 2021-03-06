@@ -86,7 +86,6 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
               , maxLines: 2
             ),
             SizedBox(width: 5),
-            // payments_outlined 
             Icon(Icons.account_balance, size: 30),
           ]
         ),

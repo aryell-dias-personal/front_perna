@@ -35,7 +35,6 @@ class UserProfilePage extends StatelessWidget {
                     color: Colors.transparent,
                     child: CircleAvatar(
                       radius: 60,
-                      // backgroundColor: this.textColor,
                       child: this.user.photoUrl==null || this.user.photoUrl == ""? Icon(Icons.person, size: 90): null,
                       backgroundImage: NetworkImage(this.user.photoUrl)
                     )
