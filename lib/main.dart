@@ -64,7 +64,7 @@ void main() async {
   final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
   final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  
+
   NotificationSettings settings = await firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
@@ -78,6 +78,11 @@ void main() async {
   String messagingToken;
   if(settings.authorizationStatus == AuthorizationStatus.authorized) {
     messagingToken = await firebaseMessaging.getToken();
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
   }
 
   PluginGooglePlacePicker.initialize(
