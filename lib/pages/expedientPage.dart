@@ -277,7 +277,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     children: <Widget>[
                       OutlinedTextFormField(
                         readOnly: widget.readOnly,
-                        initialValue: this.agent.email ?? "",
+                        initialValue: (this.agent.email ?? this.email) ?? "",
                         onChanged: (text){ this.email = text; },
                         textInputType: TextInputType.emailAddress,
                         labelText: AppLocalizations.of(context).translate("driver_email"),
@@ -364,7 +364,7 @@ class _ExpedientState extends State<ExpedientPage> {
                       SizedBox(height: 26),
                       OutlinedTextFormField(
                         readOnly: widget.readOnly,
-                        initialValue: this.agent.places?.toString() ?? "",
+                        initialValue: (this.agent.places?.toString() ?? this.places?.toString()) ?? "",
                         onChanged: (text){ this.places = text; },
                         textInputType: TextInputType.number,
                         labelText: AppLocalizations.of(context).translate("seats_number"),
