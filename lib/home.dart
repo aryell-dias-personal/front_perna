@@ -110,7 +110,10 @@ class _HomeState extends State<Home> {
     int time = double.parse(message.data['time']).round();
     String content = AppLocalizations.of(context).translate(
       message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
-    timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).add(Duration(seconds: 10));
+    timezone.initializeTimeZones();
+    // TODO: Gerenciar timezone para diferentes locais e configurações
+    timezone.setLocalLocation(timezone.getLocation(DateTime.now().timeZoneName));
+    timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
     );
@@ -118,9 +121,6 @@ class _HomeState extends State<Home> {
     NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics
     );
-    timezone.initializeTimeZones();
-    // TODO: Gerenciar timezone para diferentes locais e configurações
-    timezone.setLocalLocation(timezone.getLocation('America/Araguaina'));
     await flutterLocalNotificationsPlugin.zonedSchedule(
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate("remind"), 
