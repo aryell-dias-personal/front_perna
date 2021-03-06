@@ -41,6 +41,7 @@ dependencies:
   google_maps_webservice: ^0.0.20-nullsafety.0
   flutter_google_places: ^0.2.8
   google_maps_flutter: ^2.0.1
+  flutter_native_timezone: ^1.0.9
 
 dev_dependencies:
   # TODO: adicionar lint https://pub.dev/packages/lint

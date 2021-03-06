@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:perna/constants/notification.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
@@ -111,8 +112,8 @@ class _HomeState extends State<Home> {
     String content = AppLocalizations.of(context).translate(
       message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
     timezone.initializeTimeZones();
-    // TODO: Gerenciar timezone para diferentes locais e configurações
-    timezone.setLocalLocation(timezone.getLocation('America/Araguaina'));
+    String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+    timezone.setLocalLocation(timezone.getLocation(currentTimeZone));
     timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
