@@ -30,6 +30,32 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
 
   Future _execute(int position) async {
     widget.preExecute();
+    // Locale current = AppLocalizations.of(context).locale;
+    // Prediction prediction = await PlacesAutocomplete.show(
+    //   context: context,
+    //   apiKey: FlavorConfig.instance.variables['apiKey'],
+    //   mode: Mode.overlay,
+    //   hint: AppLocalizations.of(context).translate(position == 0 ? "search_start" : "search_end"),
+    //   overlayBorderRadius: BorderRadius.all(Radius.circular(15.0)),
+    //   language: current.languageCode, components: [
+    //     Component(Component.country, current.countryCode)
+    //   ]
+    // );
+    // if(prediction!=null){
+    //   PlacesDetailsResponse placesDetailsResponse = await _places.getDetailsByPlaceId(prediction.placeId);
+    //   Location location = placesDetailsResponse.result.geometry.location;
+    //   Coordinates coordinates = new Coordinates(location.lat, location.lng);
+    //   List<Address> addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    //   Address address = addresses.first;
+    //   String region = "${address.subAdminArea}, ${address.adminArea}, ${address.countryName}";
+    //   if(position == 0){
+    //     widget.onStartPlaceSelected(location, prediction.description, region);
+    //     this.initialController.text = prediction.description;
+    //   }else{
+    //     widget.onEndPlaceSelected(location, prediction.description, region);
+    //     this.endControler.text = prediction.description;
+    //   }
+    // }
     Place place = await PluginGooglePlacePicker.showAutocomplete(
       mode: PlaceAutocompleteMode.MODE_OVERLAY, 
       countryCode: AppLocalizations.of(context).locale.countryCode, 
