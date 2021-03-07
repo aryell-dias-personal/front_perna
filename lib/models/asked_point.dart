@@ -4,24 +4,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 
 class AskedPoint {
-  DateTime date;
-  List<DateTime> queue;
-  List<DateTime> history;
-  Duration askedEndAt;
-  Duration askedStartAt;
-  LatLng origin;
-  LatLng destiny;
-  String email;
-  String friendlyOrigin;
-  String friendlyDestiny;
-  String currency;
-  int amount;
-  DateTime actualStartAt;
-  DateTime actualEndAt;
-  String agentId;
-  Uint8List staticMap;
-  List<String> region;
-
   AskedPoint({
     this.date,
     this.queue,
@@ -45,36 +27,46 @@ class AskedPoint {
 
   factory AskedPoint.fromJson(Map<String, dynamic> parsedJson){
     
-    DateTime parseDate(value) {
+    DateTime parseDate(dynamic value) {
       if(value == null) return null;
-      return DateTime.fromMillisecondsSinceEpoch(value.round()*1000);
+      return DateTime.fromMillisecondsSinceEpoch((value as int)*1000);
     }
 
-    Duration parseDuration(value) {
+    Duration parseDuration(dynamic value) {
       if(value == null) return null;
-      return Duration(seconds: value.round());
+      return Duration(seconds: value as int);
     }
 
-    if(parsedJson == null)
+    Uint8List decode64(dynamic staticMap) {
+      if(staticMap == null) return null;
+      return base64Decode(staticMap as String);
+    }
+
+    if(parsedJson == null){
       return null;
+    }
+
     return AskedPoint(
-      email: parsedJson['email'],
-      currency: parsedJson['currency'],
-      amount: parsedJson['amount'],
-      origin: decodeLatLng(parsedJson['origin']),
-      destiny: decodeLatLng(parsedJson['destiny']),
-      friendlyOrigin: parsedJson['friendlyOrigin'],
-      friendlyDestiny: parsedJson['friendlyDestiny'],
+      email: parsedJson['email'] as String,
+      currency: parsedJson['currency'] as String,
+      amount: parsedJson['amount'] as int,
+      origin: decodeLatLng(parsedJson['origin'] as String),
+      destiny: decodeLatLng(parsedJson['destiny'] as String),
+      friendlyOrigin: parsedJson['friendlyOrigin'] as String,
+      friendlyDestiny: parsedJson['friendlyDestiny'] as String,
       date: parseDate(parsedJson['date']),
       askedStartAt: parseDuration(parsedJson['askedStartAt']),
       askedEndAt: parseDuration(parsedJson['askedEndAt']),
-      queue: parsedJson['queue']?.map<DateTime>(parseDate)?.toList(),
-      history: parsedJson['history']?.map<DateTime>(parseDate)?.toList(),
+      queue: parsedJson['queue']
+        ?.map<DateTime>(parseDate)?.toList() as List<DateTime>,
+      history: parsedJson['history']
+        ?.map<DateTime>(parseDate)?.toList() as List<DateTime>,
       actualStartAt: parseDate(parsedJson['actualStartAt']),
       actualEndAt: parseDate(parsedJson['actualEndAt']),
-      region: parsedJson['region']!=null?parsedJson['region'].map<String>((region)=>'$region').toList():null,
-      agentId: parsedJson ['agentId'],
-      staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
+      region: parsedJson['region']
+        ?.map<String>((dynamic region)=>'$region')?.toList() as List<String>,
+      agentId: parsedJson ['agentId'] as String,
+      staticMap: decode64(parsedJson['staticMap'])
     );
   }
 
@@ -95,7 +87,7 @@ class AskedPoint {
     List<String> region,
     Uint8List staticMap,
     String currency,
-    String amount
+    int amount
   }) => AskedPoint(
     email: email ?? this.email,
     origin: origin ?? this.origin,
@@ -116,19 +108,43 @@ class AskedPoint {
     staticMap: staticMap ?? this.staticMap
   );
 
-  dynamic toJson() => {
+  DateTime date;
+  List<DateTime> queue;
+  List<DateTime> history;
+  Duration askedEndAt;
+  Duration askedStartAt;
+  LatLng origin;
+  LatLng destiny;
+  String email;
+  String friendlyOrigin;
+  String friendlyDestiny;
+  String currency;
+  int amount;
+  DateTime actualStartAt;
+  DateTime actualEndAt;
+  String agentId;
+  Uint8List staticMap;
+  List<String> region;
+
+  dynamic toJson() => <String, dynamic>{
     'email': email,
     'origin': '${origin.latitude}, ${origin.longitude}',
     'destiny': '${destiny.latitude}, ${destiny.longitude}',
     'friendlyOrigin': friendlyOrigin,
     'friendlyDestiny': friendlyDestiny,
-    'queue': queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
-    'history': history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
+    'queue': queue?.map<double>(
+      (DateTime date)=>date.millisecondsSinceEpoch/1000
+    )?.toList(),
+    'history': history?.map<double>(
+      (DateTime date)=>date.millisecondsSinceEpoch/1000
+    )?.toList(),
     'date': date != null ? date.millisecondsSinceEpoch/1000 : null,
-    'askedStartAt': askedStartAt != null ? askedStartAt.inSeconds : null,
-    'askedEndAt': askedEndAt != null ? askedEndAt.inSeconds : null,
-    'actualStartAt': actualStartAt != null ? actualStartAt.millisecondsSinceEpoch/1000: null,
-    'actualEndAt': actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
+    'askedStartAt': askedStartAt?.inSeconds,
+    'askedEndAt': askedEndAt?.inSeconds,
+    'actualStartAt': actualStartAt != null ? 
+      actualStartAt.millisecondsSinceEpoch/1000: null,
+    'actualEndAt': actualStartAt != null ? 
+      actualEndAt.millisecondsSinceEpoch/1000: null,
     'agentId': agentId,
     'region': region,
     'currency': currency,

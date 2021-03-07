@@ -2,9 +2,9 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
-import 'package:perna/models/signInResponse.dart';
+import 'package:perna/models/sign_in_response.dart';
 import 'package:perna/models/user.dart';
-import 'package:perna/services/signIn.dart';
+import 'package:perna/services/sign_in.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +12,15 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/widgets/log_and_sign_in_button.dart';
 import 'package:intl/intl.dart';
+import 'package:redux/redux.dart';
 
 enum SignLogin { sign, login}
 
 class InitialPage extends StatefulWidget {
+  const InitialPage({@required this.signInService, @required this.messagingToken});
+
   final SignInService signInService;
   final String messagingToken;
-  InitialPage({@required this.signInService, @required this.messagingToken});
 
   @override
   _InitialPageState createState() => _InitialPageState();
@@ -32,14 +34,14 @@ class _InitialPageState extends State<InitialPage> {
     return Center(
       child: isLoading ? Loading(indicator: BallPulseIndicator(), color: Theme.of(context).primaryColor, size: 100.0) : 
       StoreConnector<StoreState, Function(SignLogin)>(
-        converter: (store) => (SignLogin choice) async {
-          Locale locale = AppLocalizations.of(context).locale;
-          String localeName = '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
-          String currencyName = NumberFormat.simpleCurrency(locale: localeName).currencyName.toLowerCase();
-          SignInResponse signInResponse = choice == SignLogin.sign ? 
+        converter: (Store<StoreState> store) => (SignLogin choice) async {
+          final Locale locale = AppLocalizations.of(context).locale;
+          final String localeName = '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
+          final String currencyName = NumberFormat.simpleCurrency(locale: localeName).currencyName.toLowerCase();
+          final SignInResponse signInResponse = choice == SignLogin.sign ? 
             await widget.signInService.signIn(widget.messagingToken, currencyName) : 
             await widget.signInService.logIn(widget.messagingToken);
-          User user = signInResponse?.user;
+          final User user = signInResponse?.user;
           if(user==null){
             showSnackBar(
               AppLocalizations.of(context).translate('unrecognized_user'), 
@@ -49,18 +51,15 @@ class _InitialPageState extends State<InitialPage> {
             store.dispatch(choice == SignLogin.sign? SignIn(user):LogIn(user));
           }
         },
-        builder: (BuildContext context, onSignLogIn) => Column(
+        builder: (BuildContext context, dynamic Function(SignLogin) onSignLogIn) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            AvatarGlow(
+            const AvatarGlow(
               endRadius: 90,
-              duration: Duration(seconds: 2),
               glowColor: Colors.grey,
-              repeat: true,
-              repeatPauseDuration: Duration(seconds: 0),
+              repeatPauseDuration: Duration(),
               startDelay: Duration(seconds: 1),
               child: Material(
-                elevation: 0.0,
                 shape: CircleBorder(),
                 color: Colors.transparent,
                 child: CircleAvatar(
@@ -70,12 +69,12 @@ class _InitialPageState extends State<InitialPage> {
                 )
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20.0,
             ),
             Text(
               AppLocalizations.of(context).translate('hey_there'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 40.0,
                 color: Theme.of(context).primaryColor
@@ -83,13 +82,13 @@ class _InitialPageState extends State<InitialPage> {
             ),
             Text(
               AppLocalizations.of(context).translate('welcome'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 35.0,
                 color: Theme.of(context).primaryColor
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 50.0,
             ),
             LogAndSignInButton(
@@ -97,27 +96,27 @@ class _InitialPageState extends State<InitialPage> {
               text: AppLocalizations.of(context).translate('first_time'),
               onPressed: (){
                 setState(() {
-                  this.isLoading = true;
+                  isLoading = true;
                 });
                 onSignLogIn(SignLogin.sign).whenComplete((){
                   setState(() {
-                    this.isLoading = false;
+                    isLoading = false;
                   });
                 });
               }
             ),
-            SizedBox(
+            const SizedBox(
               height: 20.0,
             ),
             LogAndSignInButton(
               text: AppLocalizations.of(context).translate('have_been_here'),
               onPressed: (){
                 setState(() {
-                  this.isLoading = true;
+                  isLoading = true;
                 });
                 onSignLogIn(SignLogin.login).whenComplete((){
                   setState(() {
-                    this.isLoading = false;
+                    isLoading = false;
                   });
                 });
               }

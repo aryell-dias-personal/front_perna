@@ -41,10 +41,10 @@ class MainPage extends StatelessWidget {
         return MainWidget(
           getRefreshToken: getRefreshToken,
           firestore: firestore,
-          email: resources['email'],
-          name: resources['name'],
-          logout: resources['logoutFunction'],
-          photoUrl: resources['photoUrl']
+          email: resources['email'] as String,
+          name: resources['name'] as String,
+          logout: resources['logoutFunction'] as Function(),
+          photoUrl: resources['photoUrl'] as String
         );
       }
     );

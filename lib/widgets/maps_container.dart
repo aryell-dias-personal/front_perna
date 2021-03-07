@@ -18,7 +18,7 @@ import 'package:perna/widgets/floatingAnimatedButton.dart';
 import 'package:perna/widgets/map_listener.dart';
 import 'package:perna/widgets/reactiveFloatingButton.dart';
 import 'package:perna/widgets/searchLocation.dart';
-import 'package:perna/models/askedPoint.dart';
+import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:redux/redux.dart';
@@ -47,8 +47,7 @@ class MapsContainer extends StatefulWidget {
 }
 
 class _MapsContainerState extends State<MapsContainer> {
-  // ignore: prefer_collection_literals
-  Set<Marker> markers = Set<Marker>();
+  Set<Marker> markers = <Marker>{};
   bool isPinVisible = false;
   BitmapDescriptor originPin;
   BitmapDescriptor destinyPin;

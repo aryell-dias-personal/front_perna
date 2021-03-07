@@ -21,7 +21,7 @@ class SideMenuButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children:<Widget>[
           Text(this.text, style: const TextStyle(color: textColor, fontSize: 18)),
-          SizedBox(width: 2),
+          const SizedBox(width: 2),
           Icon(icon, color: textColor, size: 18)
         ]
       ),

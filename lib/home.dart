@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:redux/redux.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +12,7 @@ import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:perna/services/driver.dart';
-import 'package:perna/services/signIn.dart';
+import 'package:perna/services/sign_in.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/pages/main_page.dart';
 import 'package:perna/pages/no_connection_page.dart';
@@ -28,11 +29,11 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<dynamic> onMessage(RemoteMessage message) async {
   const JsonEncoder enc = JsonEncoder();
   final Random rand = Random();
-  final AndroidNotificationDetails androidPlatformChannelSpecifics = 
+  const AndroidNotificationDetails androidPlatformChannelSpecifics = 
     AndroidNotificationDetails(updateDotAndRouteChannelId, 
       updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
     );
-  final NotificationDetails platformChannelSpecifics = NotificationDetails(
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics
   );
   await flutterLocalNotificationsPlugin.show(
@@ -66,10 +67,10 @@ class _HomeState extends State<Home> {
   bool isConnected = true;
 
   Future<dynamic> askNewAgentHandler(RemoteMessage message) async {
-    const JsonEncoder enc = JsonEncoder();
+    const JsonDecoder dec = JsonDecoder();
     final NavigatorState navigatorState = Navigator.of(context);
     final Agent agent = Agent.fromJson(
-      enc.convert(message.data['agent'])
+      dec.convert(message.data['agent'] as String) as Map<String, dynamic>,
     );
     await navigatorState.push( 
       MaterialPageRoute<Scaffold>(
@@ -135,10 +136,10 @@ class _HomeState extends State<Home> {
     Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
   }
 
-  Future scheduleMessage(RemoteMessage message) async {
+  Future<dynamic> scheduleMessage(RemoteMessage message) async {
     const JsonEncoder enc = JsonEncoder();
     final Random rand = Random();
-    final int time = double.parse(message.data['time']).round();
+    final int time = double.parse(message.data['time'] as String).round();
     final String content = AppLocalizations.of(context).translate(
       message.data['type'] == expedientType ?  
         'reminder_content_expedient' : 
@@ -147,24 +148,33 @@ class _HomeState extends State<Home> {
     final String currentTimeZone = 
       await FlutterNativeTimezone.getLocalTimezone();
     timezone.setLocalLocation(timezone.getLocation(currentTimeZone));
-    timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).subtract(Duration(hours: 1));
-    AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
+    final timezone.TZDateTime date = timezone.TZDateTime
+      .fromMicrosecondsSinceEpoch(timezone.local, time*1000)
+      .subtract(const Duration(hours: 1));
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = 
+    AndroidNotificationDetails(
+      remeberYouOfDotAndRouteChannelId, 
+      remeberYouOfDotAndRouteChannelName, 
+      remeberYouOfDotAndRouteChannelDescription
     );
-    DateFormat format = DateFormat('HH:mm');
-    NotificationDetails platformChannelSpecifics = NotificationDetails(
+    final DateFormat format = DateFormat('HH:mm');
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics
     );
     await flutterLocalNotificationsPlugin.zonedSchedule(
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate('remind'), 
-      AppLocalizations.of(context).translateFormat('reminder_message', [format.format(date), content]), 
-      date, platformChannelSpecifics, payload: enc.convert({ 'data': null }), androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+      AppLocalizations.of(context).translateFormat('reminder_message', 
+      <dynamic>[format.format(date), content]), 
+      date, platformChannelSpecifics, 
+      payload: enc.convert(<String, dynamic>{ 'data': null }), 
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: 
+        UILocalNotificationDateInterpretation.absoluteTime
     );
   }
   
-  Future onLaunch(RemoteMessage message) async {
+  Future<dynamic> onLaunch(RemoteMessage message) async {
     if(message.data != null){
       if(message.data['time'] != null && message.data['type'] != null){
         await scheduleMessage(message);
@@ -177,14 +187,17 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
-    InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid
-    );
+    const AndroidInitializationSettings initializationSettingsAndroid = 
+      AndroidInitializationSettings('ic_launcher');
+    const InitializationSettings initializationSettings = 
+      InitializationSettings(
+        android: initializationSettingsAndroid
+      );
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String payload) async { 
-        JsonDecoder dec = JsonDecoder();
-        RemoteMessage message = RemoteMessage.fromMap(dec.convert(payload)); 
+        const JsonDecoder dec = JsonDecoder();
+        final RemoteMessage message = 
+          RemoteMessage.fromMap(dec.convert(payload) as Map<String, dynamic>); 
         await onLaunch(message);
       }
     );
@@ -196,7 +209,8 @@ class _HomeState extends State<Home> {
   
     Connectivity().onConnectivityChanged.listen((ConnectivityResult connection){
       setState(() {
-        isConnected = connection == ConnectivityResult.mobile || connection == ConnectivityResult.wifi;
+        isConnected = connection == ConnectivityResult.mobile 
+          || connection == ConnectivityResult.wifi;
       });
     });
 
@@ -204,27 +218,27 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return !isConnected ? NoConnectionPage() : 
+    return !isConnected ? const NoConnectionPage() : 
       StoreConnector<StoreState, Map<String, dynamic>>(
-      converter: (store) {
-        return {
+      converter: (Store<StoreState> store) {
+        return <String, dynamic>{
           'logedIn': store.state.logedIn,
           'messagingToken': store.state.messagingToken,
           'email': store.state.user?.email,
           'firestore': store.state.firestore
         };
       },
-      builder: (BuildContext context, resources) {
-        if(resources['logedIn'] == null || !resources['logedIn']){
+      builder: (BuildContext context, Map<String, dynamic> resources) {
+        if(resources['logedIn'] == null || !(resources['logedIn'] as bool)){
           return InitialPage(
             signInService: widget.signInService, 
-            messagingToken: resources['messagingToken']
+            messagingToken: resources['messagingToken'] as String
           );
         } else {
           return MainPage(
             getRefreshToken: widget.signInService.getRefreshToken, 
             onLogout: widget.signInService.logOut, 
-            email: resources['email'], 
+            email: resources['email'] as String, 
             firestore: resources['firestore']
           );
         }

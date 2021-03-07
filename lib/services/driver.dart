@@ -9,7 +9,7 @@ class DriverService {
   });
 
   MyDecoder myDecoder;
-  String baseUrl = FlavorConfig.instance.variables['baseUrl'];
+  String baseUrl = FlavorConfig.instance.variables['baseUrl'] as String;
 
   Future<int> postNewAgent(Agent agent, String token) async {
     final Response res = await post(

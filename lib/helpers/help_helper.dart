@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
-import 'package:perna/models/helpItem.dart';
+import 'package:perna/models/help_item.dart';
 
 HelpItem getHelpRoot(BuildContext context) {
   return HelpItem(

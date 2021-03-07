@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:perna/services/driver.dart';
+import 'package:perna/services/user.dart';
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,12 +12,12 @@ import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/models/agent.dart';
-import 'package:perna/models/askedPoint.dart';
+import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
-import 'package:perna/widgets/titledValueWidget.dart';
+import 'package:perna/widgets/titled_value_widget.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({@required this.email, @required this.firestore});
@@ -50,25 +52,29 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   StreamSubscription<QuerySnapshot> initAgentsListner(){
-    return widget.firestore.collection('agent').where('email', isEqualTo: widget.email)
+    return widget.firestore.collection('agent')
+      .where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot agentsSnapshot){
         setState(() {
-          this.agents = agentsSnapshot.docs.map((agent){
+          agents = agentsSnapshot.docs.map((QueryDocumentSnapshot agent){
             return agent.data;
           }).toList();
-          this.isLoadingAgents = false;
+          isLoadingAgents = false;
         });
     });
   }
 
   StreamSubscription<QuerySnapshot> initAskedPointsListener(){
-    return widget.firestore.collection('askedPoint').where('email', isEqualTo: widget.email)
+    return widget.firestore.collection('askedPoint')
+      .where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot askedPointsSnapshot){
         setState(() {
-          this.askedPoints = askedPointsSnapshot.docs.map((askedPoint){
-            return askedPoint.data;
-          }).toList();
-          this.isLoadingAskedPoints = false;
+          askedPoints = askedPointsSnapshot.docs.map(
+            (QueryDocumentSnapshot askedPoint){
+              return askedPoint.data;
+            }
+          ).toList();
+          isLoadingAskedPoints = false;
         });
     });
   }
@@ -92,9 +98,9 @@ class _HistoryPageState extends State<HistoryPage> {
   String parseDuration(int shiftStart, int shiftEnd, int date){
     final int shift = shiftStart ?? shiftEnd; 
     final DateTime dateTime = 
-      DateTime.fromMillisecondsSinceEpoch(date.round()*1000);
+      DateTime.fromMillisecondsSinceEpoch(date*1000);
     final Duration duration = shift == null 
-      ? null : Duration(seconds: shift.round());
+      ? null : Duration(seconds: shift);
     if(dateTime != null && duration != null) {
       final DateTime currTime = dateTime.add(duration);
       return format.format(currTime);
@@ -105,7 +111,8 @@ class _HistoryPageState extends State<HistoryPage> {
   List<dynamic> getHistory(){
     final List<dynamic> history = agents + askedPoints;
     history.sort((dynamic first, dynamic second){
-      return -((first['askedEndAt'] ?? 0) - (second['askedEndAt'] ?? 0));
+      return -(
+        (first['askedEndAt'] as int ?? 0) - (second['askedEndAt'] as int ?? 0));
     });
     return history;
   }
@@ -192,17 +199,21 @@ class _HistoryPageState extends State<HistoryPage> {
                             'userService': store.state.userService,
                             'driverService': store.state.driverService
                           },
-                          builder: (BuildContext context, resources) => 
+                          builder: (BuildContext context, Map<String, dynamic> resources) => 
                             operation['origin'] != null?
                             AskedPointPage(
-                              userService: resources['userService'], 
-                              askedPoint: AskedPoint.fromJson(operation), 
+                              userService: 
+                                resources['userService'] as UserService, 
+                              askedPoint: AskedPoint.fromJson(
+                                operation as Map<String, dynamic>), 
                               readOnly: true, 
                               clear: (){}
                             ):
                             ExpedientPage(
-                              driverService: resources['driverService'], 
-                              agent: Agent.fromJson(operation), 
+                              driverService: 
+                                resources['driverService'] as DriverService, 
+                              agent: Agent.fromJson(
+                                operation as Map<String, dynamic>), 
                               readOnly: true, 
                               clear: (){}
                             )
@@ -217,29 +228,41 @@ class _HistoryPageState extends State<HistoryPage> {
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               TitledValueWidget(
-                                title: AppLocalizations.of(context).translate(operation['origin'] == null ? 'expedient' : 'order'),
-                                value: parseDuration(operation['askedStartAt'], operation['askedEndAt'], operation['date']),
+                                title: 
+                                  AppLocalizations.of(context).translate(
+                                    operation['origin'] == null ? 
+                                      'expedient' : 'order'),
+                                value: parseDuration(
+                                  operation['askedStartAt'] as int,
+                                  operation['askedEndAt'] as int, 
+                                  operation['date'] as int
+                                ),
                               ),
-                              operation['origin'] == null ? TitledValueWidget(
-                                title: AppLocalizations.of(context).translate('driver'),  
-                                value: operation['email'] ?? ''
-                              ) : SizedBox(),
+                              if(operation['origin'] == null) TitledValueWidget(
+                                title: AppLocalizations.of(context)
+                                  .translate('driver'),  
+                                value: operation['email'] as String ?? ''
+                              )
                             ],
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              operation['amount'] != null ? TitledValueWidget(
-                                title: AppLocalizations.of(context).translate('price'),
-                                value: formatAmount(operation['amount'], operation['currency'], AppLocalizations.of(context).locale)
-                              ): SizedBox(),
+                              if(operation['amount'] == null) TitledValueWidget(
+                                title: AppLocalizations.of(context)
+                                  .translate('price'),
+                                value: formatAmount(
+                                  operation['amount'] as int, 
+                                  operation['currency'] as String, 
+                                  AppLocalizations.of(context).locale
+                                )
+                              ),
                               Icon(
                                 Icons.chevron_right,
                                 color: Theme.of(context).primaryColor,
@@ -249,7 +272,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         ]
                       ),
                       const SizedBox(height: 10),
-                      Image.memory(base64Decode(operation['staticMap'])),
+                      Image.memory(
+                        base64Decode(operation['staticMap'] as String)),
                       const SizedBox(height: 10),
                     ],
                   )

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
-import 'package:perna/models/creditCard.dart';
+import 'package:perna/models/credit_card.dart';
 
 class CreditCardForm extends StatefulWidget {
   const CreditCardForm({

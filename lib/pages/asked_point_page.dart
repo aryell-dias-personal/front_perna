@@ -1,17 +1,19 @@
 import 'dart:typed_data';
+import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/agent.dart';
-import 'package:perna/models/askedPoint.dart';
-import 'package:perna/models/creditCard.dart';
-import 'package:perna/pages/askedPointConfirmationPAge.dart';
+import 'package:perna/models/asked_point.dart';
+import 'package:perna/models/credit_card.dart';
+import 'package:perna/pages/asked_point_confirmation_page.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
@@ -20,20 +22,14 @@ import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/add_button.dart';
-import 'package:perna/widgets/formContainer.dart';
-import 'package:perna/widgets/formDatePicker.dart';
+import 'package:perna/widgets/form_container.dart';
+import 'package:perna/widgets/form_date_picker.dart';
 import 'package:perna/widgets/form_time_picker.dart';
 import 'package:perna/widgets/outlined_text_form_field.dart';
 
 enum AskedPointOptions { aboutExpedient }
 
 class AskedPointPage extends StatefulWidget {
-  final bool readOnly;
-  final Function() clear;
-  final AskedPoint askedPoint;
-  final UserService userService;
-  final Future<String> Function() getRefreshToken;
-
   const AskedPointPage({
     @required this.userService, 
     @required this.readOnly, 
@@ -42,14 +38,45 @@ class AskedPointPage extends StatefulWidget {
     this.getRefreshToken
   });
 
+  final bool readOnly;
+  final Function() clear;
+  final AskedPoint askedPoint;
+  final UserService userService;
+  final Future<String> Function() getRefreshToken;
+
   @override
   _AskedPointPageState createState() => _AskedPointPageState(
-    askedPoint: this.askedPoint
+    askedPoint: askedPoint
   );
 }
 
 class _AskedPointPageState extends State<AskedPointPage> {
-  final _formKey = GlobalKey<FormState>();
+  _AskedPointPageState({
+    @required this.askedPoint, 
+  }) {
+    initialDateTime = DateTime(
+      initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
+    minTime = initialDateTime;
+    date = dateFormat.format(askedPoint.date ?? minTime);
+    if(askedPoint.staticMap == null) {
+      staticMapService.getUint8List(
+        markerA: askedPoint.origin,
+        markerB: askedPoint.destiny,
+        route: <LatLng>[
+          askedPoint.origin,
+          askedPoint.destiny
+        ]
+      ).then((Uint8List uint8List) {
+        setState(() {
+          askedPoint = askedPoint.copyWith(
+            staticMap: uint8List
+          );
+        });
+      });
+    }
+  }
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -63,58 +90,41 @@ class _AskedPointPageState extends State<AskedPointPage> {
   bool isLoading = false;
   StaticMapService staticMapService = StaticMapService();
 
-  _AskedPointPageState({
-    @required this.askedPoint, 
-  }) {
-    initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
-    minTime = initialDateTime;
-    date = dateFormat.format(this.askedPoint.date ?? minTime);
-    if(this.askedPoint.staticMap == null) {
-      staticMapService.getUint8List(
-        markerA: askedPoint.origin,
-        markerB: askedPoint.destiny,
-        route: [
-          askedPoint.origin,
-          askedPoint.destiny
-        ]
-      ).then((Uint8List uint8List) {
-        setState(() {
-          this.askedPoint = this.askedPoint.copyWith(
-            staticMap: uint8List
-          );
-        });
-      });
-    }
-  }
-
-  void _onPressed(String email, PaymentsService paymentsService) async {
+  Future<dynamic> _onPressed(String email, PaymentsService paymentsService) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
-      String token = await widget.getRefreshToken();
-      List<CreditCard> creditCards = await paymentsService.listCard(token);
+      final String token = await widget.getRefreshToken();
+      final List<CreditCard> creditCards = 
+        await paymentsService.listCard(token);
       if(creditCards.isEmpty) {
         setState(() { isLoading = false; });
-        showSnackBar(AppLocalizations.of(context).translate('at_least_one_credit_card'), 
+        showSnackBar(
+          AppLocalizations.of(context).translate('at_least_one_credit_card'), 
           Colors.redAccent, context);
         return;
       }    
-      DateTime dateTime = dateFormat.parse(this.date);
+      final DateTime dateTime = dateFormat.parse(date);
       DateTime askedEndAtTime, askedStartAtTime;
-      if(this.askedEndAt != null) {
-        String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} ${this.date}';
+      if(askedEndAt != null) {
+        final String askedEndAtString = 
+          askedEndAt.length > 5? askedEndAt : '$askedEndAt $date';
         askedEndAtTime = format.parse(askedEndAtString);
       }
-      if(this.askedStartAt != null) askedStartAtTime = format.parse('${this.askedStartAt} ${this.date}');
-      AskedPoint newAskedPoint =  this.askedPoint.copyWith(
+      if(askedStartAt != null) {
+        askedStartAtTime = format.parse('$askedStartAt $date');
+      } 
+      final AskedPoint newAskedPoint = askedPoint.copyWith(
         email: email,
         date: dateTime,
         askedEndAt: askedEndAtTime?.difference(dateTime),
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
-      AskedPoint simulatedAskedPoint = await widget.userService.simulateAskedPoint(newAskedPoint, token);
+      final AskedPoint simulatedAskedPoint = 
+        await widget.userService.simulateAskedPoint(newAskedPoint, token);
       
       if(simulatedAskedPoint != null){
-        await Navigator.push(context, MaterialPageRoute(
+        await Navigator.push(context, 
+          MaterialPageRoute<AskedPointConfirmationPage>(
           builder: (BuildContext context) => AskedPointConfirmationPage(
             askedPoint: simulatedAskedPoint,
             userToken: token,
@@ -126,27 +136,30 @@ class _AskedPointPageState extends State<AskedPointPage> {
         setState(() { isLoading = false; });
       }else{
         setState(() { isLoading = false; });
-        showSnackBar(AppLocalizations.of(context).translate('unsuccessfully_simutale_order'), 
-          Colors.redAccent, context);
+        showSnackBar(
+          AppLocalizations.of(context)
+            .translate('unsuccessfully_simutale_order'), 
+          Colors.redAccent, context
+        );
       }
     }
   }
 
-  void _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
-    setState(() { this.isLoading = true; });
-    DocumentSnapshot documentSnapshot = await firestore.collection('agent').doc(this.askedPoint.agentId).get();
+  Future<dynamic> _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
+    setState(() { isLoading = true; });
+    final DocumentSnapshot documentSnapshot = await firestore.collection('agent').doc(askedPoint.agentId).get();
     if (documentSnapshot.data().isNotEmpty) {
-      Agent agent = Agent.fromJson(documentSnapshot.data());
-      await Navigator.push(context, MaterialPageRoute(
+      final Agent agent = Agent.fromJson(documentSnapshot.data());
+      await Navigator.push(context, MaterialPageRoute<ExpedientPage>(
         builder: (BuildContext context) => Scaffold(
           body: StoreConnector<StoreState, DriverService>(
-            builder: (BuildContext context, driverService) => ExpedientPage(
+            builder: (BuildContext context, DriverService driverService) => ExpedientPage(
               driverService: driverService,
               agent: agent, 
               readOnly: true, 
               clear: (){}
             ),
-            converter: (store)=>store.state.driverService
+            converter: (Store<StoreState> store)=>store.state.driverService
           )
         )
       ));
@@ -154,59 +167,59 @@ class _AskedPointPageState extends State<AskedPointPage> {
       showSnackBar(AppLocalizations.of(context).translate('not_found_expedient'), 
         Colors.redAccent, context);
     }
-    setState(() { this.isLoading = false; });
+    setState(() { isLoading = false; });
   }
 
   void _updateMinTime(String text) {
-    DateTime nextMinTime = this.dateFormat.parse(text);
-    String nextAskedEndAt = this.askedEndAt;
-    if(this.askedEndAt != null && this.askedStartAt != null) {
-      String minTimeString = this.dateFormat.format(this.minTime);
-      String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} $minTimeString';
-      DateTime askedEndAtTime = this.format.parse(askedEndAtString);
-      Duration shift = nextMinTime.difference(this.minTime);
-      DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
-      nextAskedEndAt = this.format.format(nextAskedEndAtTime);
+    final DateTime nextMinTime = dateFormat.parse(text);
+    String nextAskedEndAt = askedEndAt;
+    if(askedEndAt != null && askedStartAt != null) {
+      final String minTimeString = dateFormat.format(minTime);
+      final String askedEndAtString = askedEndAt.length > 5? askedEndAt : '$askedEndAt $minTimeString';
+      final DateTime askedEndAtTime = format.parse(askedEndAtString);
+      final Duration shift = nextMinTime.difference(minTime);
+      final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
+      nextAskedEndAt = format.format(nextAskedEndAtTime);
       if(RegExp(text).hasMatch(nextAskedEndAt)) {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
     }
     setState(() {
-      this.date = text;
-      this.minTime = nextMinTime;
-      this.askedEndAt = nextAskedEndAt;
+      date = text;
+      minTime = nextMinTime;
+      askedEndAt = nextAskedEndAt;
     });
   }
 
   void _updateStartAt(String nextStartAt) {
-    String nextAskedEndAt = this.askedEndAt;
-    if(this.askedEndAt != null && this.askedStartAt != null) {
-      String minTimeString = this.dateFormat.format(this.minTime);
-      DateTime oldAskedStartAt = this.format.parse('${this.askedStartAt} $minTimeString');
-      DateTime newAskedStartAt = this.format.parse('$nextStartAt $minTimeString');
-      String askedEndAtString = this.askedEndAt.length > 5? this.askedEndAt : '${this.askedEndAt} $minTimeString';
-      DateTime askedEndAtTime = this.format.parse(askedEndAtString);
-      Duration shift = newAskedStartAt.difference(oldAskedStartAt);
-      DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
-      nextAskedEndAt = this.format.format(nextAskedEndAtTime);
+    String nextAskedEndAt = askedEndAt;
+    if(askedEndAt != null && askedStartAt != null) {
+      final String minTimeString = dateFormat.format(minTime);
+      final DateTime oldAskedStartAt = format.parse('$askedStartAt $minTimeString');
+      final DateTime newAskedStartAt = format.parse('$nextStartAt $minTimeString');
+      final String askedEndAtString = askedEndAt.length > 5? askedEndAt : '$askedEndAt $minTimeString';
+      final DateTime askedEndAtTime = format.parse(askedEndAtString);
+      final Duration shift = newAskedStartAt.difference(oldAskedStartAt);
+      final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
+      nextAskedEndAt = format.format(nextAskedEndAtTime);
       if(RegExp(minTimeString).hasMatch(nextAskedEndAt)) {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
     }
     setState(() {
-      this.askedStartAt = nextStartAt; 
-      this.askedEndAt = nextAskedEndAt;
+      askedStartAt = nextStartAt; 
+      askedEndAt = nextAskedEndAt;
     });
   }
 
   @override
   Widget build(BuildContext context) => StoreConnector<StoreState, Map<String, dynamic>>(
-      converter: (store) => {
+      converter: (Store<StoreState> store) => <String, dynamic>{
         'email': store.state.user.email,
         'firestore': store.state.firestore,
         'paymentsService': store.state.paymentsService 
       },
-      builder: (BuildContext context, resources) => Scaffold( 
+      builder: (BuildContext context, Map<String, dynamic> resources) => Scaffold( 
         appBar: AppBar(
           brightness: Theme.of(context).brightness,
           centerTitle: true,
@@ -220,8 +233,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   fontSize: 30.0
                 )
               ),
-              SizedBox(width: 5),
-              Icon(Icons.scatter_plot, size: 30),
+              const SizedBox(width: 5),
+              const Icon(Icons.scatter_plot, size: 30),
             ]
           ),
           backgroundColor: Theme.of(context).backgroundColor,
@@ -235,17 +248,17 @@ class _AskedPointPageState extends State<AskedPointPage> {
               fontFamily: Theme.of(context).textTheme.headline6.fontFamily
             )
           ),
-          actions: widget.readOnly && this.askedPoint.agentId != null ? <Widget>[
-            PopupMenuButton(
+          actions: widget.readOnly && askedPoint.agentId != null ? <Widget>[
+            PopupMenuButton<AskedPointOptions>(
               tooltip: AppLocalizations.of(context).translate('open_menu'),
-              onSelected: (AskedPointOptions result) => this._onSelectedAskedPointOptions(resources['firestore'], result),
+              onSelected: (AskedPointOptions result) => _onSelectedAskedPointOptions(resources['firestore'], result),
               itemBuilder:  (BuildContext context) => <PopupMenuEntry<AskedPointOptions>>[
                 PopupMenuItem<AskedPointOptions>(
                   value: AskedPointOptions.aboutExpedient,
                   child: Text(AppLocalizations.of(context).translate('about_expedient'))
                 )
               ],
-              offset: Offset(0, 50),
+              offset: const Offset(0, 50),
             )
           ] : null,
         ),
@@ -256,7 +269,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
+                SizedBox(
                   height: 180,
                   width: 600,
                   child: Stack(
@@ -264,125 +277,128 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       Center(
                         child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
                       ),
-                      this.askedPoint.staticMap != null ? Image.memory(this.askedPoint.staticMap) : SizedBox()
+                      if(askedPoint.staticMap != null) Image.memory(askedPoint.staticMap)
                     ],
                   )
                 ),
                 FormContainer(
-                  formkey: this._formKey,
+                  formkey: _formKey,
                   children: <Widget>[
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         FormDatePicker(
-                          value: this.date,
+                          value: date,
                           isRequired: true,
-                          initialValue: this.askedPoint.date ?? this.initialDateTime,
+                          initialValue: askedPoint.date ?? initialDateTime,
                           onChanged: _updateMinTime,
-                          action: TextInputAction.next,
                           labelText: AppLocalizations.of(context).translate('date'),
                           icon: Icons.insert_invitation,
                           readOnly: widget.readOnly,
-                          onSubmit: (text){ FocusScope.of(context).nextFocus(); },
+                          onSubmit: (String text){ FocusScope.of(context).nextFocus(); },
                           validatorMessage: AppLocalizations.of(context).translate('select_a_date'),
                         ),
                         const SizedBox(height: 26),
-                      ] + (this.askedPoint.askedStartAt == null && widget.readOnly ? [] : [
-                        SizedBox(width: 10),
+                      ] + (askedPoint.askedStartAt == null && widget.readOnly ? <Widget>[] : <Widget>[
+                        const SizedBox(width: 10),
                         FormTimePicker(
-                          isRequired: false,
-                          value: this.askedStartAt,
-                          minTime: this.initialDateTime,
-                          initialValue: this.askedPoint?.date?.add(this.askedPoint.askedStartAt),
+                          value: askedStartAt,
+                          minTime: initialDateTime,
+                          initialValue: askedPoint?.date?.add(askedPoint.askedStartAt),
                           icon: Icons.access_time,
                           labelText: AppLocalizations.of(context).translate('desired_start'),
-                          onChanged: (text){
-                            List<String> chuncks = text.split(' '); 
-                            String minTimeString = this.dateFormat.format(this.initialDateTime);
+                          onChanged: (String text){
+                            final List<String> chuncks = text.split(' '); 
+                            String minTimeString = dateFormat.format(initialDateTime);
                             if(chuncks.length == 2) {
                               minTimeString = chuncks[1];
                             }
-                            this._updateStartAt(chuncks[0]);
-                            this._updateMinTime(minTimeString);
+                            _updateStartAt(chuncks[0]);
+                            _updateMinTime(minTimeString);
                           },
-                          selectedDay: this.date,
+                          selectedDay: date,
                           lastDay: 31,
                           readOnly: widget.readOnly,
                           validatorMessage: AppLocalizations.of(context).translate('enter_desired_start'),
-                          onSubmit: (text) { FocusScope.of(context).nextFocus(); }
+                          onSubmit: (String text) { FocusScope.of(context).nextFocus(); }
                         )
                       ])
                     ),
                     const SizedBox(height: 26),
-                  ] + (this.askedPoint.askedEndAt == null && widget.readOnly ? [] : [
+                  ] + (askedPoint.askedEndAt == null && widget.readOnly ? <Widget>[] : <Widget>[
                     FormTimePicker(
-                      isRequired: false,
-                      value: this.askedEndAt,
-                      minTime: this.minTime,
-                      initialValue: this.askedPoint?.date?.add(this.askedPoint.askedEndAt),
-                      onChanged: (text){ 
-                        String minTimeString = this.dateFormat.format(this.minTime);
+                      value: askedEndAt,
+                      minTime: minTime,
+                      initialValue: askedPoint?.date?.add(askedPoint.askedEndAt),
+                      onChanged: (String text){ 
+                        final String minTimeString = dateFormat.format(minTime);
                         setState(() {
                           if(RegExp(minTimeString).hasMatch(text)) {
-                            this.askedEndAt = text.split(' ')[0];
+                            askedEndAt = text.split(' ')[0];
                           } else {
-                            this.askedEndAt = text; 
+                            askedEndAt = text; 
                           }
                         });
                       },
                       action: TextInputAction.done,
-                      selectedDay: this.date,
+                      selectedDay: date,
                       labelText: AppLocalizations.of(context).translate('desired_end'),
                       icon: Icons.access_time,
                       readOnly: widget.readOnly,
-                      onSubmit: (text) => _onPressed(resources['email'], resources['paymentsService']),
+                      onSubmit: (String text) => _onPressed(
+                        resources['email'] as String, 
+                        resources['paymentsService']
+                      ),
                       validatorMessage: AppLocalizations.of(context).translate('enter_desired_end'),
                     ),
                     const SizedBox(height: 26)
-                  ]) + (this.askedPoint.actualStartAt!=null && this.askedPoint.actualEndAt!=null ? [
+                  ]) + (askedPoint.actualStartAt!=null && askedPoint.actualEndAt!=null ? <Widget>[
                     FormTimePicker(
                       readOnly: true,
-                      selectedDay: this.date,
-                      initialValue: this.askedPoint.actualStartAt,
+                      selectedDay: date,
+                      initialValue: askedPoint.actualStartAt,
                       labelText: AppLocalizations.of(context).translate('actual_start'),
                       icon: Icons.access_time
                     ),
                     const SizedBox(height: 26),
                     FormTimePicker(
                       readOnly: true,
-                      selectedDay: this.date,
-                      initialValue: this.askedPoint.actualEndAt,
+                      selectedDay: date,
+                      initialValue: askedPoint.actualEndAt,
                       labelText: AppLocalizations.of(context).translate('actual_end'),
                       icon: Icons.access_time
                     ),
                     const SizedBox(height: 26)
-                  ]: []) + [
+                  ]: <Widget>[]) + <Widget>[
                     OutlinedTextFormField(
                       readOnly: true,
-                      initialValue: this.askedPoint.friendlyOrigin,
+                      initialValue: askedPoint.friendlyOrigin,
                       labelText: AppLocalizations.of(context).translate('start_place'),
                       icon: Icons.pin_drop
                     ),
                     const SizedBox(height: 26),
                     OutlinedTextFormField(
                       readOnly: true,
-                      initialValue: this.askedPoint.friendlyDestiny,
+                      initialValue: askedPoint.friendlyDestiny,
                       labelText: AppLocalizations.of(context).translate('end_place'),
                       icon: Icons.flag
                     ),
                     const SizedBox(height: 26),
-                  ] + (this.askedPoint.amount != null ? [
+                  ] + (askedPoint.amount != null ? <Widget>[
                     OutlinedTextFormField(
                       readOnly: true,
-                      initialValue: formatAmount(this.askedPoint.amount, this.askedPoint.currency, AppLocalizations.of(context).locale),
+                      initialValue: formatAmount(askedPoint.amount, askedPoint.currency, AppLocalizations.of(context).locale),
                       labelText: AppLocalizations.of(context).translate('price'),
                       icon: Icons.payments_outlined
                     ),
                     const SizedBox(height: 26),
-                  ] : []) + [
+                  ] : <Widget>[]) + <Widget>[
                     AddButton(
-                      onPressed: ()=>_onPressed(resources['email'], resources['paymentsService']),
-                      readOnly: widget.readOnly || this.askedPoint.staticMap == null,
+                      onPressed: ()=>_onPressed(
+                        resources['email'] as String, 
+                        resources['paymentsService']
+                      ),
+                      readOnly: widget.readOnly || askedPoint.staticMap == null,
                       addAndcontinue: true
                     )
                   ]

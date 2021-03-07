@@ -161,7 +161,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
                             fontSize: 18
                           )
                         ),
-                        SizedBox(width: 2),
+                        const SizedBox(width: 2),
                         Icon(showSecond || endControler.text != ''?Icons.remove:Icons.add, 
                           color: endControler.text != ''? Colors.grey :Theme.of(context).primaryColor, 
                           size: 18

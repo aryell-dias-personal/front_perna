@@ -11,12 +11,12 @@ class CreditCard {
 
   factory CreditCard.fromJson(Map<String, dynamic> parsedJson){
     return CreditCard(
-      id: parsedJson['id'],
-      cardNumber: parsedJson['cardNumber'],
-      expiryDate: parsedJson['expiryDate'],
-      cardHolderName: parsedJson['cardHolderName'],
-      cvvCode: parsedJson['cvvCode'],
-      brand: parsedJson['brand']
+      id: parsedJson['id'] as String,
+      cardNumber: parsedJson['cardNumber'] as String,
+      expiryDate: parsedJson['expiryDate'] as String,
+      cardHolderName: parsedJson['cardHolderName'] as String,
+      cvvCode: parsedJson['cvvCode'] as String,
+      brand: parsedJson['brand'] as String
     );
   }
 

@@ -10,7 +10,7 @@ import 'package:perna/services/directions.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/my_google_map.dart';
-import 'package:perna/models/askedPoint.dart';
+import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:random_color/random_color.dart';

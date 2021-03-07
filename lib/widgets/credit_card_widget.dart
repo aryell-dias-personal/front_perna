@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
-import 'package:perna/widgets/creditCardAnimation.dart';
+import 'package:perna/widgets/credit_card_animation.dart';
 
 class CreditCardWidget extends StatefulWidget {
   const CreditCardWidget({
@@ -124,7 +124,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
               ],
             ),
             width: widget.width ?? width,
-            height: widget.height ?? (orientation == Orientation.portrait ? height / 4 : height / 2),
+            height: widget.height ?? 
+              (orientation == Orientation.portrait ? height / 4 : height / 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -157,7 +158,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16),
                     child: Text(
-                      widget.expiryDate.isEmpty || widget.expiryDate == null ? widget.labelExpiredDate : widget.expiryDate,
+                      widget.expiryDate.isEmpty || widget.expiryDate == null ? 
+                        widget.labelExpiredDate : widget.expiryDate,
                       style: Theme.of(context).textTheme.headline6.merge(
                         TextStyle(
                           color: Theme.of(context).backgroundColor,
@@ -170,9 +172,14 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    padding: 
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                     child: Text(
-                      widget.cardHolderName.isEmpty || widget.cardHolderName == null ? AppLocalizations.of(context).translate('card_holder').toUpperCase() : widget.cardHolderName,
+                      widget.cardHolderName.isEmpty 
+                        || widget.cardHolderName == null ?
+                          AppLocalizations.of(context)
+                            .translate('card_holder').toUpperCase() :
+                          widget.cardHolderName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline6.merge(

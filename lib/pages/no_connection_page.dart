@@ -18,55 +18,53 @@ class NoConnectionPage extends StatelessWidget {
           children: <Widget>[ 
             AvatarGlow(
               endRadius: 90,
-              duration: Duration(seconds: 2),
               glowColor: Colors.grey,
-              repeat: true,
-              repeatPauseDuration: Duration(seconds: 2),
-              startDelay: Duration(seconds: 1),
+              repeatPauseDuration: const Duration(seconds: 2),
+              startDelay: const Duration(seconds: 1),
               child: Material(
                   elevation: 8.0,
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   child: CircleAvatar(
                     backgroundColor: Theme.of(context).backgroundColor,
+                    radius: 50.0,
                     child: Icon(
                       Icons.signal_wifi_off,
                       size: 60,
                       color: Theme.of(context).primaryColor,
                     ),
-                    radius: 50.0,
                   )),
             ),
             Text(
               AppLocalizations.of(context).translate('no_connection'),
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
                   color: Theme.of(context).primaryColor),
             ),
             Text(
               AppLocalizations.of(context).translate('ask_to_connect'),
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 33.0,
                   color: Theme.of(context).primaryColor),
             ),
-            SizedBox(
+            const SizedBox(
               height: 50.0,
             ),
             ElevatedButton(
+              onPressed: (){AppSettings.openWIFISettings();},
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                padding: MaterialStateProperty.all(const EdgeInsets.fromLTRB(20, 10, 20, 10)),
+                shape: MaterialStateProperty.all(const StadiumBorder())
+              ),
               child: Text(
                 AppLocalizations.of(context).translate('go_to_settings'),
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 25.0,
                     color: Theme.of(context).backgroundColor),
               ),
-              onPressed: (){AppSettings.openWIFISettings();},
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
-                padding: MaterialStateProperty.all(EdgeInsets.fromLTRB(20, 10, 20, 10)),
-                shape: MaterialStateProperty.all(StadiumBorder())
-              )
             )
           ],
         )

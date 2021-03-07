@@ -6,7 +6,7 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/titledValueWidget.dart';
+import 'package:perna/widgets/titled_value_widget.dart';
 
 class PinInfo extends StatelessWidget {
   final bool visible;

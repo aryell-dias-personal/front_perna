@@ -5,7 +5,7 @@ import 'package:loading/loading.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
-import 'package:perna/models/creditCard.dart';
+import 'package:perna/models/credit_card.dart';
 import 'package:perna/pages/credit_card_page.dart';
 import 'package:perna/services/payments.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -59,7 +59,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyText2.color, 
                   fontFamily: 'ProductSans'
                 ),
@@ -72,8 +72,8 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
               ) 
               , maxLines: 2
             ),
-            SizedBox(width: 5),
-            Icon(Icons.account_balance_wallet_outlined, size: 30),
+            const SizedBox(width: 5),
+            const Icon(Icons.account_balance_wallet_outlined, size: 30),
           ]
         ),
         backgroundColor: Theme.of(context).backgroundColor,
@@ -117,10 +117,10 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           builder: (BuildContext context) {
             return ListView.separated(
               itemCount: creditCards.length,
-              separatorbuilder: (BuildContext context, index) {
+              separatorBuilder: (BuildContext context, index) {
                 return const Divider();
               },
-              itembuilder: (BuildContext context, index) {
+              itemBuilder: (BuildContext context, index) {
                 CreditCard currCreditCard = creditCards[index];
                 return AnimatedSize(
                   vsync: this,
@@ -169,10 +169,10 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                           Icons.star_border, 
                                           color: Theme.of(context).primaryColor,
                                         ),
-                                        SizedBox(width: 2),
+                                        const SizedBox(width: 2),
                                         Text(
                                           AppLocalizations.of(context).translate('default_credit_card'),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).primaryColor
                                           ),
@@ -190,10 +190,10 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                           Icons.check_circle_outline, 
                                           color: Theme.of(context).backgroundColor,
                                         ),
-                                        SizedBox(width: 2),
+                                        const SizedBox(width: 2),
                                         Text(
                                           AppLocalizations.of(context).translate('selected_credit_card'),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Theme.of(context).backgroundColor
                                           ),
@@ -209,7 +209,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                 children: <Widget>[
                                   Text(
                                     currCreditCard.cardHolderName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).backgroundColor
                                     ),
@@ -232,14 +232,14 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                 children: <Widget>[
                                   Text(
                                     currCreditCard.cardNumber,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).backgroundColor
                                     ),
                                   ),
                                   Text(
                                     currCreditCard.expiryDate,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).backgroundColor
                                     ),

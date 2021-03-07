@@ -96,8 +96,8 @@ class UserProfilePage extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children:<Widget>[
-                      Text(AppLocalizations.of(context).translate('talk'), style: const TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
-                      SizedBox(width: 5),
+                      Text(AppLocalizations.of(context).translate('talk'), style: TextStyle(color: Theme.of(context).backgroundColor, fontSize: 18)),
+                      const SizedBox(width: 5),
                       Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
                     ]
                   ),

@@ -111,7 +111,6 @@ class MaskedTextController extends TextEditingController {
         continue;
       }
 
-      // ignore: use_string_buffers
       result += maskChar;
       maskCharIndex += 1;
       continue;
@@ -160,7 +159,6 @@ CardType detectCCType(String cardNumber) {
   return cardType;
 }
 
-// ignore: lines_longer_than_80_chars
 Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback) {
   Widget icon;
   final CardType cardType = detectCCType(cardNumber);

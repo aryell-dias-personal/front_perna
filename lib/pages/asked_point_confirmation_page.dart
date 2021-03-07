@@ -2,23 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/constants/constants.dart';
-import 'package:perna/helpers/app_localizations.dart'';
-impor'package:perna/helpers/credit_card.dart'rt';
-imp'package:perna/helpers/show_snack_bar.dart'.dart';
-import 'package:perna/models/askedPoint.dart';
-import 'package:perna/models/creditCard.dart';
+import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/helpers/credit_card.dart';
+import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/models/asked_point.dart';
+import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/widgets/titledValueWidget.dart';
+import 'package:perna/widgets/titled_value_widget.dart';
 import 'package:intl/intl.dart';
 
-class AskedPointConfirmationPage extends StatefulWidget {
-  final PaymentsService paymentsService;
-  final String userToken;  
-  final AskedPoint askedPoint;
-  final CreditCard defaultCreditCard;
-  final Function() clear;
-  
-  AskedPointConfirmationPage({
+class AskedPointConfirmationPage extends StatefulWidget {  
+   const AskedPointConfirmationPage({
     @required this.clear,
     @required this.paymentsService,
     @required this.userToken,
@@ -26,8 +20,15 @@ class AskedPointConfirmationPage extends StatefulWidget {
     @required this.defaultCreditCard
   });
 
+  final PaymentsService paymentsService;
+  final String userToken;  
+  final AskedPoint askedPoint;
+  final CreditCard defaultCreditCard;
+  final Function() clear;
+  
   @override
-  _AskedPointConfirmationPageState createState() => _AskedPointConfirmationPageState();
+  _AskedPointConfirmationPageState createState() => 
+    _AskedPointConfirmationPageState();
 }
 
 class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage> {
@@ -36,25 +37,31 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
   final DateFormat format = DateFormat('dd/MM/yyyy HH:mm');
   final DateFormat formatDate = DateFormat('dd/MM/yyyy');
   
-  void _onPressed(context) async {
+  Future<dynamic> _onPressed(BuildContext context) async {
     setState(() { isLoading = true; });
-    int statusCode = await widget.paymentsService.confirmAskedPointPayment(widget.askedPoint, widget.userToken);
+    final int statusCode = 
+      await widget.paymentsService.confirmAskedPointPayment(
+        widget.askedPoint, widget.userToken
+      );
     if(statusCode == 200) {
       widget.clear();
-      Navigator.popUntil(context, (route) => route.isFirst);
-      showSnackBar(AppLocalizations.of(context).translate('successfully_added_order'), 
+      Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
+      showSnackBar(
+        AppLocalizations.of(context).translate('successfully_added_order'), 
         Colors.greenAccent, context);
     } else {
       setState(() { isLoading = false; });
-      showSnackBar(AppLocalizations.of(context).translate('unsuccessfully_added_order'), 
+      showSnackBar(
+        AppLocalizations.of(context).translate('unsuccessfully_added_order'), 
         Colors.redAccent, context);
     }
   }
 
   String parseDuration(){
-    Duration duration = widget.askedPoint.askedStartAt ?? widget.askedPoint.askedEndAt;
+    final Duration duration = 
+      widget.askedPoint.askedStartAt ?? widget.askedPoint.askedEndAt;
     if(duration != null) {
-      DateTime currTime = widget.askedPoint.date.add(duration);
+      final DateTime currTime = widget.askedPoint.date.add(duration);
       return format.format(currTime);
     }
     return formatDate.format(widget.askedPoint.date);
@@ -72,21 +79,22 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
             RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyText2.color, 
                   fontFamily: 'ProductSans'
                 ),
                 children:  <TextSpan>[
                   TextSpan(
                     text: AppLocalizations.of(context).translate('pay'), 
-                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
+                    style: 
+                      const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
                   ),
                 ],
               ) 
               , maxLines: 2
             ),
-            SizedBox(width: 5),
-            Icon(Icons.account_balance, size: 30),
+            const SizedBox(width: 5),
+            const Icon(Icons.account_balance, size: 30),
           ]
         ),
         backgroundColor: Theme.of(context).backgroundColor,
@@ -151,10 +159,11 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                                       Icons.star_border, 
                                       color: Theme.of(context).primaryColor,
                                     ),
-                                    SizedBox(width: 2),
+                                    const SizedBox(width: 2),
                                     Text(
-                                      AppLocalizations.of(context).translate('default_credit_card'),
-                                      style: const TextStyle(
+                                      AppLocalizations.of(context)
+                                        .translate('default_credit_card'),
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Theme.of(context).primaryColor
                                       ),
@@ -166,41 +175,43 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Text(
                                 widget.defaultCreditCard.cardHolderName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).backgroundColor
                                 ),
                               ),  
-                              (!brandToCardType.containsKey(widget.defaultCreditCard.brand) ? Container(
+                              SizedBox(
                                 height: 48,
                                 width: 48,
-                              ) : Image.asset(
-                                cardTypeIconAsset[brandToCardType[widget.defaultCreditCard.brand]],
+                                child: !brandToCardType.containsKey(widget.defaultCreditCard.brand) ? Image.asset(
+                                  cardTypeIconAsset[
+                                    brandToCardType[
+                                      widget.defaultCreditCard.brand
+                                    ]
+                                  ],
                                   height: 48,
                                   width: 48
-                                )
-                              ),
+                                ) : const SizedBox()
+                              )
                             ]
                           ),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Text(
                                 widget.defaultCreditCard.cardNumber,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).backgroundColor
                                 ),
                               ),
                               Text(
                                 widget.defaultCreditCard.expiryDate,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).backgroundColor
                                 ),
@@ -217,7 +228,8 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
               const Divider(), 
               TextButton(
                 style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                  overlayColor: 
+                    MaterialStateProperty.all(Theme.of(context).splashColor)
                 ),
                 onPressed: (){
                   Navigator.of(context).pop();
@@ -228,10 +240,10 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                   children: <Widget>[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         TitledValueWidget(
-                          title: AppLocalizations.of(context).translate('order'),
+                          title: 
+                            AppLocalizations.of(context).translate('order'),
                           value: parseDuration(),
                         ),
                         Icon(
@@ -248,34 +260,41 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
               ),            
               const Divider(),
               Container(
-                padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+                padding: const EdgeInsets.only(
+                  bottom: 5, top: 5, left: 10, right: 10),
                 child: Material(
                   elevation: 3,
                   color: Theme.of(context).backgroundColor,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
-                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
+                    overlayColor: MaterialStateProperty.all(
+                      Theme.of(context).splashColor),
                     onTap: ()  {},
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     child: Container(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           Text(
-                            AppLocalizations.of(context).translate('order_value'),
-                            style: const TextStyle(
+                            AppLocalizations.of(context)
+                              .translate('order_value'),
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12.0,
                               color: Theme.of(context).primaryColor
                             ),
                           ),
                           Text(
-                            formatAmount(widget.askedPoint.amount, widget.askedPoint.currency, AppLocalizations.of(context).locale),
-                            style: const TextStyle(
+                            formatAmount(
+                              widget.askedPoint.amount, 
+                              widget.askedPoint.currency, 
+                              AppLocalizations.of(context).locale
+                            ),
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 30.0,
                               color: Theme.of(context).primaryColor
@@ -292,19 +311,20 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
         )
       ),
       floatingActionButton: Builder(
-        builder: (BuildContext context) => isLoading ? SizedBox() :  FloatingActionButton.extended(
+        builder: (BuildContext context) => isLoading ? 
+          const SizedBox() : FloatingActionButton.extended(
           onPressed: () => _onPressed(context),
           label: Row(
             children: <Widget>[
               Text(
                 AppLocalizations.of(context).translate('do_payment'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15.0,
                   color: Theme.of(context).backgroundColor
                 ),
               ),
-              SizedBox(width: 5),
+              const SizedBox(width: 5),
               Icon(
                 Icons.payment, 
                 color: Theme.of(context).backgroundColor,

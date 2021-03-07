@@ -5,11 +5,11 @@ import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
-import 'package:perna/models/creditCard.dart';
+import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/widgets/credit_cardForm.dart';
 import 'package:perna/widgets/add_button.dart';
-import 'package:perna/widgets/creditCardWidget.dart';
+import 'package:perna/widgets/credit_card_widget.dart';
 
 class CreditCardPage extends StatefulWidget {
   final PaymentsService paymentsService;
@@ -34,17 +34,17 @@ class CreditCardPageState extends State<CreditCardPage> {
   CreditCard creditCardModel = CreditCard();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  void _onPressed(context) async {
+  Future<dynamic> _onPressed(BuildContext context) async {
     if (formKey.currentState.validate()) {
       setState(() { isLoading = true; });
-      int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
+      final int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
       if(statusCode == 200) {
-        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
         showSnackBar(AppLocalizations.of(context).translate('successfully_added_card'), 
           Colors.greenAccent, context);
       } else {
         setState(() {
-          this.cardType = Container(
+          cardType = const SizedBox(
             height: 48,
             width: 48,
           );
@@ -69,20 +69,22 @@ class CreditCardPageState extends State<CreditCardPage> {
             RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyText2.color, 
                   fontFamily: 'ProductSans'
                 ),
                 children:  <TextSpan>[
                   TextSpan(
-                    text: AppLocalizations.of(context).translate('credit_card'), 
-                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)
+                    text: 
+                      AppLocalizations.of(context).translate('credit_card'), 
+                    style: const TextStyle(
+                      fontSize: 30, fontWeight: FontWeight.bold)
                   ),
                 ],
               ) 
               , maxLines: 2
             ),
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             Icon(Icons.credit_card, size: 30),
           ]
         ),

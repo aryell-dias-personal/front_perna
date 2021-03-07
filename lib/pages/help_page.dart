@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:perna/models/helpItem.dart';
+import 'package:perna/models/help_item.dart';
 
 class HelpPage extends StatelessWidget {
 
@@ -22,7 +22,7 @@ class HelpPage extends StatelessWidget {
             RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: const TextStyle(
+                style: TextStyle(
                   color: Theme.of(context).textTheme.bodyText2.color, 
                   fontFamily: 'ProductSans'
                 ),
@@ -35,8 +35,8 @@ class HelpPage extends StatelessWidget {
               ) 
               , maxLines: 2
             ),
-          ] + (helpItem.iconData == null ? [] : [
-            SizedBox(width: 5),
+          ] + (helpItem.iconData == null ? <Widget>[] : <Widget>[
+            const SizedBox(width: 5),
             Icon(helpItem.iconData, size: 30),
           ])
         ),
@@ -57,10 +57,10 @@ class HelpPage extends StatelessWidget {
         builder: (BuildContext context) {
           return ListView.separated(
             itemCount: (helpItem?.subItems?.length ?? 0) + (helpItem.content == null ? 0 : 1),
-            separatorbuilder: (BuildContext context, index) {
+            separatorBuilder: (BuildContext context, index) {
               return const Divider();
             },
-            itembuilder: (BuildContext context, index) {
+            itemBuilder: (BuildContext context, index) {
               if(index == 0) {
                 return Padding(
                   padding: EdgeInsets.all(10),
@@ -111,7 +111,7 @@ class HelpPage extends StatelessWidget {
                         children: <Widget>[
                           Text(
                             subHelpItem.smallTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).primaryColor
                             ),
@@ -119,7 +119,7 @@ class HelpPage extends StatelessWidget {
                           RichText(
                             overflow: TextOverflow.ellipsis,
                             text: TextSpan(
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Theme.of(context).textTheme.bodyText2.color, 
                                 fontFamily: 'ProductSans'
                               ),

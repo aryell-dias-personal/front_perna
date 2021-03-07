@@ -5,21 +5,21 @@ import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class StaticMapService{
-  final decoder = JsonDecoder();
-  final baseUrl = 'https://maps.googleapis.com/maps/api/directions/';
-  String apiKey = FlavorConfig.instance.variables['apiKey'];
+  final JsonDecoder decoder = const JsonDecoder();
+  final String baseUrl = 'https://maps.googleapis.com/maps/api/directions/';
+  String apiKey = FlavorConfig.instance.variables['apiKey'] as String;
 
   String mountStaticMapUrl({
     List<LatLng> route,
     LatLng markerA, LatLng markerB 
   }){
-    final baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
+    const String baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
     String routeParams = '';
-    if(route != null && route.length > 0) {
+    if(route != null && route.isNotEmpty) {
       routeParams = '&path=color:0x0000ff|weight:5';
-      route.forEach((LatLng point) {
+      for (final LatLng point in route) {
         routeParams += '|${point.latitude},${point.longitude}';
-      });
+      }
     }
     String markersParams = '';
     if(markerA != null) {
@@ -35,8 +35,8 @@ class StaticMapService{
     List<LatLng> route,
     LatLng markerA, LatLng markerB 
   }) async {
-    String url = mountStaticMapUrl(markerA: markerA, markerB: markerB, route: route);
-    Response response = await get(Uri.parse(url));   
+    final String url = mountStaticMapUrl(markerA: markerA, markerB: markerB, route: route);
+    final Response response = await get(Uri.parse(url));   
     return Uint8List.fromList(response.bodyBytes);
   }
 

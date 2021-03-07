@@ -7,7 +7,7 @@ import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/services/signIn.dart';
+import 'package:perna/services/sign_in.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +38,7 @@ Future<dynamic> main() async {
   
   FlavorConfig(
       name: 'DEVELOP',
-      variables: {
-        // ignore: lines_longer_than_80_chars
+      variables: <String, String>{
         'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
         'appName': 'aryell-test',
         'projectID': 'aryell-test',
@@ -53,12 +52,13 @@ Future<dynamic> main() async {
   );
 
   final FirebaseApp app = await Firebase.initializeApp(
-    name: FlavorConfig.instance.variables['appName'],
+    name: FlavorConfig.instance.variables['appName'] as String,
     options: FirebaseOptions(
-      appId: FlavorConfig.instance.variables['googleAppID'],
-      apiKey: FlavorConfig.instance.variables['apiKey'],
-      projectId: FlavorConfig.instance.variables['projectID'],
-      messagingSenderId: FlavorConfig.instance.variables['gcmSenderID'],
+      appId: FlavorConfig.instance.variables['googleAppID'] as String,
+      apiKey: FlavorConfig.instance.variables['apiKey'] as String,
+      projectId: FlavorConfig.instance.variables['projectID'] as String,
+      messagingSenderId: 
+        FlavorConfig.instance.variables['gcmSenderID'] as String,
     )
   );
   final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
