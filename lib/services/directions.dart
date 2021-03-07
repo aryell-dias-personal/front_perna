@@ -27,7 +27,6 @@ class DirectionsService{
     }
   }
 
-  // TODO: testar esse cara
   List<LatLng> decodeEncodedPolyline(String encoded){
     final List<LatLng> poly = <LatLng>[];
     final int len = encoded.length;

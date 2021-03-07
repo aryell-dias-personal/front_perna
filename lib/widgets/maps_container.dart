@@ -243,7 +243,6 @@ class _MapsContainerState extends State<MapsContainer> {
     DateTime today = DateTime.now();
     today = DateTime(today.year, today.month, today.day);
     final int elapsedTime = DateTime.now().microsecondsSinceEpoch - today.microsecondsSinceEpoch;
-    // TODO: corrigir evento, askedEndAt agora é um duration, num da pra funcionar assim mais
     return getIt<FirebaseFirestore>().collection('agent')
       .where('email', isEqualTo: widget.email)
       .where('processed', isEqualTo: true)

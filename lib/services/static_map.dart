@@ -9,7 +9,6 @@ class StaticMapService{
   final String baseUrl = 'https://maps.googleapis.com/maps/api/directions/';
   String apiKey = FlavorConfig.instance.variables['apiKey'] as String;
 
-  // TODO: verificar esse cara  aqui
   String mountStaticMapUrl({
     List<LatLng> route,
     LatLng markerA, LatLng markerB 
