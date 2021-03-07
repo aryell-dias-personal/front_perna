@@ -111,6 +111,7 @@ class MaskedTextController extends TextEditingController {
         continue;
       }
 
+      // ignore: use_string_buffers
       result += maskChar;
       maskCharIndex += 1;
       continue;
@@ -129,7 +130,7 @@ CardType detectCCType(String cardNumber) {
 
   cardNumPatterns.forEach(
     (CardType type, Set<List<String>> patterns) {
-      for (List<String> patternRange in patterns) {
+      for (final List<String> patternRange in patterns) {
         String ccPatternStr = cardNumber.replaceAll(RegExp(r'\s+\b|\b\s'), '');
         final int rangeLen = patternRange[0].length;
         if (rangeLen < cardNumber.length) {
@@ -140,7 +141,9 @@ CardType detectCCType(String cardNumber) {
           final int ccPrefixAsInt = int.parse(ccPatternStr);
           final int startPatternPrefixAsInt = int.parse(patternRange[0]);
           final int endPatternPrefixAsInt = int.parse(patternRange[1]);
-          if (ccPrefixAsInt >= startPatternPrefixAsInt && ccPrefixAsInt <= endPatternPrefixAsInt) {
+          if (ccPrefixAsInt >= startPatternPrefixAsInt 
+            && ccPrefixAsInt <= endPatternPrefixAsInt
+          ) {
             cardType = type;
             break;
           }
@@ -157,11 +160,12 @@ CardType detectCCType(String cardNumber) {
   return cardType;
 }
 
+// ignore: lines_longer_than_80_chars
 Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback) {
   Widget icon;
-  CardType cardType = detectCCType(cardNumber);
+  final CardType cardType = detectCCType(cardNumber);
   if (cardType == CardType.otherBrand) {
-    icon = Container(
+    icon = const SizedBox(
       height: 48,
       width: 48,
     );
@@ -172,13 +176,17 @@ Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback)
       height: 48,
       width: 48
     );
-    isAmexCallback(cardType == CardType.americanExpress, cardTypeToBrand[cardType]);
+    isAmexCallback(
+      cardType == CardType.americanExpress, 
+      cardTypeToBrand[cardType]
+    );
   }
   return icon;
 }
 
 String formatAmount(int amount, String currency, Locale locale) {
-  String localeName = '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
-  NumberFormat format = NumberFormat.simpleCurrency(locale: localeName);
+  final String localeName = 
+    '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
+  final NumberFormat format = NumberFormat.simpleCurrency(locale: localeName);
   return format.format(amount/100);
 }
