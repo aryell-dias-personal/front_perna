@@ -1,4 +1,4 @@
-final darkStyle = """
+const String darkStyle = '''
 [
   {
     "elementType": "geometry",
@@ -185,4 +185,4 @@ final darkStyle = """
     ]
   }
 ]
-""";
+''';
