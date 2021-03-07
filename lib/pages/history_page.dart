@@ -195,7 +195,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       MaterialPageRoute<Widget>(
                         builder: (BuildContext context) => 
                           StoreConnector<StoreState, Map<String, dynamic>>(
-                          converter: (Store<StoreState> store) => {
+                          converter: (Store<StoreState> store) => <String, dynamic>{
                             'userService': store.state.userService,
                             'driverService': store.state.driverService
                           },

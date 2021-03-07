@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/agent.dart';
@@ -9,75 +10,72 @@ import 'package:perna/store/state.dart';
 import 'package:perna/widgets/titled_value_widget.dart';
 
 class PinInfo extends StatelessWidget {
+  const PinInfo({Key key, this.visible, this.agent}) : super(key: key);
+
   final bool visible;
   final Agent agent;
 
-  const PinInfo({Key key, this.visible, this.agent}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       left: 0,
       right: 0,
-      bottom: this.visible? 0 : -100,
+      bottom: visible? 0 : -100,
       child: Padding(
-        padding: EdgeInsets.all(15),
+        padding: const EdgeInsets.all(15),
         child:  Material(
           color: Theme.of(context).backgroundColor,
           clipBehavior: Clip.antiAlias,
-          borderRadius: BorderRadius.all(Radius.circular(50)),
+          borderRadius: const BorderRadius.all(Radius.circular(50)),
           elevation: 5,
           child: InkWell(
             overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(
+              Navigator.push(context, MaterialPageRoute<ExpedientPage>(
                   builder: (BuildContext context) => Scaffold(
                     body: StoreConnector<StoreState, DriverService>(
-                      builder: (BuildContext context, driverService) => ExpedientPage(
+                      builder: (BuildContext context, DriverService driverService) => ExpedientPage(
                         driverService: driverService,
-                        agent: this.agent, 
+                        agent: agent, 
                         readOnly: true, 
                         clear: (){}
                       ),
-                      converter: (store)=>store.state.driverService
+                      converter: (Store<StoreState> store)=>store.state.driverService
                     )
                   )
                 )
               );
             },
             child: Container(
-              padding: EdgeInsets.only(left: 30, right: 10, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(left: 30, right: 10, top: 10, bottom: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Container(
+                        SizedBox(
                           width: 230,
                           child: TitledValueWidget(
                             title: AppLocalizations.of(context).translate('driver'),  
-                            value: (this.agent?.email ?? ''),
-                            titleSize: 14,
-                            valueSize: 14,
+                            value: agent?.email ?? '',
                           ),
                         ),
                         TitledValueWidget(
                           title: AppLocalizations.of(context).translate('seats_number'),  
-                          value: '${this.agent?.places ?? ''}',
-                          titleSize: 14,
-                          valueSize: 14,
+                          value: '${agent?.places ?? ''}',
                         ),
                       ]
                     ),
                   CircleAvatar(
                     backgroundColor: Theme.of(context).primaryColor,
+                    radius: 30,
                     child: Padding(
-                      padding: EdgeInsets.all(10), 
+                      padding: const EdgeInsets.all(10), 
                       child: Image.asset('icons/car_small.png') 
                     ),
-                    radius: 30,
                   )
                 ],
               )

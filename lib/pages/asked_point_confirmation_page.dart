@@ -37,7 +37,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
   final DateFormat format = DateFormat('dd/MM/yyyy HH:mm');
   final DateFormat formatDate = DateFormat('dd/MM/yyyy');
   
-  Future<dynamic> _onPressed(BuildContext context) async {
+  Future<void> _onPressed(BuildContext context) async {
     setState(() { isLoading = true; });
     final int statusCode = 
       await widget.paymentsService.confirmAskedPointPayment(
@@ -119,42 +119,39 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
           )
         ) : SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(bottom: 5, top: 15, left: 10, right: 10),
+                padding: const EdgeInsets.only(bottom: 5, top: 15, left: 10, right: 10),
                 child: Material(
                   elevation: 3,
                   color: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
                     overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                     onTap: ()  {},
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                     child: Container(
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
-                            mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                            children: <Widget>[
                               Container(
-                                padding: EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 3),
+                                padding: const EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 3),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  borderRadius: const BorderRadius.all(Radius.circular(50)),
                                   color: Theme.of(context).backgroundColor
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
+                                  children: <Widget>[
                                     Icon(
                                       Icons.star_border, 
                                       color: Theme.of(context).primaryColor,

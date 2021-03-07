@@ -6,15 +6,6 @@ import 'package:perna/services/sign_in.dart';
 import 'package:perna/services/user.dart';
 
 class StoreState{
-  bool logedIn;
-  User user;
-  String messagingToken;
-  FirebaseFirestore firestore;
-  UserService userService;
-  DriverService driverService;
-  SignInService signInService;
-  PaymentsService paymentsService;
-
   StoreState({
     this.logedIn,
     this.user,
@@ -26,14 +17,38 @@ class StoreState{
     this.paymentsService
   });
 
-  static StoreState fromJson(dynamic json) {
+  // ignore: prefer_constructors_over_static_methods
+  static StoreState fromJson(dynamic parsedJson) {
+    if(parsedJson == null){
+      return StoreState(
+        logedIn: false
+      );
+    }
     return StoreState(
-      user: json != null ? User.fromJson(json['user']): null,
-      logedIn: json != null ? json['logedIn'] : false
+      user: User.fromJson(parsedJson['user'] as Map<String, dynamic>),
+      logedIn: parsedJson['logedIn'] as bool
     );
   }
 
-  StoreState copyWith({user, logedIn, firestore, messagingToken, userService, driverService, signInService, paymentsService}) => StoreState(
+  bool logedIn;
+  User user;
+  String messagingToken;
+  FirebaseFirestore firestore;
+  UserService userService;
+  DriverService driverService;
+  SignInService signInService;
+  PaymentsService paymentsService;
+
+  StoreState copyWith({
+    User user, 
+    bool logedIn, 
+    FirebaseFirestore firestore, 
+    String messagingToken, 
+    UserService userService, 
+    DriverService driverService, 
+    SignInService signInService, 
+    PaymentsService paymentsService
+  }) => StoreState(
     user: user ?? this.user,
     logedIn: logedIn ?? this.logedIn,
     firestore: firestore ?? this.firestore,
@@ -45,7 +60,7 @@ class StoreState{
   );
 
   dynamic toJson(){
-    return {
+    return <String, dynamic>{
       'user': user.toJson(),
       'logedIn': logedIn
     };

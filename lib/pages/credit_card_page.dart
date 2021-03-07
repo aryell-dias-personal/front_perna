@@ -7,18 +7,19 @@ import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/widgets/credit_cardForm.dart';
+import 'package:perna/widgets/credit_card_form.dart';
 import 'package:perna/widgets/add_button.dart';
 import 'package:perna/widgets/credit_card_widget.dart';
 
 class CreditCardPage extends StatefulWidget {
-  final PaymentsService paymentsService;
-  final String userToken;
   
-  CreditCardPage({
+  const CreditCardPage({
     @required this.paymentsService,
     @required this.userToken
   });
+
+  final PaymentsService paymentsService;
+  final String userToken;
 
   @override
   State<StatefulWidget> createState() => CreditCardPageState();
@@ -27,14 +28,14 @@ class CreditCardPage extends StatefulWidget {
 class CreditCardPageState extends State<CreditCardPage> {
   bool isLoading = false;
   bool isAmex = false;
-  Widget cardType = Container(
+  Widget cardType = const SizedBox(
     height: 48,
     width: 48,
   );
   CreditCard creditCardModel = CreditCard();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  Future<dynamic> _onPressed(BuildContext context) async {
+  Future<void> _onPressed(BuildContext context) async {
     if (formKey.currentState.validate()) {
       setState(() { isLoading = true; });
       final int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
@@ -85,7 +86,7 @@ class CreditCardPageState extends State<CreditCardPage> {
               , maxLines: 2
             ),
             const SizedBox(width: 5),
-            Icon(Icons.credit_card, size: 30),
+            const Icon(Icons.credit_card, size: 30),
           ]
         ),
         backgroundColor: Theme.of(context).backgroundColor,
@@ -112,22 +113,22 @@ class CreditCardPageState extends State<CreditCardPage> {
         child: Column(
           children: <Widget>[
             CreditCardWidget(
-              isAmex: this.isAmex,
-              cardType: this.cardType,
-              cardNumber: this.creditCardModel.cardNumber ?? '',
-              expiryDate: this.creditCardModel.expiryDate ?? '',
-              cardHolderName: this.creditCardModel.cardHolderName ?? '',
-              cvvCode: this.creditCardModel.cvvCode ?? '',
-              showBackView: this.creditCardModel.isCvvFocused ?? false
+              isAmex: isAmex,
+              cardType: cardType,
+              cardNumber: creditCardModel.cardNumber ?? '',
+              expiryDate: creditCardModel.expiryDate ?? '',
+              cardHolderName: creditCardModel.cardHolderName ?? '',
+              cvvCode: creditCardModel.cvvCode ?? '',
+              showBackView: creditCardModel.isCvvFocused ?? false
             ),
             const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: <Widget>[
                     CreditCardForm(
-                      isAmex: this.isAmex,
+                      isAmex: isAmex,
                       formKey: formKey,
                       obscureCvv: true,
                       obscureNumber: true,
@@ -152,11 +153,11 @@ class CreditCardPageState extends State<CreditCardPage> {
 
   void onCreditCardChange(CreditCard newCreditCardModel) {
     setState(() {
-      this.creditCardModel = newCreditCardModel;
-      this.cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (willBeAmex, cardBrand) {
+      creditCardModel = newCreditCardModel;
+      cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (bool willBeAmex, String cardBrand) {
         setState(() {
           isAmex = willBeAmex; 
-          this.creditCardModel.brand = cardBrand;
+          creditCardModel.brand = cardBrand;
         });
       });
     });

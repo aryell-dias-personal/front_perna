@@ -26,7 +26,7 @@ GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
-Future<dynamic> main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final Persistor<StoreState> persistor = Persistor<StoreState>(
@@ -104,22 +104,23 @@ Future<dynamic> main() async {
         myDecoder: myDecoder
       )
     ),
-    middleware: [persistor.createMiddleware()]
+    middleware: <dynamic Function(Store<StoreState>, dynamic, dynamic Function(dynamic))>[persistor.createMiddleware()]
   );
   runApp(MyApp(store: store, firebaseMessaging: firebaseMessaging));
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({@required this.store, @required this.firebaseMessaging});
+
   final Store<StoreState> store;
   final FirebaseMessaging firebaseMessaging;
 
-  MyApp({@required this.store, @required this.firebaseMessaging});
 
   @override
   Widget build(BuildContext context) {
     const Color mainLightColor = Color(0xFF1c4966);
     const Color mainDarkColor = Color(0xFFf5feff);
-    SystemChrome.setPreferredOrientations([
+    SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
@@ -141,13 +142,13 @@ class MyApp extends StatelessWidget {
           Locale('en', 'US'),
           Locale('pt', 'BR'),
         ],
-        localizationsDelegates: [
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          for (var supportedLocale in supportedLocales) {
+        localeResolutionCallback: (Locale locale, Iterable<Locale> supportedLocales) {
+          for (final Locale supportedLocale in supportedLocales) {
             if (supportedLocale.languageCode == locale.languageCode &&
                 supportedLocale.countryCode == locale.countryCode) {
               return supportedLocale;
@@ -157,10 +158,10 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           brightness: Brightness.light,
-          textTheme: TextTheme(
+          textTheme: const TextTheme(
             bodyText2: TextStyle(color: mainLightColor)
           ),
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: mainLightColor
           ),
           primaryColor: mainLightColor,
@@ -170,10 +171,10 @@ class MyApp extends StatelessWidget {
         ),
         darkTheme: ThemeData(
           brightness: Brightness.dark,
-          textTheme: TextTheme(
+          textTheme: const TextTheme(
             bodyText2: TextStyle(color: mainDarkColor)
           ),
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: mainDarkColor
           ),
           primaryColor: mainDarkColor,

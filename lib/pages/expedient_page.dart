@@ -84,7 +84,7 @@ class _ExpedientState extends State<ExpedientPage> {
   bool isLoading = false;
   StaticMapService staticMapService = StaticMapService();
 
-  Future<dynamic> _askNewAgend(Agent agent) async {
+  Future<void> _askNewAgend(Agent agent) async {
     final int statusCode = await widget.driverService.askNewAgent(agent);
     if(statusCode == 200){
       widget.clear();
@@ -98,7 +98,7 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  Future<dynamic> _onPressed(String email, String fromEmail) async {
+  Future<void> _onPressed(String email, String fromEmail) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
       final DateTime dateTime = dateFormat.parse(date);
@@ -137,7 +137,7 @@ class _ExpedientState extends State<ExpedientPage> {
     (accept? widget.accept(): widget.deny()).then((_){ setState(() { isLoading=false; }); });
   }
   
-  Future<dynamic> _onSelectedExpedientOptions(FirebaseFirestore firestore, ExpedientOptions result) async {
+  Future<void> _onSelectedExpedientOptions(FirebaseFirestore firestore, ExpedientOptions result) async {
     setState(() { isLoading = true; });
     final String email = result == ExpedientOptions.aboutDriver ? agent.email : agent.fromEmail;
     final QuerySnapshot querySnapshot = await firestore.collection('user').where('email', isEqualTo:email).get();

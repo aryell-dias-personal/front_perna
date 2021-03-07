@@ -24,7 +24,7 @@ const Map<String, CardType> brandToCardType = <String, CardType>{
   'Discover': CardType.discover,
 };
 
-const Map<CardType, String> cardTypeIconAsset = {
+const Map<CardType, String> cardTypeIconAsset = <CardType, String>{
   CardType.visa: 'icons/visa.png',
   CardType.americanExpress: 'icons/amex.png',
   CardType.mastercard: 'icons/mastercard.png',

@@ -10,21 +10,21 @@ import 'package:perna/pages/credit_card_page.dart';
 import 'package:perna/services/payments.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
-class WalletPage extends StatefulWidget {
-  final Future<String> Function() getRefreshToken;
-  final PaymentsService paymentsService;
- 
+class WalletPage extends StatefulWidget { 
   const WalletPage({
     @required this.getRefreshToken,
     @required this.paymentsService
   });
+
+  final Future<String> Function() getRefreshToken;
+  final PaymentsService paymentsService;
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
 
 class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
-  List<CreditCard> creditCards = [];
+  List<CreditCard> creditCards = <CreditCard>[];
   bool isLoading = true;
   String userToken;
   String selectedCardId;
@@ -37,7 +37,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
         userToken = token;
       });
       widget.paymentsService.listCard(userToken).then(
-        (creditCards) {
+        (List<CreditCard> creditCards) {
           setState(() {
             this.creditCards = creditCards;
             isLoading = false;
@@ -112,26 +112,25 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           ],
         )
       ) : Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.only(top: 10),
         child: Builder(
           builder: (BuildContext context) {
             return ListView.separated(
               itemCount: creditCards.length,
-              separatorBuilder: (BuildContext context, index) {
+              separatorBuilder: (BuildContext context, int index) {
                 return const Divider();
               },
-              itemBuilder: (BuildContext context, index) {
-                CreditCard currCreditCard = creditCards[index];
+              itemBuilder: (BuildContext context, int index) {
+                final CreditCard currCreditCard = creditCards[index];
                 return AnimatedSize(
                   vsync: this,
-                  curve: Curves.linear,
-                  duration: Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   child: Container(
-                    padding: EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
+                    padding: const EdgeInsets.only(bottom: 5, top: 5, left: 10, right: 10),
                     child: Material(
                       elevation: 3,
                       color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10))
                       ),
                       child: InkWell(
@@ -141,30 +140,27 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                             selectedCardId = selectedCardId != currCreditCard.id ? currCreditCard.id : null;
                           });
                         },
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
                         child: Container(
-                          padding: EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Row(
-                                mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  (index != 0 ? SizedBox() 
-                                  : Container(
-                                    padding: EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 3),
+                                children: <Widget>[
+                                  if(index == 0) Container(
+                                    padding: const EdgeInsets.only(left: 5, right: 10, top: 3, bottom: 3),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                                      borderRadius: const BorderRadius.all(Radius.circular(50)),
                                       color: Theme.of(context).backgroundColor
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
+                                      children: <Widget>[
                                         Icon(
                                           Icons.star_border, 
                                           color: Theme.of(context).primaryColor,
@@ -179,33 +175,29 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                         ),  
                                       ],
                                     )
-                                  )),
-                                  (selectedCardId != currCreditCard.id ? SizedBox() 
-                                  : Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Icon(
-                                          Icons.check_circle_outline, 
-                                          color: Theme.of(context).backgroundColor,
+                                  ),
+                                  if(selectedCardId == currCreditCard.id) Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.check_circle_outline, 
+                                        color: Theme.of(context).backgroundColor,
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        AppLocalizations.of(context).translate('selected_credit_card'),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).backgroundColor
                                         ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          AppLocalizations.of(context).translate('selected_credit_card'),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(context).backgroundColor
-                                          ),
-                                        ),  
-                                      ],
-                                    )
+                                      ),  
+                                    ],
                                   )
                                 ]
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
                                     currCreditCard.cardHolderName,
@@ -213,22 +205,25 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).backgroundColor
                                     ),
-                                  ),  
-                                  (!brandToCardType.containsKey(currCreditCard.brand) ? Container(
+                                  ), 
+                                  SizedBox(
                                     height: 48,
                                     width: 48,
-                                  ) : Image.asset(
-                                    cardTypeIconAsset[brandToCardType[currCreditCard.brand]],
+                                    child: !brandToCardType.containsKey(currCreditCard.brand) ? Image.asset(
+                                      cardTypeIconAsset[
+                                        brandToCardType[
+                                          currCreditCard.brand
+                                        ]
+                                      ],
                                       height: 48,
                                       width: 48
-                                    )
-                                  ),
+                                    ) : const SizedBox()
+                                  )
                                 ]
                               ),
                               const SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
                                     currCreditCard.cardNumber,
@@ -260,14 +255,13 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
         ))
       ),
       floatingActionButton: Builder(
-        builder: (BuildContext context) => (
-          isLoading || creditCards.length == maxCardNumber ? SizedBox() : (selectedCardId == null ? FloatingActionButton(
+        builder: (BuildContext context) =>
+          isLoading || creditCards.length == maxCardNumber ? const SizedBox() : (selectedCardId == null ? FloatingActionButton(
             heroTag: '3',
             backgroundColor: Theme.of(context).primaryColor,
-            child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
             tooltip: AppLocalizations.of(context).translate('add_credit_card'),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
+              Navigator.push(context, MaterialPageRoute<CreditCardPage>(
                 builder: (BuildContext context) => CreditCardPage(
                     paymentsService: widget.paymentsService,
                     userToken: userToken,
@@ -275,6 +269,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                 )
               );
             },
+            child: Icon(Icons.credit_card, color: Theme.of(context).backgroundColor),
           ) : SpeedDial(
             icon: Icons.edit_outlined,
             marginEnd: 14,
@@ -284,13 +279,13 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             ),
             heroTag: '3',
             backgroundColor: Theme.of(context).primaryColor,
-            children: (creditCards?.first?.id == selectedCardId ? <SpeedDialChild>[] : [
+            children: (creditCards?.first?.id == selectedCardId ? <SpeedDialChild>[] : <SpeedDialChild>[
               SpeedDialChild(
                 onTap: () async {
                   setState(() { isLoading = true; });
-                  int statusCode = await widget.paymentsService.turnCardDefault(selectedCardId, userToken);
+                  final int statusCode = await widget.paymentsService.turnCardDefault(selectedCardId, userToken);
                   if(statusCode == 200) {
-                    List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
+                    final List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate('successfully_turned_card_default'), 
                       Colors.greenAccent, context);
@@ -310,13 +305,13 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                 label: AppLocalizations.of(context).translate('turn_credit_card_default'),
                 backgroundColor: Colors.amberAccent,
               )
-            ]) + [
+            ]) + <SpeedDialChild>[
               SpeedDialChild(
                 onTap: () async {
                   setState(() { isLoading = true; });
-                  int statusCode = await widget.paymentsService.deleteCard(selectedCardId, userToken);
+                  final int statusCode = await widget.paymentsService.deleteCard(selectedCardId, userToken);
                   if(statusCode == 200) {
-                    List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
+                    final List<CreditCard> creditCards = await widget.paymentsService.listCard(userToken);
                     setState(() { this.creditCards = creditCards; });
                     showSnackBar(AppLocalizations.of(context).translate('successfully_delete_card'), 
                       Colors.greenAccent, context);
@@ -339,7 +334,6 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
             ],
             tooltip: AppLocalizations.of(context).translate('edit_credit_card'),
           ))
-        )
       )
     );
   }

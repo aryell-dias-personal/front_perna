@@ -116,7 +116,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   Theme.of(context).primaryColor.withOpacity(0.86),
                 ],
               ),
-              boxShadow: <BoxShadow>[
+              boxShadow: const <BoxShadow>[
                 BoxShadow(
                   color: Colors.black38,
                   blurRadius: 5,
@@ -154,7 +154,6 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   ),
                 ),
                 Expanded(
-                  flex: 1,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16),
                     child: Text(
@@ -212,7 +211,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   Theme.of(context).primaryColor.withOpacity(0.86),
                 ],
               ),
-              boxShadow: <BoxShadow>[
+              boxShadow: const <BoxShadow>[
                 BoxShadow(
                   color: Colors.black38,
                   blurRadius: 5,
@@ -239,7 +238,6 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   child: Container(
                     margin: const EdgeInsets.only(top: 16),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Expanded(
                           flex: 9,
@@ -261,7 +259,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                                 maxLines: 1,
                                 style: 
                                   Theme.of(context).textTheme.headline6.merge(
-                                    TextStyle(
+                                    const TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'halter',
                                       fontSize: 16

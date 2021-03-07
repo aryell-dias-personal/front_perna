@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -62,7 +63,7 @@ class SideMenu extends StatelessWidget {
                 Navigator.push(context, MaterialPageRoute<HistoryPage>(
                     builder: (BuildContext context) => 
                       StoreConnector<StoreState, FirebaseFirestore>(
-                      converter: (store) => store.state.firestore,
+                      converter: (Store<StoreState> store) => store.state.firestore,
                       builder: 
                       (BuildContext context, FirebaseFirestore firestore) => 
                         HistoryPage(email: email, firestore: firestore)
@@ -79,7 +80,7 @@ class SideMenu extends StatelessWidget {
                 Navigator.push(context, MaterialPageRoute<WalletPage>(
                     builder: (BuildContext context) => 
                     StoreConnector<StoreState, Map<String, dynamic>>(
-                      converter: (store) => {
+                      converter: (Store<StoreState> store) => <String, dynamic>{
                         'getRefreshToken': 
                           store.state.signInService.getRefreshToken,
                         'paymentsService': store.state.paymentsService 
@@ -87,7 +88,7 @@ class SideMenu extends StatelessWidget {
                       builder: 
                       (BuildContext context, Map<String, dynamic> resources) => 
                       WalletPage(
-                        getRefreshToken: resources['getRefreshToken'],
+                        getRefreshToken: resources['getRefreshToken'] as Future<String> Function(),
                         paymentsService: resources['paymentsService']
                       )
                     )

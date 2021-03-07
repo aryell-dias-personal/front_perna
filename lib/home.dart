@@ -26,7 +26,7 @@ import 'package:timezone/timezone.dart' as timezone;
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = 
   FlutterLocalNotificationsPlugin();
 
-Future<dynamic> onMessage(RemoteMessage message) async {
+Future<void> onMessage(RemoteMessage message) async {
   const JsonEncoder enc = JsonEncoder();
   final Random rand = Random();
   const AndroidNotificationDetails androidPlatformChannelSpecifics = 
@@ -66,7 +66,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isConnected = true;
 
-  Future<dynamic> askNewAgentHandler(RemoteMessage message) async {
+  Future<void> askNewAgentHandler(RemoteMessage message) async {
     const JsonDecoder dec = JsonDecoder();
     final NavigatorState navigatorState = Navigator.of(context);
     final Agent agent = Agent.fromJson(
@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<dynamic> answerNewAgentHandler(Agent agent, { bool accepted }) async {
+  Future<void> answerNewAgentHandler(Agent agent, { bool accepted }) async {
     if(accepted){
       final String token =  await widget.signInService.getRefreshToken();
       final int statusCodeNewAgent = await widget.driverService.postNewAgent(
@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
     Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
   }
 
-  Future<dynamic> scheduleMessage(RemoteMessage message) async {
+  Future<void> scheduleMessage(RemoteMessage message) async {
     const JsonEncoder enc = JsonEncoder();
     final Random rand = Random();
     final int time = double.parse(message.data['time'] as String).round();
@@ -174,7 +174,7 @@ class _HomeState extends State<Home> {
     );
   }
   
-  Future<dynamic> onLaunch(RemoteMessage message) async {
+  Future<void> onLaunch(RemoteMessage message) async {
     if(message.data != null){
       if(message.data['time'] != null && message.data['type'] != null){
         await scheduleMessage(message);

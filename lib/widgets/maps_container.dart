@@ -14,10 +14,10 @@ import 'package:perna/models/point.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/floatingAnimatedButton.dart';
+import 'package:perna/widgets/floating_animated_button.dart';
 import 'package:perna/widgets/map_listener.dart';
-import 'package:perna/widgets/reactiveFloatingButton.dart';
-import 'package:perna/widgets/searchLocation.dart';
+import 'package:perna/widgets/reactive_floating_button.dart';
+import 'package:perna/widgets/search_location.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
@@ -34,12 +34,12 @@ class MapsContainer extends StatefulWidget {
     @required this.firestore
   });
   
-  final Function preExecute;
+  final Function() preExecute;
   final String email;
   final FirebaseFirestore firestore;
-  final Function changeSideMenuState;
+  final Function() changeSideMenuState;
   final Function setVisiblePin;
-  final Function getRefreshToken;
+  final Future<String> Function() getRefreshToken;
   final AnimationController controller;
 
   @override
@@ -80,12 +80,12 @@ class _MapsContainerState extends State<MapsContainer> {
     });
   }
 
-  Future<dynamic> addNewExpedient() async {
+  Future<void> addNewExpedient() async {
     if(markers.length == 1){
       final List<String> snippet1 = markers.first.infoWindow.snippet.split('</>');
       final Agent agent = Agent(
         friendlyGarage: snippet1.first,
-        region: snippet1.length > 1 ? [
+        region: snippet1.length > 1 ? <String>[
           snippet1.last
         ] : null,
         garage: markers.first.position
@@ -113,14 +113,14 @@ class _MapsContainerState extends State<MapsContainer> {
     }
   }
 
-  Future<dynamic> addNewAsk() async {
+  Future<void> addNewAsk() async {
     if(markers.length == 2){
       final List<String> snippet1 = markers.first.infoWindow.snippet.split('</>');
       final List<String> snippet2 = markers.last.infoWindow.snippet.split('</>');
       final AskedPoint askedPoint = AskedPoint(
         friendlyOrigin: snippet1.first,
         friendlyDestiny: snippet2.first,
-        region: snippet1.length > 1 && snippet2.length > 1 ? [
+        region: snippet1.length > 1 && snippet2.length > 1 ? <String>[
           snippet1.last,
           snippet2.last
         ] : null,
@@ -139,7 +139,7 @@ class _MapsContainerState extends State<MapsContainer> {
                 clear: markers.clear, 
                 getRefreshToken: widget.getRefreshToken
               ),
-              converter: (store)=>store.state.userService
+              converter: (Store<StoreState> store)=>store.state.userService
             )
           )
         )
@@ -150,7 +150,7 @@ class _MapsContainerState extends State<MapsContainer> {
     }
   }
 
-  Future<dynamic> putMarker(
+  Future<void> putMarker(
     LatLng location, 
     String description, 
     MarkerType 
@@ -241,7 +241,7 @@ class _MapsContainerState extends State<MapsContainer> {
               description, MarkerType.destiny, region
             )
         )
-      ]  + (points==null || points.length <= 1 ? [] : [
+      ]  + (points==null || points.length <= 1 ? <Widget>[] : <Widget>[
         FloatingAnimatedButton(
           heroTag: '1',
           bottom: isPinVisible? 190 : 90,
@@ -251,7 +251,7 @@ class _MapsContainerState extends State<MapsContainer> {
           child: Icon(Icons.navigation, size: 30,
             color: Theme.of(context).backgroundColor),
         )
-      ]) + [
+      ]) + <Widget>[
         ReactiveFloatingButton(
           bottom: isPinVisible? 115 : 15,
           controller: widget.controller,

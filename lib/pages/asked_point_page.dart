@@ -90,7 +90,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   bool isLoading = false;
   StaticMapService staticMapService = StaticMapService();
 
-  Future<dynamic> _onPressed(String email, PaymentsService paymentsService) async {
+  Future<void> _onPressed(String email, PaymentsService paymentsService) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
       final String token = await widget.getRefreshToken();
@@ -145,7 +145,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
     }
   }
 
-  Future<dynamic> _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
+  Future<void> _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
     setState(() { isLoading = true; });
     final DocumentSnapshot documentSnapshot = await firestore.collection('agent').doc(askedPoint.agentId).get();
     if (documentSnapshot.data().isNotEmpty) {

@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:perna/models/help_item.dart';
 
 class HelpPage extends StatelessWidget {
+  const HelpPage({@required this.helpItem});
 
   final HelpItem helpItem;
 
-  HelpPage({@required this.helpItem});
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    double screemWidth = size.width; 
+    final Size size = MediaQuery.of(context).size;
+    final double screemWidth = size.width; 
     return Scaffold(
       appBar: AppBar(
         brightness: Theme.of(context).brightness,
@@ -57,16 +56,16 @@ class HelpPage extends StatelessWidget {
         builder: (BuildContext context) {
           return ListView.separated(
             itemCount: (helpItem?.subItems?.length ?? 0) + (helpItem.content == null ? 0 : 1),
-            separatorBuilder: (BuildContext context, index) {
+            separatorBuilder: (BuildContext context, int index) {
               return const Divider();
             },
-            itemBuilder: (BuildContext context, index) {
+            itemBuilder: (BuildContext context, int index) {
               if(index == 0) {
                 return Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Center(
                     child: Column(
-                      children: [
+                      children: <Widget>[
                         Text(
                           helpItem.title,
                           textAlign: TextAlign.center,
@@ -87,23 +86,22 @@ class HelpPage extends StatelessWidget {
                   )
                 );
               }
-              HelpItem subHelpItem = helpItem.subItems[index-1];
+              final HelpItem subHelpItem = helpItem.subItems[index-1];
               return TextButton(
                 style: ButtonStyle(
                   overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
                 ),
                 onPressed: (){
                   Navigator.push(context, 
-                    MaterialPageRoute(
+                    MaterialPageRoute<HelpPage>(
                       builder: (BuildContext context) => HelpPage(helpItem: subHelpItem)
                     )
                   );
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Container(
+                    SizedBox(
                       width: screemWidth - 56,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,

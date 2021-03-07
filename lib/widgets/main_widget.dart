@@ -6,16 +6,9 @@ import 'package:perna/models/agent.dart';
 import 'package:perna/widgets/animated_side_menu.dart';
 import 'package:perna/widgets/pin_info.dart';
 import 'package:perna/widgets/maps_container.dart';
-import 'package:perna/widgets/sideMenu.dart';
+import 'package:perna/widgets/side_menu.dart';
 
 class MainWidget extends StatefulWidget {
-  final String name;
-  final String email;
-  final String photoUrl;
-  final FirebaseFirestore firestore;
-  final Function logout;
-  final Future<String> Function() getRefreshToken;
-
   const MainWidget({
     Key key, 
     @required this.photoUrl, 
@@ -26,26 +19,20 @@ class MainWidget extends StatefulWidget {
     @required this.logout,
   }) : super(key: key);
 
-  @override
-  _MainWidgetState createState() {
-    return _MainWidgetState(
-      getRefreshToken: this.getRefreshToken,
-      firestore: this.firestore,
-      photoUrl: this.photoUrl, 
-      email: this.email, 
-      name: this.name, 
-      logout: this.logout
-    );
-  }
-}
-
-class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin {
   final String name;
   final String email;
   final String photoUrl;
   final FirebaseFirestore firestore;
-  final Function logout;  
+  final Function() logout;
   final Future<String> Function() getRefreshToken;
+
+  @override
+  _MainWidgetState createState() {
+    return _MainWidgetState();
+  }
+}
+
+class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin {
   Agent visiblePin;
   bool isSideMenuOpen = false;
   bool isPinVisible = false;
@@ -55,48 +42,39 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     setState(() {
-      this.controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
+      controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
     });
   }
-
-  _MainWidgetState({
-    @required this.photoUrl, 
-    @required this.firestore, 
-    @required this.name,
-    @required this.getRefreshToken,
-    @required this.email, 
-    @required this.logout,
-  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
         MapsContainer(
-          preExecute: (){ if(this.isSideMenuOpen) changeSideMenuState(); },
-          changeSideMenuState: this.changeSideMenuState,
-          controller: this.controller,
-          email: this.email,
-          firestore: this.firestore,
-          getRefreshToken: this.getRefreshToken,
+          preExecute: (){ if(isSideMenuOpen) changeSideMenuState(); },
+          changeSideMenuState: changeSideMenuState,
+          controller: controller,
+          email: widget.email,
+          firestore: widget.firestore,
+          getRefreshToken: widget.getRefreshToken,
           setVisiblePin: (Agent agent, Polyline oldPolyline) { 
-            this.setState((){
-              this.isPinVisible = !oldPolyline.visible;
+            setState((){
+              isPinVisible = !oldPolyline.visible;
               visiblePin = agent;
             });
           }
         ),
         PinInfo(
-          visible: this.isPinVisible,
-          agent: this.visiblePin
+          visible: isPinVisible,
+          agent: visiblePin
         ),
         AnimatedSideMenu(
-          isOpen: this.isSideMenuOpen,
+          isOpen: isSideMenuOpen,
           sideMenu: SideMenu(
-            email: this.email, 
-            name: this.name, 
-            logout: this.logout, 
-            photoUrl: this.photoUrl,
+            email: widget.email, 
+            name: widget.name, 
+            logout: widget.logout, 
+            photoUrl: widget.photoUrl,
             textColor: Theme.of(context).primaryColor
           )
         )
@@ -104,7 +82,7 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     );
   }
 
-  changeSideMenuState(){
+  void changeSideMenuState(){
     setState(() {
       isSideMenuOpen =! isSideMenuOpen;
       isSideMenuOpen ? controller.forward() : controller.reverse();

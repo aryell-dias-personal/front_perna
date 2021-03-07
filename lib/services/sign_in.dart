@@ -90,7 +90,7 @@ class SignInService {
     return res.statusCode == 200 ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>) : null;
   }
 
-  Future<dynamic> _authFirebase(GoogleSignInAccount user) async {
+  Future<void> _authFirebase(GoogleSignInAccount user) async {
     final GoogleSignInAuthentication googleAuth = await user.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,

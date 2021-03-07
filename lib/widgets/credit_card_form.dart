@@ -137,7 +137,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
         children: <Widget>[
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            margin: const EdgeInsets.only(left: 16, top: 0, right: 16),
+            margin: const EdgeInsets.only(left: 16, right: 16),
             child: TextFormField(
               obscureText: widget.obscureNumber,
               controller: _cardNumberController,
@@ -145,7 +145,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                 FocusScope.of(context).requestFocus(expiryDateNode);
               },
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 labelText: AppLocalizations.of(context).translate('credit_card_number'),
                 hintText: 'XXXX XXXX XXXX XXXX',
               ),
@@ -172,7 +172,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       FocusScope.of(context).requestFocus(cvvFocusNode);
                     },
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       labelText: AppLocalizations.of(context).translate('credit_card_expire_date'),
                       hintText: 'XX/XX',
                     ),
@@ -184,7 +184,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       }
 
                       final DateTime now = DateTime.now();
-                      final List<String> date = value.split(RegExp(r'/'));
+                      final List<String> date = value.split(RegExp('/'));
                       final int month = int.parse(date.first);
                       final int year = int.parse('20${date.last}');
                       final DateTime cardDate = DateTime(year, month);
@@ -209,7 +209,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       FocusScope.of(context).requestFocus(cardHolderNode);
                     },
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       labelText: AppLocalizations.of(context).translate('cvv'),
                       hintText: widget.isAmex ? 'XXXX' : 'XXX' ,
                     ),
@@ -220,7 +220,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                         cvvCode = text;
                       });
                     },
-                    validator: (value) {
+                    validator: (String value) {
                       if (value.isEmpty || value.length != (widget.isAmex ? 4 : 3)) {
                         return AppLocalizations.of(context).translate('cvv_error');
                       }
@@ -238,7 +238,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
               controller: _cardHolderNameController,
               focusNode: cardHolderNode,
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 labelText: AppLocalizations.of(context).translate('card_holder'),
               ),
               keyboardType: TextInputType.text,
@@ -247,7 +247,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                 onCreditCardChange(creditCardModel);
               },
               onFieldSubmitted: (_) => widget.onSubmit(),
-              validator: (value) {
+              validator: (String value) {
                 if (value.isEmpty) {
                   return AppLocalizations.of(context).translate('card_holder_error');
                 }

@@ -4,19 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class FormDatePicker extends StatelessWidget {
-  final DateFormat format = DateFormat('dd/MM/yyyy');
-  final DateTime initialValue;
-  final String labelText;
-  final String validatorMessage;
-  final IconData icon;
-  final bool readOnly;
-  final bool isRequired;
-  final Function(String) onChanged;
-  final Function(String) onSubmit;
-  final TextInputAction action;
-  final String value;
-
-  FormDatePicker({ 
+FormDatePicker({ 
     @required this.icon,
     @required this.onSubmit,
     @required this.initialValue, 
@@ -29,48 +17,60 @@ class FormDatePicker extends StatelessWidget {
     this.action = TextInputAction.next
   });
 
+  final DateFormat format = DateFormat('dd/MM/yyyy');
+  final DateTime initialValue;
+  final String labelText;
+  final String validatorMessage;
+  final IconData icon;
+  final bool readOnly;
+  final bool isRequired;
+  final Function(String) onChanged;
+  final Function(String) onSubmit;
+  final TextInputAction action;
+  final String value;
+
   @override
   Widget build(BuildContext context) {
     return Flexible(
       child: TextFormField(
         controller: TextEditingController(
-          text: this.value ?? this.format.format(this.initialValue)
+          text: value ?? format.format(initialValue)
         ),
         readOnly: true,
         onTap: () async {
-          if(!this.readOnly) {
-            DateTime selectedDate = await showDatePicker(
+          if(!readOnly) {
+            final DateTime selectedDate = await showDatePicker(
               context: context, 
-              initialDate: this.value != null ? this.format.parse(this.value) : this.initialValue, 
-              firstDate: this.initialValue, 
-              lastDate: this.initialValue.add(Duration(days: 31))
+              initialDate: value != null ? format.parse(value) : initialValue, 
+              firstDate: initialValue, 
+              lastDate: initialValue.add(const Duration(days: 31))
             );
             if(selectedDate != null) {
-              String date = DateFormat('dd/MM/yyyy').format(selectedDate);
-              this.onChanged(date);
+              final String date = DateFormat('dd/MM/yyyy').format(selectedDate);
+              onChanged(date);
             }
           }
         },
         keyboardType: TextInputType.datetime,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: this.labelText,
+          border: const OutlineInputBorder(),
+          labelText: labelText,
           suffixIcon: Icon(icon),
         ), 
         textInputAction: action,
-        validator: (value) {
-          if (this.isRequired) {
+        validator: (String value) {
+          if (isRequired) {
             if(value.isEmpty) {
-              return this.validatorMessage;
+              return validatorMessage;
             }
-            DateTime dateTime = this.format.parse(value);
-            if(this.initialValue.isAfter(dateTime)) {
-              return this.validatorMessage;
+            final DateTime dateTime = format.parse(value);
+            if(initialValue.isAfter(dateTime)) {
+              return validatorMessage;
             }
           }
           return null;
         },
-        onFieldSubmitted: this.onSubmit
+        onFieldSubmitted: onSubmit
       )
     );
   }

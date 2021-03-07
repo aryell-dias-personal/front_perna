@@ -5,6 +5,22 @@ import 'package:intl/intl.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class FormTimePicker extends StatelessWidget {
+  FormTimePicker({ 
+    @required this.initialValue, 
+    @required this.readOnly, 
+    @required this.labelText, 
+    @required this.icon,
+    this.selectedDay,
+    this.value,
+    this.onChanged, 
+    this.validatorMessage, 
+    this.onSubmit, 
+    this.minTime, 
+    this.lastDay = 1,
+    this.isRequired = false, 
+    this.action = TextInputAction.next
+  });
+
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat formatDate = DateFormat('dd/MM/yyyy');
   final DateFormat formatHour = DateFormat('HH:mm');
@@ -22,25 +38,9 @@ class FormTimePicker extends StatelessWidget {
   final String selectedDay;
   final int lastDay;
 
-  FormTimePicker({ 
-    @required this.initialValue, 
-    @required this.readOnly, 
-    @required this.labelText, 
-    @required this.icon,
-    this.selectedDay,
-    this.value,
-    this.onChanged, 
-    this.validatorMessage, 
-    this.onSubmit, 
-    this.minTime, 
-    this.lastDay = 1,
-    this.isRequired = false, 
-    this.action = TextInputAction.next
-  });
-
   String formatInitialDate() {
-    String fullInitialDateString = this.format.format(this.initialValue);
-    if(fullInitialDateString.contains(this.selectedDay)) {
+    final String fullInitialDateString = format.format(initialValue);
+    if(fullInitialDateString.contains(selectedDay)) {
       return fullInitialDateString.split(' ').first;
     }
     return fullInitialDateString;
@@ -50,20 +50,19 @@ class FormTimePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
       child: TextFormField(
-        controller: this.initialValue == null ? TextEditingController(
+        controller: initialValue == null ? TextEditingController(
           text: value
         ): null,
         readOnly: true,
         onTap: () async {
-          if(!this.readOnly) {
-            DateTime initialTime = this.minTime ?? DateTime.now();
-            DateTime currentTime = value != null && selectedDay !=null ? 
+          if(!readOnly) {
+            final DateTime initialTime = minTime ?? DateTime.now();
+            final DateTime currentTime = value != null && selectedDay !=null ? 
               format.parse(value.length > 5 ? value : '$value $selectedDay') : 
               initialTime;
-            DateTime selectedDate = await DatePicker.showDateTimePicker(context,
-              showTitleActions: true,
+            final DateTime selectedDate = await DatePicker.showDateTimePicker(context,
               minTime: initialTime,
-              maxTime: initialTime.add(Duration(days: this.lastDay)),
+              maxTime: initialTime.add(Duration(days: lastDay)),
               theme: DatePickerTheme(
                 backgroundColor: Theme.of(context).backgroundColor,
                 doneStyle: TextStyle(
@@ -83,35 +82,35 @@ class FormTimePicker extends StatelessWidget {
               if(selectedDate.day == currentTime.day 
                 && selectedDate.month == currentTime.month 
                 && selectedDate.year == currentTime.year) {
-                this.onChanged(formatHour.format(selectedDate));
+                onChanged(formatHour.format(selectedDate));
               } else {
-                this.onChanged(format.format(selectedDate));
+                onChanged(format.format(selectedDate));
               }
             }
           }
         },
-        initialValue: this.initialValue !=null? this.formatInitialDate() : null,
+        initialValue: initialValue !=null? formatInitialDate() : null,
         keyboardType: TextInputType.datetime,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
-          labelText: this.initialValue == null && this.value == null ? null : this.labelText,
-          hintText: this.value == null ? this.labelText : null,
+          border: const OutlineInputBorder(),
+          labelText: initialValue == null && value == null ? null : labelText,
+          hintText: value == null ? labelText : null,
           suffixIcon: Icon(icon),
         ), 
         textInputAction: action,
-        validator: (value) {
-          if (this.isRequired) {
+        validator: (String value) {
+          if (isRequired) {
             if(value.isEmpty) {
-              return this.validatorMessage;
+              return validatorMessage;
             }
-            DateTime dateTime = format.parse(value.length > 5 ? value : '$value $selectedDay');
-            if(dateTime.isBefore(this.minTime ?? DateTime.now())) {
-              return this.validatorMessage;
+            final DateTime dateTime = format.parse(value.length > 5 ? value : '$value $selectedDay');
+            if(dateTime.isBefore(minTime ?? DateTime.now())) {
+              return validatorMessage;
             }
           }
           return null;
         },
-        onFieldSubmitted: this.onSubmit
+        onFieldSubmitted: onSubmit
       )
     );
   }
