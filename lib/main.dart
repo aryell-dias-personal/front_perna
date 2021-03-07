@@ -5,6 +5,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/home.dart';
+import 'package:perna/services/directions.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
@@ -55,16 +56,21 @@ Future<void> main() async {
       },
   );
 
-  final FirebaseApp app = await Firebase.initializeApp(
-    name: FlavorConfig.instance.variables['appName'] as String,
-    options: FirebaseOptions(
-      appId: FlavorConfig.instance.variables['googleAppID'] as String,
-      apiKey: FlavorConfig.instance.variables['apiKey'] as String,
-      projectId: FlavorConfig.instance.variables['projectID'] as String,
-      messagingSenderId: 
-        FlavorConfig.instance.variables['gcmSenderID'] as String,
-    )
-  );
+  FirebaseApp app;
+  if(Firebase.apps.isEmpty) {
+    app = await Firebase.initializeApp(
+      name: FlavorConfig.instance.variables['appName'] as String,
+      options: FirebaseOptions(
+        appId: FlavorConfig.instance.variables['googleAppID'] as String,
+        apiKey: FlavorConfig.instance.variables['apiKey'] as String,
+        projectId: FlavorConfig.instance.variables['projectID'] as String,
+        messagingSenderId: 
+          FlavorConfig.instance.variables['gcmSenderID'] as String,
+      )
+    );
+  } else {
+    app = Firebase.apps.first;
+  }
   final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
   final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
@@ -88,7 +94,9 @@ Future<void> main() async {
       );
   }
 
+  // NOTE: declarado serviços
   final MyDecoder myDecoder = MyDecoder();
+  getIt.registerSingleton<DirectionsService>(DirectionsService());
   getIt.registerSingleton<UserService>(
     UserService(
       myDecoder: myDecoder
@@ -174,6 +182,7 @@ class MyApp extends StatelessWidget {
           iconTheme: const IconThemeData(
             color: mainLightColor
           ),
+          disabledColor: mainLightColor.withAlpha(66),
           primaryColor: mainLightColor,
           accentColor: mainLightColor.withAlpha(66),
           fontFamily: 'ProductSans',
@@ -187,6 +196,7 @@ class MyApp extends StatelessWidget {
           iconTheme: const IconThemeData(
             color: mainDarkColor
           ),
+          disabledColor: mainDarkColor.withAlpha(66),
           primaryColor: mainDarkColor,
           accentColor: mainDarkColor.withAlpha(66),
           fontFamily: 'ProductSans',

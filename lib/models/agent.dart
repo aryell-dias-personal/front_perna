@@ -28,13 +28,14 @@ class Agent {
   factory Agent.fromJson(Map<String, dynamic> parsedJson){
     DateTime parseDate(dynamic value) {
       if(value == null) return null;
-      return DateTime.fromMillisecondsSinceEpoch(
-        (value as int)*1000);
+      final int valueInt = value is int ? value: (value as double).round();
+      return DateTime.fromMillisecondsSinceEpoch(valueInt*1000);
     }
 
     Duration parseDuration(dynamic value) {
       if(value == null) return null;
-      return Duration(seconds: value as int);
+      final int valueInt = value is int ? value: (value as double).round();
+      return Duration(seconds: valueInt);
     }
 
     Uint8List decode64(dynamic staticMap) {
@@ -54,12 +55,12 @@ class Agent {
         decodeLatLng(parsedJson['position'] as String): null,
       places: parsedJson['places'] as int,
       friendlyGarage: parsedJson['friendlyGarage'] as String,
-      route: parsedJson['position'] !=null ? parsedJson['route'].map<Point>(
-        (Map<String, dynamic> point)=>Point.fromJson(point)
-      )?.toList() as List<Point> : null,
-      date: parseDate(parsedJson['date'] as int),
-      askedStartAt: parseDuration(parsedJson['askedStartAt'] as int),
-      askedEndAt: parseDuration(parsedJson['askedEndAt'] as int),
+      route: parsedJson['route']?.map<Point>(
+        (dynamic point)=>Point.fromJson(point as Map<String, dynamic>)
+      )?.toList() as List<Point>,
+      date: parseDate(parsedJson['date']),
+      askedStartAt: parseDuration(parsedJson['askedStartAt']),
+      askedEndAt: parseDuration(parsedJson['askedEndAt']),
       queue: parsedJson['queue']
         ?.map<DateTime>(parseDate)?.toList() as List<DateTime>,
       history: parsedJson['history']

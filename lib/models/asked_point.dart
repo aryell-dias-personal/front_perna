@@ -29,12 +29,14 @@ class AskedPoint {
     
     DateTime parseDate(dynamic value) {
       if(value == null) return null;
-      return DateTime.fromMillisecondsSinceEpoch((value as int)*1000);
+      final int valueInt = value is int ? value: (value as double).round();
+      return DateTime.fromMillisecondsSinceEpoch(valueInt*1000);
     }
 
     Duration parseDuration(dynamic value) {
       if(value == null) return null;
-      return Duration(seconds: value as int);
+      final int valueInt = value is int ? value: (value as double).round();
+      return Duration(seconds: valueInt);
     }
 
     Uint8List decode64(dynamic staticMap) {

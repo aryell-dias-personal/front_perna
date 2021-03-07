@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/main.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
@@ -10,8 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
@@ -248,13 +247,13 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   child: Text(AppLocalizations.of(context).translate('about_expedient'))
                 )
               ],
-              offset: const Offset(0, 50),
+              offset: const Offset(0, 30),
             )
           ] : null,
         ),
         body: Material(
           child: isLoading ? Center(
-            child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+            child: SpinKitDoubleBounce(size: 100.0, color: Theme.of(context).primaryColor)
           ) : SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -265,7 +264,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                   child: Stack(
                     children: <Widget>[
                       Center(
-                        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+                        child: SpinKitDoubleBounce(size: 100.0, color: Theme.of(context).primaryColor)
                       ),
                       if(askedPoint.staticMap != null) Image.memory(askedPoint.staticMap)
                     ],

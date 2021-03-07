@@ -20,7 +20,8 @@ class AddButton extends StatelessWidget {
       onPressed: readOnly? null : onPressed,
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(
-          Theme.of(context).primaryColor),
+          readOnly? Theme.of(context).disabledColor : Theme.of(context).primaryColor
+        ),
         shape: MaterialStateProperty.all(const StadiumBorder()),
       ),
       child: Row(

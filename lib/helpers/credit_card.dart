@@ -76,7 +76,6 @@ class MaskedTextController extends TextEditingController {
     };
   }
 
-  // TODO: verificar esse cara  aqui
   String _applyMask(String mask, String value) {
     final StringBuffer resultBuffer = StringBuffer();
 

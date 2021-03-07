@@ -5,10 +5,11 @@ class Point {
   Point({this.local, this.time});
 
   factory Point.fromJson(Map<String, dynamic> parsedJson){
+    final dynamic time = parsedJson['time'];
+    final int timeInt = time is int ? time: (time as double).round();
     return Point(
       local: decodeLatLng(parsedJson['local'] as String),
-      time: DateTime.fromMillisecondsSinceEpoch(
-        (parsedJson['time'] as int)*1000)
+      time: DateTime.fromMillisecondsSinceEpoch(timeInt*1000)
     );
   }
 

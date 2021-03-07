@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
@@ -84,8 +83,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: isLoading ? Center(
-        child: Loading(
-          indicator: BallPulseIndicator(), 
+        child: SpinKitDoubleBounce(
           size: 100.0, color: Theme.of(context).primaryColor
         )
       ) : (creditCards.isEmpty ? Center(

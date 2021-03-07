@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/main.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/sign_in.dart';
@@ -8,8 +9,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/agent.dart';
@@ -248,13 +247,13 @@ class _ExpedientState extends State<ExpedientPage> {
                   child: Text(AppLocalizations.of(context).translate('about_requester'))
                 )
               ],
-              offset: const Offset(0, 50),
+              offset: const Offset(0, 30),
             )
           ] : null,
         ),
         body: Material(
           child: isLoading ? Center(
-            child:Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+            child: SpinKitDoubleBounce( size: 100.0, color: Theme.of(context).primaryColor)
           ) : SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -265,7 +264,7 @@ class _ExpedientState extends State<ExpedientPage> {
                   child: Stack(
                     children: <Widget>[
                       Center(
-                        child: Loading(indicator: BallPulseIndicator(), size: 100.0, color: Theme.of(context).primaryColor)
+                        child: SpinKitDoubleBounce( size: 100.0, color: Theme.of(context).primaryColor)
                       ),
                       if(agent.staticMap != null) Image.memory(agent.staticMap)
                     ],

@@ -7,4 +7,4 @@ linter:
     sort_constructors_first: true
     prefer_single_quotes: true
     always_specify_types: true
-    lines_longer_than_120_chars: true
+    lines_longer_than_100_chars: true

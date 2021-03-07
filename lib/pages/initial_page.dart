@@ -1,5 +1,4 @@
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
@@ -32,7 +31,7 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: isLoading ? Loading(indicator: BallPulseIndicator(), color: Theme.of(context).primaryColor, size: 100.0) : 
+      child: isLoading ? SpinKitDoubleBounce(color: Theme.of(context).primaryColor, size: 100.0) : 
       StoreConnector<StoreState, Function(SignLogin)>(
         converter: (Store<StoreState> store) => (SignLogin choice) async {
           final Locale locale = AppLocalizations.of(context).locale;

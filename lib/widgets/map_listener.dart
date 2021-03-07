@@ -113,7 +113,8 @@ class _MapListenerState extends State<MapListener> {
   void initState() {
     super.initState();
     setState(() {
-      agentIdsSubscription = getIt<FirebaseFirestore>().collection('agent').where('email', isEqualTo: widget.email)
+      agentIdsSubscription = getIt<FirebaseFirestore>().collection('agent')
+        .where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
@@ -130,10 +131,11 @@ class _MapListenerState extends State<MapListener> {
             }));
           });
         });
-      watchAskedPointSubscription = getIt<FirebaseFirestore>().collection('askedPoint').where('email', isEqualTo: widget.email)
+      watchAskedPointSubscription = getIt<FirebaseFirestore>().collection('askedPoint')
+        .where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
-        .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
-        .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
+        .where('actualEndAt', isGreaterThanOrEqualTo: DateTime.now().microsecondsSinceEpoch/1000)
+        .orderBy('actualEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
           if(askedPointSnapshot.docs.isNotEmpty){
             final AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.docs.first.data());
             if(askedPoint.origin != null) {
@@ -152,7 +154,7 @@ class _MapListenerState extends State<MapListener> {
             final DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
             if(askedStartAtTime.isBefore(now)){
               if(agent.position!=null) _addAgentMarker(agent);
-              final List<LatLng> points = agent.route.fold(<LatLng>[], (List<LatLng> acc, Point curr)=>acc+<LatLng>[curr.local]);
+              final List<LatLng> points = agent.route.fold(<LatLng>[], (List<LatLng> acc, Point curr)=>acc+<LatLng>[curr.local]).toList();
               if(!_pointsPerRouteContains(points, widget.email)){
                 pointsPerRoute[widget.email] = points;
                 _addPolyline(points, name: widget.email);

@@ -37,27 +37,28 @@ class UserProfilePage extends StatelessWidget {
                 )
               ),
               Builder(
-                builder: (BuildContext context) => RatingBar(
-                  initialRating: 5,
-                  minRating: 1,
-                  allowHalfRating: true,
-                  unratedColor: Theme.of(context).brightness == Brightness.light? 
-                    Colors.grey.withOpacity(0.2): 
-                    Theme.of(context).backgroundColor.withOpacity(0.8),
-                  glow: false,
-                  itemSize: 50.0,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  ratingWidget: RatingWidget(
-                    empty: const Icon(Icons.star, color: Colors.amber),
-                    full: const Icon(Icons.star, color: Colors.amber),
-                    half: const Icon(Icons.star, color: Colors.amber)
-                  ),
-                  onRatingUpdate: (double rating) {
-                    showSnackBar(
-                      AppLocalizations.of(context).translate('not_implemented'), 
-                      Colors.pinkAccent, context);
-                  },
-                ),
+                builder: (BuildContext context) {
+                  final Color unratedColor = Colors.grey.withOpacity(0.2);
+                  return RatingBar(
+                    initialRating: 5,
+                    minRating: 1,
+                    allowHalfRating: true,
+                    unratedColor: unratedColor,
+                    glow: false,
+                    itemSize: 50.0,
+                    itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    ratingWidget: RatingWidget(
+                      empty: Icon(Icons.star, color: unratedColor),
+                      full: const Icon(Icons.star, color: Colors.amber),
+                      half: const Icon(Icons.star_half, color: Colors.amber)
+                    ),
+                    onRatingUpdate: (double rating) {
+                      showSnackBar(
+                        AppLocalizations.of(context).translate('not_implemented'), 
+                        Colors.pinkAccent, context);
+                    },
+                  );
+                }
               ),
               const SizedBox(height: 26),
               TextFormField(

@@ -86,16 +86,6 @@ class SideMenu extends StatelessWidget {
             ),
             SideMenuButton(
               textColor: textColor,
-              text: AppLocalizations.of(context).translate('theme'),
-              onPressed: (){
-                showSnackBar(
-                  AppLocalizations.of(context).translate('not_implemented'), 
-                  Colors.pinkAccent, context);
-              },
-              icon: Icons.palette,
-            ),
-            SideMenuButton(
-              textColor: textColor,
               text: AppLocalizations.of(context).translate('help'),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute<HelpPage>(

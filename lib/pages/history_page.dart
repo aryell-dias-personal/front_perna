@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:loading/loading.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/main.dart';
@@ -90,10 +89,13 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  String parseDuration(int shiftStart, int shiftEnd, int date){
-    final int shift = shiftStart ?? shiftEnd; 
+  String parseDuration(dynamic shiftStart, dynamic shiftEnd, dynamic date){
+    final int shiftStartInt = shiftStart is int ? shiftStart: (shiftStart as double)?.round();
+    final int shiftEndInt = shiftEnd is int ? shiftEnd: (shiftEnd as double)?.round();
+    final int dateInt = date is int ? date: (date as double).round();
+    final int shift = shiftStartInt ?? shiftEndInt; 
     final DateTime dateTime = 
-      DateTime.fromMillisecondsSinceEpoch(date*1000);
+      DateTime.fromMillisecondsSinceEpoch(dateInt*1000);
     final Duration duration = shift == null 
       ? null : Duration(seconds: shift);
     if(dateTime != null && duration != null) {
@@ -106,8 +108,11 @@ class _HistoryPageState extends State<HistoryPage> {
   List<dynamic> getHistory(){
     final List<dynamic> history = agents + askedPoints;
     history.sort((dynamic first, dynamic second){
-      return -(
-        (first['askedEndAt'] as int ?? 0) - (second['askedEndAt'] as int ?? 0));
+      final dynamic firstTime = first['askedEndAt'] ?? 0;
+      final dynamic secondTime = second['askedEndAt'] ?? 0;
+      final int firstTimeInt = firstTime is int ? firstTime: (firstTime as double).round();
+      final int secondTimeInt = secondTime is int ? secondTime: (secondTime as double).round();
+      return secondTimeInt - firstTimeInt;
     });
     return history;
   }
@@ -146,8 +151,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: isLoadingAgents || isLoadingAskedPoints || !passedTime ? Center(
-        child: Loading(
-          indicator: BallPulseIndicator(), 
+        child: SpinKitDoubleBounce(
           size: 100.0, 
           color: Theme.of(context).primaryColor
         )
@@ -223,9 +227,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                     operation['origin'] == null ? 
                                       'expedient' : 'order'),
                                 value: parseDuration(
-                                  operation['askedStartAt'] as int,
-                                  operation['askedEndAt'] as int, 
-                                  operation['date'] as int
+                                  operation['askedStartAt'],
+                                  operation['askedEndAt'], 
+                                  operation['date']
                                 ),
                               ),
                               if(operation['origin'] == null) TitledValueWidget(
