@@ -72,7 +72,7 @@ class AskedPoint {
       history: parsedJson['history']?.map<DateTime>(parseDate)?.toList(),
       actualStartAt: parseDate(parsedJson['actualStartAt']),
       actualEndAt: parseDate(parsedJson['actualEndAt']),
-      region: parsedJson["region"]!=null?parsedJson["region"].map<String>((region)=>"$region").toList():null,
+      region: parsedJson['region']!=null?parsedJson['region'].map<String>((region)=>'$region').toList():null,
       agentId: parsedJson ['agentId'],
       staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
@@ -117,22 +117,22 @@ class AskedPoint {
   );
 
   dynamic toJson() => {
-    "email": email,
-    "origin": "${origin.latitude}, ${origin.longitude}",
-    "destiny": "${destiny.latitude}, ${destiny.longitude}",
-    "friendlyOrigin": friendlyOrigin,
-    "friendlyDestiny": friendlyDestiny,
-    "queue": queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
-    "history": history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
-    "date": date != null ? date.millisecondsSinceEpoch/1000 : null,
-    "askedStartAt": askedStartAt != null ? askedStartAt.inSeconds : null,
-    "askedEndAt": askedEndAt != null ? askedEndAt.inSeconds : null,
-    "actualStartAt": actualStartAt != null ? actualStartAt.millisecondsSinceEpoch/1000: null,
-    "actualEndAt": actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
-    "agentId": agentId,
-    "region": region,
-    "currency": currency,
-    "amount": amount,
-    "staticMap": staticMap != null ? base64Encode(staticMap) : null
+    'email': email,
+    'origin': '${origin.latitude}, ${origin.longitude}',
+    'destiny': '${destiny.latitude}, ${destiny.longitude}',
+    'friendlyOrigin': friendlyOrigin,
+    'friendlyDestiny': friendlyDestiny,
+    'queue': queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
+    'history': history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
+    'date': date != null ? date.millisecondsSinceEpoch/1000 : null,
+    'askedStartAt': askedStartAt != null ? askedStartAt.inSeconds : null,
+    'askedEndAt': askedEndAt != null ? askedEndAt.inSeconds : null,
+    'actualStartAt': actualStartAt != null ? actualStartAt.millisecondsSinceEpoch/1000: null,
+    'actualEndAt': actualStartAt != null ? actualEndAt.millisecondsSinceEpoch/1000: null,
+    'agentId': agentId,
+    'region': region,
+    'currency': currency,
+    'amount': amount,
+    'staticMap': staticMap != null ? base64Encode(staticMap) : null
   };
 }

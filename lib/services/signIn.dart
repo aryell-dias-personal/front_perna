@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
-import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/models/signInResponse.dart';
 import 'package:perna/models/user.dart' as model;
 
@@ -65,7 +65,7 @@ class SignInService {
       'currency': currency,
       'messagingTokens': messagingToken != null ? [ messagingToken ] : []
     });
-    Response res = await post(Uri.parse("${baseUrl}insertUser"), body: body);
+    Response res = await post(Uri.parse('${baseUrl}insertUser'), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
@@ -74,7 +74,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post(Uri.parse("${baseUrl}getUser"), body: body);
+    Response res = await post(Uri.parse('${baseUrl}getUser'), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 
@@ -83,7 +83,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    Response res = await post(Uri.parse("${baseUrl}logout"), body: body);
+    Response res = await post(Uri.parse('${baseUrl}logout'), body: body);
     return res.statusCode == 200 ? SignInResponse.fromJson(await myDecoder.decode(res.body)) : null;
   }
 

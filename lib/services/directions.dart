@@ -4,23 +4,23 @@ import 'package:http/http.dart';
 
 class DirectionsService{
   final decoder = JsonDecoder();
-  final baseUrl = "https://maps.googleapis.com/maps/api/directions/";
+  final baseUrl = 'https://maps.googleapis.com/maps/api/directions/';
 
   Future<List<LatLng>> getRouteBetweenCoordinates(String googleApiKey, List<LatLng> points) async {
     List<LatLng> latLngWayPoints = points.sublist(1,points.length-1);
-    String waypoints = latLngWayPoints.fold<String>("",(String acc, LatLng curr){
-      String currLocation = "${curr.latitude},${curr.longitude}";
+    String waypoints = latLngWayPoints.fold<String>('',(String acc, LatLng curr){
+      String currLocation = '${curr.latitude},${curr.longitude}';
       if(curr == latLngWayPoints.first){
-        return "$currLocation";
+        return '$currLocation';
       }
-      return "$acc|$currLocation";
+      return '$acc|$currLocation';
     });
-    String url = "${baseUrl}json?origin=${points.first.latitude},${points.first.longitude}&destination=${points.last.latitude},${points.last.longitude}&waypoints=$waypoints&mode=driving&key=$googleApiKey";
+    String url = '${baseUrl}json?origin=${points.first.latitude},${points.first.longitude}&destination=${points.last.latitude},${points.last.longitude}&waypoints=$waypoints&mode=driving&key=$googleApiKey';
     dynamic response = await get(Uri.parse(url));
     if (response?.statusCode == 200) {
       Map<String, dynamic> body = decoder.convert(response.body);
-      if(body["status"] == "REQUEST_DENIED") return <LatLng>[];
-      String encoded = body["routes"][0]["overview_polyline"]["points"];
+      if(body['status'] == 'REQUEST_DENIED') return <LatLng>[];
+      String encoded = body['routes'][0]['overview_polyline']['points'];
       return decodeEncodedPolyline(encoded);
     } else {
       return <LatLng>[];
@@ -51,7 +51,7 @@ class DirectionsService{
       } while (b >= 0x20);
       int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lng += dlng;
-      LatLng p = new LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+      LatLng p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
       poly.add(p);
     }
     return poly;

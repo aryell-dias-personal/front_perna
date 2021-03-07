@@ -8,13 +8,13 @@ class Point {
 
   factory Point.fromJson(Map<String, dynamic> parsedJson){
     return Point(
-      local: decodeLatLng(parsedJson["local"]),
-      time: DateTime.fromMillisecondsSinceEpoch(parsedJson["time"].round()*1000)
+      local: decodeLatLng(parsedJson['local']),
+      time: DateTime.fromMillisecondsSinceEpoch(parsedJson['time'].round()*1000)
     );
   }
 
   dynamic toJson() => {
-    "email": local.toString(),
-    "time": time.millisecondsSinceEpoch/1000
+    'email': local.toString(),
+    'time': time.millisecondsSinceEpoch/1000
   };
 }

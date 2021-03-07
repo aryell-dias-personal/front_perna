@@ -1,6 +1,6 @@
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:http/http.dart';
-import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/models/askedPoint.dart';
 
 class UserService {
@@ -13,7 +13,7 @@ class UserService {
 
   Future<AskedPoint> simulateAskedPoint(AskedPoint askedPoint, String token) async {
     Response res = await post(
-      Uri.parse("${baseUrl}simulateAskedPoint"),
+      Uri.parse('${baseUrl}simulateAskedPoint'),
       body: await myDecoder.encode(askedPoint.toJson()),
       headers: {
         'Authorization': token

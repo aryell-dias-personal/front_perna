@@ -1,6 +1,6 @@
 import 'package:flutter_flavor/flutter_flavor.dart';
 import 'package:http/http.dart';
-import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/models/askedPoint.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:perna/models/creditCard.dart' as model;
@@ -23,7 +23,7 @@ class PaymentsService{
 
   Future<List<model.CreditCard>> listCard(String token) async { 
     Response res = await post(
-      Uri.parse("${baseUrl}listCreditCard"),
+      Uri.parse('${baseUrl}listCreditCard'),
       body: await myDecoder.encode({}),
       headers: {
         'Authorization': token
@@ -41,7 +41,7 @@ class PaymentsService{
   Future<int> confirmAskedPointPayment(AskedPoint askedPoint, String token) async { 
     dynamic body = await myDecoder.encode(askedPoint.toJson());
     Response res = await post(
-      Uri.parse("${baseUrl}confirmAskedPointPayment"),
+      Uri.parse('${baseUrl}confirmAskedPointPayment'),
       body: body,
       headers: {
         'Authorization': token
@@ -61,7 +61,7 @@ class PaymentsService{
       'creditCardId': creditCardId
     });
     Response res = await post(
-      Uri.parse("${baseUrl}deleteCreditCard"),
+      Uri.parse('${baseUrl}deleteCreditCard'),
       body: body,
       headers: {
         'Authorization': token
@@ -81,7 +81,7 @@ class PaymentsService{
       'creditCardId': creditCardId
     });
     Response res = await post(
-      Uri.parse("${baseUrl}turnDefaultCreditCard"),
+      Uri.parse('${baseUrl}turnDefaultCreditCard'),
       body: body,
       headers: {
         'Authorization': token
@@ -92,7 +92,7 @@ class PaymentsService{
 
   Future<int> addCard(model.CreditCard creditCard, String token) async { 
     try {
-      String cardNumber = creditCard.cardNumber.replaceAll(" ", "");
+      String cardNumber = creditCard.cardNumber.replaceAll(' ', '');
       List<String> expSlices = creditCard.expiryDate.split('/');
       int expMonth = int.parse(expSlices.first);
       int expYear = int.parse('20${expSlices.last}');
@@ -106,7 +106,7 @@ class PaymentsService{
         brand: creditCard.brand
       ));
       Response res = await post(
-        Uri.parse("${baseUrl}insertCreditCard"), 
+        Uri.parse('${baseUrl}insertCreditCard'), 
         body: await myDecoder.encode({
           'source': tokenWithCard.tokenId
         }),

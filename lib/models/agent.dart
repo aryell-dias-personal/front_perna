@@ -71,9 +71,9 @@ class Agent {
       history: parsedJson['history']?.map<DateTime>(parseDate)?.toList(),
       email: parsedJson['email'],
       fromEmail: parsedJson['fromEmail'],
-      watchedBy: parsedJson["watchedBy"]!=null?parsedJson["watchedBy"].map<String>((email)=>"$email").toList():null,
-      region: parsedJson["region"]!=null?parsedJson["region"].map<String>((region)=>"$region").toList():null,
-      askedPointIds: parsedJson["askedPointIds"]!=null?parsedJson["askedPointIds"].map<String>((id)=>"$id").toList():null,
+      watchedBy: parsedJson['watchedBy']!=null?parsedJson['watchedBy'].map<String>((email)=>'$email').toList():null,
+      region: parsedJson['region']!=null?parsedJson['region'].map<String>((region)=>'$region').toList():null,
+      askedPointIds: parsedJson['askedPointIds']!=null?parsedJson['askedPointIds'].map<String>((id)=>'$id').toList():null,
       staticMap: parsedJson['staticMap'] != null ? base64Decode(parsedJson['staticMap']) : null
     );
   }
@@ -117,22 +117,22 @@ class Agent {
   );
 
   dynamic toJson() => {
-    "garage": "${garage.latitude}, ${garage.longitude}",
-    "position": position!=null?"${position.latitude}, ${position.longitude}":null,
-    "places": places,
-    "friendlyGarage": friendlyGarage,
-    "route": route != null ? route.map<String>((Point point)=>point.toJson()).toList(): null,
-    "queue": queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
-    "history": history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
-    "date": date != null ? date.millisecondsSinceEpoch/1000 : null,
-    "askedStartAt": askedStartAt != null ? askedStartAt.inSeconds : null,
-    "askedEndAt": askedEndAt != null ? askedEndAt.inSeconds : null,
-    "email": email,
-    "fromEmail": fromEmail,
-    "askedPointIds": askedPointIds,
-    "watchedBy": watchedBy,
-    "region": region,
-    "old": old,
-    "staticMap": staticMap != null ? base64Encode(staticMap) : null
+    'garage': '${garage.latitude}, ${garage.longitude}',
+    'position': position!=null?'${position.latitude}, ${position.longitude}':null,
+    'places': places,
+    'friendlyGarage': friendlyGarage,
+    'route': route != null ? route.map<String>((Point point)=>point.toJson()).toList(): null,
+    'queue': queue?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
+    'history': history?.map<double>((date)=>(date.millisecondsSinceEpoch/1000))?.toList(),
+    'date': date != null ? date.millisecondsSinceEpoch/1000 : null,
+    'askedStartAt': askedStartAt != null ? askedStartAt.inSeconds : null,
+    'askedEndAt': askedEndAt != null ? askedEndAt.inSeconds : null,
+    'email': email,
+    'fromEmail': fromEmail,
+    'askedPointIds': askedPointIds,
+    'watchedBy': watchedBy,
+    'region': region,
+    'old': old,
+    'staticMap': staticMap != null ? base64Encode(staticMap) : null
   };
 }

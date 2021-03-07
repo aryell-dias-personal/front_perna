@@ -29,11 +29,11 @@ class User {
   );
 
   dynamic toJson() => {
-    "email": email,
-    "photoUrl": photoUrl,
-    "name": name,
-    "isProvider": isProvider,
-    "currency": currency,
-    "token": null
+    'email': email,
+    'photoUrl': photoUrl,
+    'name': name,
+    'isProvider': isProvider,
+    'currency': currency,
+    'token': null
   };
 }

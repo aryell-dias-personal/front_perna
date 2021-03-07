@@ -28,8 +28,8 @@ class StoreState{
 
   static StoreState fromJson(dynamic json) {
     return StoreState(
-      user: json != null ? User.fromJson(json["user"]): null,
-      logedIn: json != null ? json["logedIn"] : false
+      user: json != null ? User.fromJson(json['user']): null,
+      logedIn: json != null ? json['logedIn'] : false
     );
   }
 
@@ -46,8 +46,8 @@ class StoreState{
 
   dynamic toJson(){
     return {
-      "user": user.toJson(),
-      "logedIn": logedIn
+      'user': user.toJson(),
+      'logedIn': logedIn
     };
   }
 }

@@ -44,7 +44,7 @@ dependencies:
   flutter_native_timezone: ^1.0.9
 
 dev_dependencies:
-  # TODO: adicionar lint https://pub.dev/packages/lint
+  lint: ^1.0.0
   flutter_test:
     sdk: flutter
 

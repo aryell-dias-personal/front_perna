@@ -2,8 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
-import 'package:perna/helpers/appLocalizations.dart';
-import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
@@ -26,19 +26,20 @@ GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
-void main() async {
+Future<dynamic> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final persistor = Persistor<StoreState>(
+  final Persistor<StoreState> persistor = Persistor<StoreState>(
     storage: FlutterStorage(),
     serializer: JsonSerializer<StoreState>(StoreState.fromJson),
   );
 
-  final initialState = await persistor.load();
+  final StoreState initialState = await persistor.load();
   
   FlavorConfig(
-      name: "DEVELOP",
+      name: 'DEVELOP',
       variables: {
+        // ignore: lines_longer_than_80_chars
         'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
         'appName': 'aryell-test',
         'projectID': 'aryell-test',
@@ -64,7 +65,8 @@ void main() async {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-  NotificationSettings settings = await firebaseMessaging.requestPermission(
+  final NotificationSettings settings = 
+  await firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -82,8 +84,8 @@ void main() async {
       );
   }
 
-  MyDecoder myDecoder = MyDecoder();
-  final store = new Store<StoreState>(
+  final MyDecoder myDecoder = MyDecoder();
+  final Store<StoreState> store = Store<StoreState>(
     reduce, initialState: initialState.copyWith(
       firestore: firestore, 
       messagingToken: messagingToken,
@@ -104,7 +106,7 @@ void main() async {
     ),
     middleware: [persistor.createMiddleware()]
   );
-  runApp(new MyApp(store: store, firebaseMessaging: firebaseMessaging));
+  runApp(MyApp(store: store, firebaseMessaging: firebaseMessaging));
 }
 
 class MyApp extends StatelessWidget {
@@ -115,8 +117,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color mainLightColor = Color(0xFF1c4966);
-    Color mainDarkColor = Color(0xFFf5feff);
+    const Color mainLightColor = Color(0xFF1c4966);
+    const Color mainDarkColor = Color(0xFFf5feff);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -126,16 +128,16 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Builder(
-          builder: (context) => Scaffold(
+          builder: (BuildContext context) => Scaffold(
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(
-              firebaseMessaging: this.firebaseMessaging, 
+              firebaseMessaging: firebaseMessaging, 
               driverService: store.state.driverService,
               signInService: store.state.signInService,
             )
           )
         ),
-        supportedLocales: [
+        supportedLocales: const <Locale>[
           Locale('en', 'US'),
           Locale('pt', 'BR'),
         ],
@@ -163,7 +165,7 @@ class MyApp extends StatelessWidget {
           ),
           primaryColor: mainLightColor,
           accentColor: mainLightColor.withAlpha(66),
-          fontFamily: "ProductSans",
+          fontFamily: 'ProductSans',
           backgroundColor: Colors.white
         ),
         darkTheme: ThemeData(
@@ -176,8 +178,8 @@ class MyApp extends StatelessWidget {
           ),
           primaryColor: mainDarkColor,
           accentColor: mainDarkColor.withAlpha(66),
-          fontFamily: "ProductSans",
-          backgroundColor: Color(0xFF2b2b2b)
+          fontFamily: 'ProductSans',
+          backgroundColor: const Color(0xFF2b2b2b)
         ),
       )
     );

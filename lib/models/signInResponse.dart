@@ -24,8 +24,8 @@ class SignInResponse{
   );
 
   dynamic toJson() => {
-    "message": message,
-    "user": user.toJson(),
-    "error": error
+    'message': message,
+    'user': user.toJson(),
+    'error': error
   };
 }

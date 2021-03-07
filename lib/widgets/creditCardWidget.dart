@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:perna/helpers/appLocalizations.dart';
+import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/widgets/creditCardAnimation.dart';
 
 class CreditCardWidget extends StatefulWidget {
@@ -172,7 +172,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                     child: Text(
-                      widget.cardHolderName.isEmpty || widget.cardHolderName == null ? AppLocalizations.of(context).translate("card_holder").toUpperCase() : widget.cardHolderName,
+                      widget.cardHolderName.isEmpty || widget.cardHolderName == null ? AppLocalizations.of(context).translate('card_holder').toUpperCase() : widget.cardHolderName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline6.merge(
