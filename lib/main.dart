@@ -8,6 +8,7 @@ import 'package:perna/home.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
+import 'package:perna/services/static_map.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:get_it/get_it.dart';
+
+GetIt getIt = GetIt.instance;
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
@@ -85,25 +89,33 @@ Future<void> main() async {
   }
 
   final MyDecoder myDecoder = MyDecoder();
-  final Store<StoreState> store = Store<StoreState>(
-    reduce, initialState: initialState.copyWith(
-      firestore: firestore, 
-      messagingToken: messagingToken,
-      userService: UserService(
-        myDecoder: myDecoder
-      ),
-      driverService: DriverService(
-        myDecoder: myDecoder
-      ),
-      signInService: SignInService(
-        firebaseAuth: firebaseAuth,
-        googleSignIn: googleSignIn,
-        myDecoder: myDecoder
-      ),
-      paymentsService: PaymentsService(
-        myDecoder: myDecoder
-      )
+  getIt.registerSingleton<UserService>(
+    UserService(
+      myDecoder: myDecoder
     ),
+  );
+  getIt.registerSingleton<DriverService>(
+    DriverService(
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<PaymentsService>(
+    PaymentsService(
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<SignInService>(
+    SignInService(
+      firebaseAuth: firebaseAuth,
+      googleSignIn: googleSignIn,
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<StaticMapService>(StaticMapService());
+  getIt.registerSingleton<FirebaseFirestore>(firestore);
+
+  final Store<StoreState> store = Store<StoreState>(
+    reduce, initialState: initialState.copyWith(messagingToken: messagingToken),
     middleware: <dynamic Function(Store<StoreState>, dynamic, dynamic Function(dynamic))>[persistor.createMiddleware()]
   );
   runApp(MyApp(store: store, firebaseMessaging: firebaseMessaging));
@@ -132,9 +144,7 @@ class MyApp extends StatelessWidget {
           builder: (BuildContext context) => Scaffold(
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(
-              firebaseMessaging: firebaseMessaging, 
-              driverService: store.state.driverService,
-              signInService: store.state.signInService,
+              firebaseMessaging: firebaseMessaging
             )
           )
         ),

@@ -8,12 +8,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/constants/maps_style.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/agent.dart';
 
 class MyGoogleMap extends StatefulWidget {
   const MyGoogleMap({
     @required this.email, 
-    @required this.firestore, 
     @required this.preExecute, 
     @required this.putMarker, 
     @required this.points, 
@@ -25,7 +25,6 @@ class MyGoogleMap extends StatefulWidget {
   });
 
   final String email;
-  final FirebaseFirestore firestore;
   final Function preExecute;
   final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
@@ -96,7 +95,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         previousLatLng = currLatLng;
       });
       widget.agentIds.map((String documentID) async {
-        final DocumentReference ref = widget.firestore.collection('agent').doc(documentID);
+        final DocumentReference ref = getIt<FirebaseFirestore>().collection('agent').doc(documentID);
         final DocumentSnapshot documentSnapshot = await ref.get();
         final Agent oldAgent = Agent.fromJson(documentSnapshot.data());
         final DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);

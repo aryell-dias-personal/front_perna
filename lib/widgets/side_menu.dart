@@ -1,15 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/helpers/help_helper.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/pages/help_page.dart';
 import 'package:perna/pages/history_page.dart';
 import 'package:perna/pages/wallet_page.dart';
-import 'package:perna/store/state.dart';
 import 'package:perna/widgets/side_menu_button.dart';
 import 'package:perna/widgets/visible_rich_text.dart';
 
@@ -61,13 +57,7 @@ class SideMenu extends StatelessWidget {
               text: AppLocalizations.of(context).translate('history'),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute<HistoryPage>(
-                    builder: (BuildContext context) => 
-                      StoreConnector<StoreState, FirebaseFirestore>(
-                      converter: (Store<StoreState> store) => store.state.firestore,
-                      builder: 
-                      (BuildContext context, FirebaseFirestore firestore) => 
-                        HistoryPage(email: email, firestore: firestore)
-                    )
+                    builder: (BuildContext context) => HistoryPage(email: email)
                   )
                 );
               },
@@ -78,20 +68,7 @@ class SideMenu extends StatelessWidget {
               text: AppLocalizations.of(context).translate('wallet'),
               onPressed: () async {
                 Navigator.push(context, MaterialPageRoute<WalletPage>(
-                    builder: (BuildContext context) => 
-                    StoreConnector<StoreState, Map<String, dynamic>>(
-                      converter: (Store<StoreState> store) => <String, dynamic>{
-                        'getRefreshToken': 
-                          store.state.signInService.getRefreshToken,
-                        'paymentsService': store.state.paymentsService 
-                      },
-                      builder: 
-                      (BuildContext context, Map<String, dynamic> resources) => 
-                      WalletPage(
-                        getRefreshToken: resources['getRefreshToken'] as Future<String> Function(),
-                        paymentsService: resources['paymentsService']
-                      )
-                    )
+                    builder: (BuildContext context) => WalletPage()
                   )
                 );
               },

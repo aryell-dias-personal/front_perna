@@ -5,6 +5,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
@@ -14,13 +15,11 @@ import 'package:intl/intl.dart';
 class AskedPointConfirmationPage extends StatefulWidget {  
    const AskedPointConfirmationPage({
     @required this.clear,
-    @required this.paymentsService,
     @required this.userToken,
     @required this.askedPoint,
     @required this.defaultCreditCard
   });
 
-  final PaymentsService paymentsService;
   final String userToken;  
   final AskedPoint askedPoint;
   final CreditCard defaultCreditCard;
@@ -40,7 +39,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
   Future<void> _onPressed(BuildContext context) async {
     setState(() { isLoading = true; });
     final int statusCode = 
-      await widget.paymentsService.confirmAskedPointPayment(
+      await getIt<PaymentsService>().confirmAskedPointPayment(
         widget.askedPoint, widget.userToken
       );
     if(statusCode == 200) {

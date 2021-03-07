@@ -27,36 +27,36 @@ class DirectionsService{
     }
   }
 
+  // TODO: testar esse cara
   List<LatLng> decodeEncodedPolyline(String encoded){
     final List<LatLng> poly = <LatLng>[];
     final int len = encoded.length;
     int index = 0;
     int lat = 0, lng = 0;
-
+    void callback(int newIndex) => index = newIndex; 
     while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      final int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      final int dlat = getComponent(encoded, index, callback: callback);
       lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      // ignore: invariant_booleans
-      } while (b >= 0x20);
-      final int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      final int dlng = getComponent(encoded, index, callback: callback);
       lng += dlng;
       final LatLng p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
       poly.add(p);
     }
     return poly;
+  }
+
+  int getComponent(String encoded, int initialIndex, { void Function(int) callback }) {
+    int b, shift = 0, result = 0;
+    int index = initialIndex;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    if(callback != null) {
+      callback(index);
+    }
+    return (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
   }
 
 }

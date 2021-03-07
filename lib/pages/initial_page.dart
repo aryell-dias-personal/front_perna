@@ -2,6 +2,7 @@ import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/sign_in_response.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/services/sign_in.dart';
@@ -17,9 +18,8 @@ import 'package:redux/redux.dart';
 enum SignLogin { sign, login}
 
 class InitialPage extends StatefulWidget {
-  const InitialPage({@required this.signInService, @required this.messagingToken});
+  const InitialPage({@required this.messagingToken});
 
-  final SignInService signInService;
   final String messagingToken;
 
   @override
@@ -39,8 +39,8 @@ class _InitialPageState extends State<InitialPage> {
           final String localeName = '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
           final String currencyName = NumberFormat.simpleCurrency(locale: localeName).currencyName.toLowerCase();
           final SignInResponse signInResponse = choice == SignLogin.sign ? 
-            await widget.signInService.signIn(widget.messagingToken, currencyName) : 
-            await widget.signInService.logIn(widget.messagingToken);
+            await getIt<SignInService>().signIn(widget.messagingToken, currencyName) : 
+            await getIt<SignInService>().logIn(widget.messagingToken);
           final User user = signInResponse?.user;
           if(user==null){
             showSnackBar(

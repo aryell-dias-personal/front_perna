@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:perna/main.dart';
+import 'package:perna/services/driver.dart';
+import 'package:perna/services/sign_in.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,8 +14,6 @@ import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedient_page.dart';
-import 'package:perna/services/driver.dart';
-import 'package:perna/services/sign_in.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/pages/main_page.dart';
 import 'package:perna/pages/no_connection_page.dart';
@@ -49,15 +50,11 @@ Future<void> onMessage(RemoteMessage message) async {
 
 class Home extends StatefulWidget {
   const Home({
-    @required this.firebaseMessaging, 
-    @required this.driverService, 
-    @required this.signInService, 
+    @required this.firebaseMessaging,
     Key key
   }) : super(key: key);
 
   final FirebaseMessaging firebaseMessaging;
-  final DriverService driverService;
-  final SignInService signInService;
 
   @override
   _HomeState createState() => _HomeState();
@@ -75,9 +72,7 @@ class _HomeState extends State<Home> {
     await navigatorState.push( 
       MaterialPageRoute<Scaffold>(
         builder: (BuildContext context) => Scaffold(
-          body: ExpedientPage(agent: agent, readOnly: true, clear: (){}, 
-            getRefreshToken: widget.signInService.getRefreshToken,
-            driverService: widget.driverService,
+          body: ExpedientPage(agent: agent, readOnly: true, clear: (){},
             accept: () async { 
               await answerNewAgentHandler(agent, accepted: true); 
             },
@@ -92,8 +87,8 @@ class _HomeState extends State<Home> {
 
   Future<void> answerNewAgentHandler(Agent agent, { bool accepted }) async {
     if(accepted){
-      final String token =  await widget.signInService.getRefreshToken();
-      final int statusCodeNewAgent = await widget.driverService.postNewAgent(
+      final String token =  await getIt<SignInService>().getRefreshToken();
+      final int statusCodeNewAgent = await getIt<DriverService>().postNewAgent(
         agent, 
         token
       );
@@ -108,7 +103,7 @@ class _HomeState extends State<Home> {
         return;
       }
     }
-    final int statusCodeAnswer = await widget.driverService.answerNewAgent(
+    final int statusCodeAnswer = await getIt<DriverService>().answerNewAgent(
       agent.fromEmail, 
       agent.email, 
       accepted: accepted
@@ -225,21 +220,16 @@ class _HomeState extends State<Home> {
           'logedIn': store.state.logedIn,
           'messagingToken': store.state.messagingToken,
           'email': store.state.user?.email,
-          'firestore': store.state.firestore
         };
       },
       builder: (BuildContext context, Map<String, dynamic> resources) {
         if(resources['logedIn'] == null || !(resources['logedIn'] as bool)){
           return InitialPage(
-            signInService: widget.signInService, 
             messagingToken: resources['messagingToken'] as String
           );
         } else {
           return MainPage(
-            getRefreshToken: widget.signInService.getRefreshToken, 
-            onLogout: widget.signInService.logOut, 
             email: resources['email'] as String, 
-            firestore: resources['firestore']
           );
         }
       }

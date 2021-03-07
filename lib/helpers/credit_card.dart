@@ -76,8 +76,9 @@ class MaskedTextController extends TextEditingController {
     };
   }
 
+  // TODO: verificar esse cara  aqui
   String _applyMask(String mask, String value) {
-    String result = '';
+    final StringBuffer resultBuffer = StringBuffer();
 
     int maskCharIndex = 0;
     int valueCharIndex = 0;
@@ -95,7 +96,7 @@ class MaskedTextController extends TextEditingController {
       final String valueChar = value[valueCharIndex];
 
       if (maskChar == valueChar) {
-        result += maskChar;
+        resultBuffer.write(maskChar);
         valueCharIndex += 1;
         maskCharIndex += 1;
         continue;
@@ -103,7 +104,7 @@ class MaskedTextController extends TextEditingController {
 
       if (translator.containsKey(maskChar)) {
         if (translator[maskChar].hasMatch(valueChar)) {
-          result += valueChar;
+          resultBuffer.write(valueChar);
           maskCharIndex += 1;
         }
 
@@ -111,12 +112,12 @@ class MaskedTextController extends TextEditingController {
         continue;
       }
 
-      result += maskChar;
+      resultBuffer.write(maskChar);
       maskCharIndex += 1;
       continue;
     }
 
-    return result;
+    return resultBuffer.toString();
   }
 }
 

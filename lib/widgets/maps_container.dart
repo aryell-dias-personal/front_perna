@@ -3,17 +3,14 @@ import 'package:android_intent/android_intent.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/point.dart';
-import 'package:perna/services/driver.dart';
-import 'package:perna/services/user.dart';
-import 'package:perna/store/state.dart';
 import 'package:perna/widgets/floating_animated_button.dart';
 import 'package:perna/widgets/map_listener.dart';
 import 'package:perna/widgets/reactive_floating_button.dart';
@@ -21,7 +18,6 @@ import 'package:perna/widgets/search_location.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
-import 'package:redux/redux.dart';
 
 class MapsContainer extends StatefulWidget {
   const MapsContainer({
@@ -29,17 +25,13 @@ class MapsContainer extends StatefulWidget {
     @required this.preExecute, 
     @required this.changeSideMenuState, 
     @required this.controller, 
-    @required this.getRefreshToken, 
     @required this.email, 
-    @required this.firestore
   });
   
   final Function() preExecute;
   final String email;
-  final FirebaseFirestore firestore;
   final Function() changeSideMenuState;
   final Function setVisiblePin;
-  final Future<String> Function() getRefreshToken;
   final AnimationController controller;
 
   @override
@@ -92,19 +84,11 @@ class _MapsContainerState extends State<MapsContainer> {
       );
       Navigator.push(context, 
         MaterialPageRoute<dynamic>(
-          builder: (BuildContext context) => Scaffold(
-            body: StoreConnector<StoreState, DriverService>(
-              builder: (BuildContext context, DriverService driverService) => 
-              ExpedientPage(
-                agent: agent, 
-                readOnly: false,
-                driverService: driverService, 
-                clear: markers.clear, 
-                getRefreshToken: widget.getRefreshToken
-              ),
-              converter: (Store<StoreState> store)=>store.state.driverService
+          builder: (BuildContext context) => ExpedientPage(
+              agent: agent, 
+              readOnly: false,
+              clear: markers.clear, 
             )
-          )
         )
       );
     } else {
@@ -129,19 +113,11 @@ class _MapsContainerState extends State<MapsContainer> {
       );
       Navigator.push(context, 
         MaterialPageRoute<AskedPointPage>(
-          builder: (BuildContext context) => Scaffold(
-            body: StoreConnector<StoreState, UserService>(
-              builder: (BuildContext context, UserService userService) => 
-              AskedPointPage(
-                userService: userService, 
-                askedPoint: askedPoint, 
-                readOnly: false, 
-                clear: markers.clear, 
-                getRefreshToken: widget.getRefreshToken
-              ),
-              converter: (Store<StoreState> store)=>store.state.userService
-            )
-          )
+          builder: (BuildContext context) => AskedPointPage(
+            askedPoint: askedPoint, 
+            readOnly: false, 
+            clear: markers.clear, 
+          ),
         )
       );
     } else {
@@ -213,7 +189,6 @@ class _MapsContainerState extends State<MapsContainer> {
       children: <Widget>[
         MapListener(
           email: widget.email,
-          firestore: widget.firestore,
           markers: markers,
           points: points,
           putMarker: putMarker,
@@ -265,7 +240,7 @@ class _MapsContainerState extends State<MapsContainer> {
   }
 
   StreamSubscription<QuerySnapshot> _initAgentListener(){
-    return widget.firestore.collection('agent')
+    return getIt<FirebaseFirestore>().collection('agent')
       .where('email', isEqualTo: widget.email)
       .where('processed', isEqualTo: true)
       .where('askedEndAt', 

@@ -9,16 +9,17 @@ class StaticMapService{
   final String baseUrl = 'https://maps.googleapis.com/maps/api/directions/';
   String apiKey = FlavorConfig.instance.variables['apiKey'] as String;
 
+  // TODO: verificar esse cara  aqui
   String mountStaticMapUrl({
     List<LatLng> route,
     LatLng markerA, LatLng markerB 
   }){
     const String baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
-    String routeParams = '';
+    final StringBuffer routeParamsBuffer = StringBuffer();
     if(route != null && route.isNotEmpty) {
-      routeParams = '&path=color:0x0000ff|weight:5';
+      routeParamsBuffer.write('&path=color:0x0000ff|weight:5');
       for (final LatLng point in route) {
-        routeParams += '|${point.latitude},${point.longitude}';
+        routeParamsBuffer.write('|${point.latitude},${point.longitude}');
       }
     }
     String markersParams = '';
@@ -28,6 +29,7 @@ class StaticMapService{
     if(markerB != null) {
       markersParams += '&markers=color:red%7Clabel:B%7C${markerB.latitude},${markerB.longitude}';
     }
+    final String routeParams = routeParamsBuffer.toString();
     return '$baseUrl?size=600x300$routeParams$markersParams&key=$apiKey';
   }
 

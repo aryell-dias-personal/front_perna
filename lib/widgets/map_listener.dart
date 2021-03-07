@@ -1,15 +1,12 @@
 import 'dart:async';
-import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/services/directions.dart';
-import 'package:perna/services/user.dart';
-import 'package:perna/store/state.dart';
 import 'package:perna/widgets/my_google_map.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/point.dart';
@@ -20,7 +17,6 @@ import 'package:flutter_flavor/flutter_flavor.dart';
 class MapListener extends StatefulWidget {
   const MapListener({
     @required this.email, 
-    @required this.firestore, 
     @required this.preExecute, 
     @required this.putMarker, 
     @required this.points, 
@@ -29,7 +25,6 @@ class MapListener extends StatefulWidget {
   });
   
   final String email;
-  final FirebaseFirestore firestore;
   final Function preExecute;
   final Function(LatLng, String, MarkerType, String) putMarker;
   final List<LatLng> points;
@@ -52,8 +47,6 @@ class _MapListenerState extends State<MapListener> {
   StreamSubscription<QuerySnapshot> watchAskedPointSubscription;
   StreamSubscription<QuerySnapshot> watchAgentsSubscription;
 
-  DirectionsService directionsService = DirectionsService();
-
   @override
   void dispose() {
     super.dispose();
@@ -64,6 +57,7 @@ class _MapListenerState extends State<MapListener> {
 
   Future<List<LatLng>> _buildRouteCoords(List<LatLng> points) async {
     if(points.length >= 2){
+      final DirectionsService directionsService = getIt<DirectionsService>();
       final List<LatLng> coords = await directionsService.getRouteBetweenCoordinates(FlavorConfig.instance.variables['apiKey'] as String, points);
       if (coords.isNotEmpty) return coords;
     }
@@ -104,12 +98,7 @@ class _MapListenerState extends State<MapListener> {
         onTap: (){
           Navigator.push(context, 
             MaterialPageRoute<AskedPointPage>(
-              builder: (BuildContext context) => Scaffold(
-                body: StoreConnector<StoreState, UserService>(
-                  builder: (BuildContext context, UserService userService) => AskedPointPage(userService: userService, askedPoint: askedPoint, readOnly: true, clear: (){}),
-                  converter: (Store<StoreState> store)=>store.state.userService
-                )
-              )
+              builder: (BuildContext context) => AskedPointPage(askedPoint: askedPoint, readOnly: true, clear: (){})
             )
           );
         },
@@ -124,7 +113,7 @@ class _MapListenerState extends State<MapListener> {
   void initState() {
     super.initState();
     setState(() {
-      agentIdsSubscription = widget.firestore.collection('agent').where('email', isEqualTo: widget.email)
+      agentIdsSubscription = getIt<FirebaseFirestore>().collection('agent').where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
         .where('old', isEqualTo: false)
         .snapshots().listen((QuerySnapshot agentSnapshot) {
@@ -141,7 +130,7 @@ class _MapListenerState extends State<MapListener> {
             }));
           });
         });
-      watchAskedPointSubscription = widget.firestore.collection('askedPoint').where('email', isEqualTo: widget.email)
+      watchAskedPointSubscription = getIt<FirebaseFirestore>().collection('askedPoint').where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
         .where('askedEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
         .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
@@ -152,7 +141,7 @@ class _MapListenerState extends State<MapListener> {
             }
           }
         });
-      watchAgentsSubscription = widget.firestore.collection('agent')
+      watchAgentsSubscription = getIt<FirebaseFirestore>().collection('agent')
         .where('processed', isEqualTo: true)
         .where('watchedBy', arrayContains: widget.email)
         .where('old', isEqualTo: false)
@@ -252,7 +241,6 @@ class _MapListenerState extends State<MapListener> {
     return MyGoogleMap(
       agentIds: agentIds,
       email: widget.email,
-      firestore: widget.firestore,
       markers: widget.markers,
       nextPlaces: nextPlaces,
       points: widget.points,

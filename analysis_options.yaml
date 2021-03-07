@@ -8,6 +8,3 @@ linter:
     prefer_single_quotes: true
     always_specify_types: true
     lines_longer_than_120_chars: true
-
-    use_string_buffers: false
-    no_logic_in_create_state: false

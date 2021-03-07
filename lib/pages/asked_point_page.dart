@@ -1,4 +1,9 @@
 import 'dart:typed_data';
+import 'package:perna/main.dart';
+import 'package:perna/services/payments.dart';
+import 'package:perna/services/sign_in.dart';
+import 'package:perna/services/static_map.dart';
+import 'package:perna/services/user.dart';
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,10 +20,6 @@ import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/pages/asked_point_confirmation_page.dart';
 import 'package:perna/pages/expedient_page.dart';
-import 'package:perna/services/driver.dart';
-import 'package:perna/services/payments.dart';
-import 'package:perna/services/static_map.dart';
-import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/add_button.dart';
@@ -31,35 +32,33 @@ enum AskedPointOptions { aboutExpedient }
 
 class AskedPointPage extends StatefulWidget {
   const AskedPointPage({
-    @required this.userService, 
     @required this.readOnly, 
     @required this.askedPoint, 
-    @required this.clear, 
-    this.getRefreshToken
+    @required this.clear 
   });
 
   final bool readOnly;
   final Function() clear;
   final AskedPoint askedPoint;
-  final UserService userService;
-  final Future<String> Function() getRefreshToken;
 
   @override
-  _AskedPointPageState createState() => _AskedPointPageState(
-    askedPoint: askedPoint
-  );
+  _AskedPointPageState createState() => _AskedPointPageState();
 }
 
 class _AskedPointPageState extends State<AskedPointPage> {
-  _AskedPointPageState({
-    @required this.askedPoint, 
-  }) {
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      askedPoint = widget.askedPoint;
+    });
     initialDateTime = DateTime(
       initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
     date = dateFormat.format(askedPoint.date ?? minTime);
     if(askedPoint.staticMap == null) {
-      staticMapService.getUint8List(
+      getIt<StaticMapService>().getUint8List(
         markerA: askedPoint.origin,
         markerB: askedPoint.destiny,
         route: <LatLng>[
@@ -88,14 +87,13 @@ class _AskedPointPageState extends State<AskedPointPage> {
   String askedEndAt;
   String askedStartAt;
   bool isLoading = false;
-  StaticMapService staticMapService = StaticMapService();
 
-  Future<void> _onPressed(String email, PaymentsService paymentsService) async {
+  Future<void> _onPressed(String email) async {
     if(_formKey.currentState.validate()){
       setState(() { isLoading = true; });
-      final String token = await widget.getRefreshToken();
+      final String token = await getIt<SignInService>().getRefreshToken();
       final List<CreditCard> creditCards = 
-        await paymentsService.listCard(token);
+        await getIt<PaymentsService>().listCard(token);
       if(creditCards.isEmpty) {
         setState(() { isLoading = false; });
         showSnackBar(
@@ -120,7 +118,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
       final AskedPoint simulatedAskedPoint = 
-        await widget.userService.simulateAskedPoint(newAskedPoint, token);
+        await getIt<UserService>().simulateAskedPoint(newAskedPoint, token);
       
       if(simulatedAskedPoint != null){
         await Navigator.push(context, 
@@ -128,7 +126,6 @@ class _AskedPointPageState extends State<AskedPointPage> {
           builder: (BuildContext context) => AskedPointConfirmationPage(
             askedPoint: simulatedAskedPoint,
             userToken: token,
-            paymentsService: paymentsService,
             defaultCreditCard: creditCards.first,
             clear: widget.clear
           )
@@ -145,24 +142,19 @@ class _AskedPointPageState extends State<AskedPointPage> {
     }
   }
 
-  Future<void> _onSelectedAskedPointOptions(FirebaseFirestore firestore, AskedPointOptions result) async {
+  Future<void> _onSelectedAskedPointOptions(AskedPointOptions result) async {
     setState(() { isLoading = true; });
-    final DocumentSnapshot documentSnapshot = await firestore.collection('agent').doc(askedPoint.agentId).get();
+    final DocumentSnapshot documentSnapshot = await getIt<FirebaseFirestore>().collection('agent').doc(askedPoint.agentId).get();
     if (documentSnapshot.data().isNotEmpty) {
       final Agent agent = Agent.fromJson(documentSnapshot.data());
       await Navigator.push(context, MaterialPageRoute<ExpedientPage>(
-        builder: (BuildContext context) => Scaffold(
-          body: StoreConnector<StoreState, DriverService>(
-            builder: (BuildContext context, DriverService driverService) => ExpedientPage(
-              driverService: driverService,
-              agent: agent, 
-              readOnly: true, 
-              clear: (){}
-            ),
-            converter: (Store<StoreState> store)=>store.state.driverService
+        builder: (BuildContext context) => ExpedientPage(
+            agent: agent, 
+            readOnly: true, 
+            clear: (){}
           )
         )
-      ));
+      );
     } else {
       showSnackBar(AppLocalizations.of(context).translate('not_found_expedient'), 
         Colors.redAccent, context);
@@ -216,8 +208,6 @@ class _AskedPointPageState extends State<AskedPointPage> {
   Widget build(BuildContext context) => StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (Store<StoreState> store) => <String, dynamic>{
         'email': store.state.user.email,
-        'firestore': store.state.firestore,
-        'paymentsService': store.state.paymentsService 
       },
       builder: (BuildContext context, Map<String, dynamic> resources) => Scaffold( 
         appBar: AppBar(
@@ -251,7 +241,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
           actions: widget.readOnly && askedPoint.agentId != null ? <Widget>[
             PopupMenuButton<AskedPointOptions>(
               tooltip: AppLocalizations.of(context).translate('open_menu'),
-              onSelected: (AskedPointOptions result) => _onSelectedAskedPointOptions(resources['firestore'], result),
+              onSelected: (AskedPointOptions result) => _onSelectedAskedPointOptions(result),
               itemBuilder:  (BuildContext context) => <PopupMenuEntry<AskedPointOptions>>[
                 PopupMenuItem<AskedPointOptions>(
                   value: AskedPointOptions.aboutExpedient,
@@ -346,8 +336,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                       icon: Icons.access_time,
                       readOnly: widget.readOnly,
                       onSubmit: (String text) => _onPressed(
-                        resources['email'] as String, 
-                        resources['paymentsService']
+                        resources['email'] as String 
                       ),
                       validatorMessage: AppLocalizations.of(context).translate('enter_desired_end'),
                     ),
@@ -396,7 +385,6 @@ class _AskedPointPageState extends State<AskedPointPage> {
                     AddButton(
                       onPressed: ()=>_onPressed(
                         resources['email'] as String, 
-                        resources['paymentsService']
                       ),
                       readOnly: widget.readOnly || askedPoint.staticMap == null,
                       addAndcontinue: true

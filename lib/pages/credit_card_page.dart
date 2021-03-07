@@ -5,6 +5,7 @@ import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/widgets/credit_card_form.dart';
@@ -14,11 +15,9 @@ import 'package:perna/widgets/credit_card_widget.dart';
 class CreditCardPage extends StatefulWidget {
   
   const CreditCardPage({
-    @required this.paymentsService,
     @required this.userToken
   });
 
-  final PaymentsService paymentsService;
   final String userToken;
 
   @override
@@ -38,7 +37,7 @@ class CreditCardPageState extends State<CreditCardPage> {
   Future<void> _onPressed(BuildContext context) async {
     if (formKey.currentState.validate()) {
       setState(() { isLoading = true; });
-      final int statusCode = await widget.paymentsService.addCard(creditCardModel, widget.userToken);
+      final int statusCode = await getIt<PaymentsService>().addCard(creditCardModel, widget.userToken);
       if(statusCode == 200) {
         Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
         showSnackBar(AppLocalizations.of(context).translate('successfully_added_card'), 

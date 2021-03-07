@@ -1,5 +1,5 @@
-import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:perna/main.dart';
+import 'package:perna/services/sign_in.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 import 'package:perna/widgets/main_widget.dart';
@@ -10,15 +10,9 @@ import 'package:redux/redux.dart';
 class MainPage extends StatelessWidget {
   const MainPage({
     @required this.email, 
-    @required this.onLogout,  
-    @required this.getRefreshToken, 
-    @required this.firestore
   });
 
   final String email;
-  final Function onLogout;
-  final Future<String> Function() getRefreshToken;
-  final FirebaseFirestore firestore;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +20,7 @@ class MainPage extends StatelessWidget {
       converter: (Store<StoreState> store) {
         return <String, dynamic>{
           'logoutFunction': () {
-            onLogout(
+            getIt<SignInService>().logOut(
               user: store.state.user, 
               messagingToken: store.state.messagingToken
             );
@@ -39,8 +33,6 @@ class MainPage extends StatelessWidget {
       },
       builder: (BuildContext context, Map<String, dynamic> resources) {
         return MainWidget(
-          getRefreshToken: getRefreshToken,
-          firestore: firestore,
           email: resources['email'] as String,
           name: resources['name'] as String,
           logout: resources['logoutFunction'] as Function(),

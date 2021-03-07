@@ -1,4 +1,8 @@
 import 'dart:typed_data';
+import 'package:perna/main.dart';
+import 'package:perna/services/driver.dart';
+import 'package:perna/services/sign_in.dart';
+import 'package:perna/services/static_map.dart';
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,8 +15,6 @@ import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/user.dart';
 import 'package:perna/pages/user_profile_page.dart';
-import 'package:perna/services/driver.dart';
-import 'package:perna/services/static_map.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/action_buttons.dart';
@@ -26,11 +28,9 @@ enum ExpedientOptions { aboutDriver, aboutRequester }
 
 class ExpedientPage extends StatefulWidget {
   const ExpedientPage({
-    @required this.driverService, 
     @required this.readOnly, 
     @required this.agent, 
     @required this.clear, 
-    this.getRefreshToken, 
     this.accept, 
     this.deny
   });
@@ -40,24 +40,24 @@ class ExpedientPage extends StatefulWidget {
   final Function() deny;
   final Function() clear;
   final Function() accept;
-  final DriverService driverService;
-  final Future<String> Function() getRefreshToken;
   
   @override
-  _ExpedientState createState() => _ExpedientState( 
-    agent: agent,
-  );
+  _ExpedientState createState() => _ExpedientState();
 }
 
 class _ExpedientState extends State<ExpedientPage> {
-  _ExpedientState({
-    @required this.agent, 
-  }) {
+  
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      agent = widget.agent;
+    });
     initialDateTime = DateTime(initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
     date = dateFormat.format(agent.date ?? minTime);
     if(agent.staticMap == null) {
-      staticMapService.getUint8List(
+      getIt<StaticMapService>().getUint8List(
         markerA: agent.garage
       ).then((Uint8List uint8List) {
         setState(() {
@@ -82,10 +82,9 @@ class _ExpedientState extends State<ExpedientPage> {
   String askedEndAt;
   String askedStartAt;
   bool isLoading = false;
-  StaticMapService staticMapService = StaticMapService();
 
   Future<void> _askNewAgend(Agent agent) async {
-    final int statusCode = await widget.driverService.askNewAgent(agent);
+    final int statusCode = await getIt<DriverService>().askNewAgent(agent);
     if(statusCode == 200){
       widget.clear();
       Navigator.pop(context);
@@ -116,8 +115,8 @@ class _ExpedientState extends State<ExpedientPage> {
       if(fromEmail != email) {
         _askNewAgend(agent);
       } else {
-        final String token = await widget.getRefreshToken();
-        final int statusCode = await widget.driverService.postNewAgent(agent, token);
+        final String token = await getIt<SignInService>().getRefreshToken();
+        final int statusCode = await getIt<DriverService>().postNewAgent(agent, token);
         if(statusCode==200){
           widget.clear();
           Navigator.pop(context);
@@ -137,10 +136,10 @@ class _ExpedientState extends State<ExpedientPage> {
     (accept? widget.accept(): widget.deny()).then((_){ setState(() { isLoading=false; }); });
   }
   
-  Future<void> _onSelectedExpedientOptions(FirebaseFirestore firestore, ExpedientOptions result) async {
+  Future<void> _onSelectedExpedientOptions(ExpedientOptions result) async {
     setState(() { isLoading = true; });
     final String email = result == ExpedientOptions.aboutDriver ? agent.email : agent.fromEmail;
-    final QuerySnapshot querySnapshot = await firestore.collection('user').where('email', isEqualTo:email).get();
+    final QuerySnapshot querySnapshot = await getIt<FirebaseFirestore>().collection('user').where('email', isEqualTo:email).get();
     if(querySnapshot.docs.isNotEmpty){
       final User user = User.fromJson(querySnapshot.docs.first.data());
       await Navigator.push(context, 
@@ -204,8 +203,7 @@ class _ExpedientState extends State<ExpedientPage> {
   Widget build(BuildContext context) {
     return StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (Store<StoreState> store) => <String, dynamic>{
-        'email': store.state.user.email,
-        'firestore': store.state.firestore          
+        'email': store.state.user.email        
       },
       builder: (BuildContext context, Map<String, dynamic> resources) => Scaffold(
         appBar: AppBar(
@@ -239,7 +237,7 @@ class _ExpedientState extends State<ExpedientPage> {
           actions: widget.readOnly ? <Widget>[
             PopupMenuButton<ExpedientOptions>(
               tooltip: AppLocalizations.of(context).translate('open_menu'),
-              onSelected: (ExpedientOptions result) => _onSelectedExpedientOptions(resources['firestore'], result),
+              onSelected: (ExpedientOptions result) => _onSelectedExpedientOptions(result),
               itemBuilder: (BuildContext context) => <PopupMenuEntry<ExpedientOptions>>[
                 PopupMenuItem<ExpedientOptions>(
                   value: ExpedientOptions.aboutDriver,

@@ -1,29 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:perna/services/driver.dart';
-import 'package:perna/services/user.dart';
-import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:loading/loading.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
-import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
 import 'package:perna/widgets/titled_value_widget.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({@required this.email, @required this.firestore});
+  const HistoryPage({@required this.email});
   
   final String email;
-  final FirebaseFirestore firestore;
 
   @override
   _HistoryPageState createState() => _HistoryPageState();
@@ -52,12 +47,12 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   StreamSubscription<QuerySnapshot> initAgentsListner(){
-    return widget.firestore.collection('agent')
+    return getIt<FirebaseFirestore>().collection('agent')
       .where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot agentsSnapshot){
         setState(() {
           agents = agentsSnapshot.docs.map((QueryDocumentSnapshot agent){
-            return agent.data;
+            return agent.data();
           }).toList();
           isLoadingAgents = false;
         });
@@ -65,13 +60,13 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   StreamSubscription<QuerySnapshot> initAskedPointsListener(){
-    return widget.firestore.collection('askedPoint')
+    return getIt<FirebaseFirestore>().collection('askedPoint')
       .where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot askedPointsSnapshot){
         setState(() {
           askedPoints = askedPointsSnapshot.docs.map(
             (QueryDocumentSnapshot askedPoint){
-              return askedPoint.data;
+              return askedPoint.data();
             }
           ).toList();
           isLoadingAskedPoints = false;
@@ -194,30 +189,19 @@ class _HistoryPageState extends State<HistoryPage> {
                     Navigator.push(context, 
                       MaterialPageRoute<Widget>(
                         builder: (BuildContext context) => 
-                          StoreConnector<StoreState, Map<String, dynamic>>(
-                          converter: (Store<StoreState> store) => <String, dynamic>{
-                            'userService': store.state.userService,
-                            'driverService': store.state.driverService
-                          },
-                          builder: (BuildContext context, Map<String, dynamic> resources) => 
-                            operation['origin'] != null?
-                            AskedPointPage(
-                              userService: 
-                                resources['userService'] as UserService, 
-                              askedPoint: AskedPoint.fromJson(
-                                operation as Map<String, dynamic>), 
-                              readOnly: true, 
-                              clear: (){}
-                            ):
-                            ExpedientPage(
-                              driverService: 
-                                resources['driverService'] as DriverService, 
-                              agent: Agent.fromJson(
-                                operation as Map<String, dynamic>), 
-                              readOnly: true, 
-                              clear: (){}
-                            )
-                        )
+                          operation['origin'] != null?
+                          AskedPointPage(
+                            askedPoint: AskedPoint.fromJson(
+                              operation as Map<String, dynamic>), 
+                            readOnly: true, 
+                            clear: (){}
+                          ):
+                          ExpedientPage(
+                            agent: Agent.fromJson(
+                              operation as Map<String, dynamic>), 
+                            readOnly: true, 
+                            clear: (){}
+                          )
                       )
                     );
                   },
@@ -254,7 +238,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <Widget>[
-                              if(operation['amount'] == null) TitledValueWidget(
+                              if(operation['amount'] != null) TitledValueWidget(
                                 title: AppLocalizations.of(context)
                                   .translate('price'),
                                 value: formatAmount(
