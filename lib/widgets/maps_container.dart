@@ -242,11 +242,11 @@ class _MapsContainerState extends State<MapsContainer> {
   StreamSubscription<QuerySnapshot> _initAgentListener(){
     DateTime today = DateTime.now();
     today = DateTime(today.year, today.month, today.day);
-    final int elapsedTime = DateTime.now().microsecondsSinceEpoch - today.microsecondsSinceEpoch;
+    final int elapsedTime = DateTime.now().millisecondsSinceEpoch - today.millisecondsSinceEpoch;
     return getIt<FirebaseFirestore>().collection('agent')
       .where('email', isEqualTo: widget.email)
       .where('processed', isEqualTo: true)
-      .where('date', isEqualTo: today.microsecondsSinceEpoch/1000)
+      .where('date', isEqualTo: today.millisecondsSinceEpoch/1000)
       .where('askedEndAt', isGreaterThanOrEqualTo: elapsedTime/1000)
       .orderBy('askedEndAt').limit(1).snapshots().listen((QuerySnapshot agentSnapshot){
         if(agentSnapshot.docs.isNotEmpty){

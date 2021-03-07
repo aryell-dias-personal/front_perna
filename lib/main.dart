@@ -56,9 +56,12 @@ Future<void> main() async {
       },
   );
 
-  FirebaseApp app;
-  if(Firebase.apps.isEmpty) {
-    app = await Firebase.initializeApp(
+  FirebaseApp firebaseApp;
+  FirebaseFirestore firestore;
+  FirebaseAuth firebaseAuth;
+  FirebaseMessaging firebaseMessaging;
+  try {
+    firebaseApp = await Firebase.initializeApp(
       name: FlavorConfig.instance.variables['appName'] as String,
       options: FirebaseOptions(
         appId: FlavorConfig.instance.variables['googleAppID'] as String,
@@ -68,12 +71,13 @@ Future<void> main() async {
           FlavorConfig.instance.variables['gcmSenderID'] as String,
       )
     );
-  } else {
-    app = Firebase.apps.first;
+  } on FirebaseException {
+    firebaseApp = Firebase.app(FlavorConfig.instance.variables['appName'] as String);
+  } finally {
+    firestore = FirebaseFirestore.instanceFor(app: firebaseApp);
+    firebaseAuth = FirebaseAuth.instanceFor(app: firebaseApp);
+    firebaseMessaging = FirebaseMessaging.instance;
   }
-  final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   final NotificationSettings settings = 
   await firebaseMessaging.requestPermission(
@@ -134,7 +138,6 @@ class MyApp extends StatelessWidget {
 
   final Store<StoreState> store;
   final FirebaseMessaging firebaseMessaging;
-
 
   @override
   Widget build(BuildContext context) {

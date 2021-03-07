@@ -134,7 +134,7 @@ class _MapListenerState extends State<MapListener> {
       watchAskedPointSubscription = getIt<FirebaseFirestore>().collection('askedPoint')
         .where('email', isEqualTo: widget.email)
         .where('processed', isEqualTo: true)
-        .where('actualEndAt', isGreaterThanOrEqualTo: DateTime.now().microsecondsSinceEpoch/1000)
+        .where('actualEndAt', isGreaterThanOrEqualTo: DateTime.now().millisecondsSinceEpoch/1000)
         .orderBy('actualEndAt').limit(1).snapshots().listen((QuerySnapshot askedPointSnapshot){
           if(askedPointSnapshot.docs.isNotEmpty){
             final AskedPoint askedPoint = AskedPoint.fromJson(askedPointSnapshot.docs.first.data());
