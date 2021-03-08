@@ -180,7 +180,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                               SizedBox(
                                 height: 48,
                                 width: 48,
-                                child: !brandToCardType.containsKey(widget.defaultCreditCard.brand) ? Image.asset(
+                                child: brandToCardType.containsKey(widget.defaultCreditCard.brand) ? Image.asset(
                                   cardTypeIconAsset[
                                     brandToCardType[
                                       widget.defaultCreditCard.brand
