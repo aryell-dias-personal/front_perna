@@ -201,7 +201,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                   SizedBox(
                                     height: 48,
                                     width: 48,
-                                    child: !brandToCardType.containsKey(currCreditCard.brand) ? Image.asset(
+                                    child: brandToCardType.containsKey(currCreditCard.brand) ? Image.asset(
                                       cardTypeIconAsset[
                                         brandToCardType[
                                           currCreditCard.brand
