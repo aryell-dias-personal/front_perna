@@ -1,4 +1,4 @@
-// NOTE: Essas mensagens não são visíveis para o usuário
+// HACK: Essas mensagens não são visíveis para o usuário
 const String updateDotAndRouteChannelDescription = 
   'Atualizando os usuários sobre suas rotas e seus próximos pontos';
 const String updateDotAndRouteChannelName = 'Atualizando você';

@@ -39,7 +39,7 @@ class _SearchLocationState extends State<SearchLocation> with TickerProviderStat
     final Prediction prediction = await PlacesAutocomplete.show(
       context: context,
       apiKey: FlavorConfig.instance.variables['apiKey'] as String,
-      // NOTE: esse types e strictbounds tão sem valor default lá dentro, não tira
+      // HACK: esse types e strictbounds tão sem valor default lá dentro, não tira
       types: <String>[],
       strictbounds: false,
       mode: Mode.overlay,

@@ -99,7 +99,6 @@ Future<void> main() async {
       );
   }
 
-  // NOTE: declarado serviços
   final MyDecoder myDecoder = MyDecoder();
   getIt.registerSingleton<DirectionsService>(DirectionsService());
   getIt.registerSingleton<UserService>(

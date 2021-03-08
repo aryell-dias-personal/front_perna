@@ -38,7 +38,7 @@ dependencies:
   google_sign_in: ^5.0.0
   http: ^0.13.0
   http_parser: ^4.0.0
-  location: ^4.0.2
+  location: 4.0.2 # NOTE: 4.1.0 é a mais nova, mas se encontra com bug
   random_color: ^1.0.5
   redux_persist: ^0.8.4
   redux_persist_flutter: ^0.8.2
