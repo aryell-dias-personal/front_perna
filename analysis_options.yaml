@@ -8,3 +8,4 @@ linter:
     prefer_single_quotes: true
     always_specify_types: true
     lines_longer_than_100_chars: true
+    sort_pub_dependencies: true
