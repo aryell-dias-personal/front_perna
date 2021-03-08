@@ -32,6 +32,7 @@
 release/
 */key.properties
 release.keystore
+**/google-services.json
 
 # Web related
 lib/generated_plugin_registrant.dart
