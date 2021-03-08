@@ -3,6 +3,8 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 ## Antes de rodar
 
+- Não esqueça de baixar o `google-services.json`
+
 - Garanta que o Firestore esteja ativo
 
 - Garanta que o Authentication esteja ativo
