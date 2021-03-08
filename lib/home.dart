@@ -51,17 +51,19 @@ Future<void> onMessage(RemoteMessage message) async {
 class Home extends StatefulWidget {
   const Home({
     @required this.firebaseMessaging,
+    @required this.isInitiallyConnected,
     Key key
   }) : super(key: key);
 
   final FirebaseMessaging firebaseMessaging;
+  final bool isInitiallyConnected;
 
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  bool isConnected = true;
+  bool isConnected;
 
   Future<void> askNewAgentHandler(RemoteMessage message) async {
     const JsonDecoder dec = JsonDecoder();
@@ -213,7 +215,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return !isConnected ? const NoConnectionPage() : 
+    return !(isConnected ?? widget.isInitiallyConnected) ? const NoConnectionPage() : 
       StoreConnector<StoreState, Map<String, dynamic>>(
       converter: (Store<StoreState> store) {
         return <String, dynamic>{

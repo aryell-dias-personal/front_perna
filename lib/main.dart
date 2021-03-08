@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -130,13 +131,26 @@ Future<void> main() async {
     reduce, initialState: initialState.copyWith(messagingToken: messagingToken),
     middleware: <dynamic Function(Store<StoreState>, dynamic, dynamic Function(dynamic))>[persistor.createMiddleware()]
   );
-  runApp(MyApp(store: store, firebaseMessaging: firebaseMessaging));
+
+  
+  final ConnectivityResult initialConnection = await Connectivity().checkConnectivity();
+
+  runApp(MyApp(
+    store: store, firebaseMessaging: firebaseMessaging, 
+    isInitiallyConnected: initialConnection == ConnectivityResult.mobile 
+      || initialConnection == ConnectivityResult.wifi
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({@required this.store, @required this.firebaseMessaging});
+  const MyApp({
+    @required this.store, 
+    @required this.firebaseMessaging,
+    @required this.isInitiallyConnected
+  });
 
   final Store<StoreState> store;
+  final bool isInitiallyConnected;
   final FirebaseMessaging firebaseMessaging;
 
   @override
@@ -155,6 +169,7 @@ class MyApp extends StatelessWidget {
           builder: (BuildContext context) => Scaffold(
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(
+              isInitiallyConnected: isInitiallyConnected,
               firebaseMessaging: firebaseMessaging
             )
           )
