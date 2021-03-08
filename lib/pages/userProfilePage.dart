@@ -35,7 +35,6 @@ class UserProfilePage extends StatelessWidget {
                     color: Colors.transparent,
                     child: CircleAvatar(
                       radius: 60,
-                      // backgroundColor: this.textColor,
                       child: this.user.photoUrl==null || this.user.photoUrl == ""? Icon(Icons.person, size: 90): null,
                       backgroundImage: NetworkImage(this.user.photoUrl)
                     )
@@ -54,14 +53,15 @@ class UserProfilePage extends StatelessWidget {
                   itemCount: 5,
                   itemSize: 50.0,
                   itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: Colors.amber,
+                  ratingWidget: RatingWidget(
+                    empty: Icon(Icons.star, color: Colors.amber),
+                    full: Icon(Icons.star, color: Colors.amber),
+                    half: Icon(Icons.star, color: Colors.amber)
                   ),
                   onRatingUpdate: (rating) {
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      Colors.pinkAccent, context: context);
+                      Colors.pinkAccent, context);
                   },
                 ),
               ),
@@ -87,11 +87,11 @@ class UserProfilePage extends StatelessWidget {
               ),
               SizedBox(height: 26),
               Builder(
-                builder: (context)=> RaisedButton(
+                builder: (context)=> ElevatedButton(
                   onPressed: (){
                     showSnackBar(
                       AppLocalizations.of(context).translate("not_implemented"), 
-                      Colors.pinkAccent, context: context);
+                      Colors.pinkAccent, context);
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -101,8 +101,10 @@ class UserProfilePage extends StatelessWidget {
                       Icon(Icons.message, color: Theme.of(context).backgroundColor, size: 20)
                     ]
                   ),
-                  color: Theme.of(context).primaryColor,
-                  shape: StadiumBorder(),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                    shape: MaterialStateProperty.all(StadiumBorder()),
+                  )
                 )
               )
             ],

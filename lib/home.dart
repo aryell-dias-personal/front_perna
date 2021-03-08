@@ -1,9 +1,9 @@
 import 'dart:math';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:perna/constants/notification.dart';
 import 'package:perna/helpers/appLocalizations.dart';
 import 'package:perna/helpers/showSnackBar.dart';
@@ -19,20 +19,25 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import 'package:timezone/data/latest.dart' as timezone;
+import 'package:timezone/timezone.dart' as timezone;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-Future onMessage(Map<String, dynamic> message) async {
+Future onMessage(RemoteMessage message) async {
   JsonEncoder enc = JsonEncoder();
   Random rand = Random();
   AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
     updateDotAndRouteChannelId, updateDotAndRouteChannelName, updateDotAndRouteChannelDescription
   );
   NotificationDetails platformChannelSpecifics = NotificationDetails(
-    androidPlatformChannelSpecifics, null);
+    android: androidPlatformChannelSpecifics
+  );
   await flutterLocalNotificationsPlugin.show(
-    rand.nextInt(1000), message["notification"]["title"], message["notification"]["body"], platformChannelSpecifics,
-    payload: enc.convert(message)
+    rand.nextInt(1000), message.notification.title, message.notification.body, platformChannelSpecifics,
+    payload: enc.convert({
+      'data': message.data
+    })
   );
 }
 
@@ -55,9 +60,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isConnected = true;
 
-  Future askNewAgentHandler(Map<String, dynamic> message) async {
+  Future askNewAgentHandler(RemoteMessage message) async {
     NavigatorState navigatorState = Navigator.of(context);
-    Agent agent = Agent.fromJson(JsonDecoder().convert(message['data']['agent']));
+    Agent agent = Agent.fromJson(JsonDecoder().convert(message.data['agent']));
     await navigatorState.push( 
       MaterialPageRoute(
         builder: (context) => Scaffold(
@@ -74,12 +79,12 @@ class _HomeState extends State<Home> {
 
   Future answerNewAgentHandler(Agent agent, bool accepted) async {
     if(accepted){
-      IdTokenResult idTokenResult =  await widget.signInService.getRefreshToken();
-      int statusCodeNewAgent = await widget.driverService.postNewAgent(agent, idTokenResult.token);
+      String token =  await widget.signInService.getRefreshToken();
+      int statusCodeNewAgent = await widget.driverService.postNewAgent(agent, token);
       if(statusCodeNewAgent !=200){
         showSnackBar(
           AppLocalizations.of(context).translateFormat("accept_not_possible", [agent.fromEmail]),
-          Colors.redAccent, context: context
+          Colors.redAccent, context
         );
         return;
       }
@@ -89,42 +94,48 @@ class _HomeState extends State<Home> {
       String answer = AppLocalizations.of(context).translate(accepted? "accepted" : "denied");
       showSnackBar(
         AppLocalizations.of(context).translateFormat("answer_order", [answer, agent.fromEmail]), 
-        Colors.greenAccent, context: context
+        Colors.greenAccent, context
       );
     } else {
       showSnackBar(
         AppLocalizations.of(context).translateFormat("not_answer_order", [agent.fromEmail]), 
-        Colors.redAccent, context: context
+        Colors.redAccent, context
       );
     }
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  Future scheduleMessage(Map<String, dynamic> message) async {
+  Future scheduleMessage(RemoteMessage message) async {
+    JsonEncoder enc = JsonEncoder();
     Random rand = Random();
-    int time = double.parse(message['data']['time']).round();
+    int time = double.parse(message.data['time']).round();
     String content = AppLocalizations.of(context).translate(
-      message['data']['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(time*1000).subtract(Duration(hours: 1));
+      message.data['type'] == expedientType ? "reminder_content_expedient" : "reminder_content_travel");
+    timezone.initializeTimeZones();
+    String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+    timezone.setLocalLocation(timezone.getLocation(currentTimeZone));
+    timezone.TZDateTime date = timezone.TZDateTime.fromMicrosecondsSinceEpoch(timezone.local, time*1000).subtract(Duration(hours: 1));
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       remeberYouOfDotAndRouteChannelId, remeberYouOfDotAndRouteChannelName, remeberYouOfDotAndRouteChannelDescription
     );
     DateFormat format = DateFormat('HH:mm');
     NotificationDetails platformChannelSpecifics = NotificationDetails(
-      androidPlatformChannelSpecifics, null);
-    await flutterLocalNotificationsPlugin.schedule(
+      android: androidPlatformChannelSpecifics
+    );
+    await flutterLocalNotificationsPlugin.zonedSchedule(
       rand.nextInt(1000), 
       AppLocalizations.of(context).translate("remind"), 
       AppLocalizations.of(context).translateFormat("reminder_message", [format.format(date), content]), 
-      date, platformChannelSpecifics, payload: 'remember', androidAllowWhileIdle: true
+      date, platformChannelSpecifics, payload: enc.convert({ 'data': null }), androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
     );
   }
   
-  Future onLaunch(Map<String, dynamic> message) async {
-    if(message.keys.contains("data")){
-      if(message['data']['time'] != null && message['data']['type'] != null){
+  Future onLaunch(RemoteMessage message) async {
+    if(message.data != null){
+      if(message.data['time'] != null && message.data['type'] != null){
         await scheduleMessage(message);
-      } else if(message['data']['agent'] != null){
+      } else if(message.data['agent'] != null){
         await askNewAgentHandler(message);
       }
     }
@@ -134,23 +145,21 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
-    InitializationSettings initializationSettings = InitializationSettings(initializationSettingsAndroid, null);
+    InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid
+    );
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String payload) async { 
-        if(payload != "remember"){
-          JsonDecoder dec = JsonDecoder();
-          Map<String, dynamic> message = dec.convert(payload); 
-          await onLaunch(message);
-        }
+        JsonDecoder dec = JsonDecoder();
+        RemoteMessage message = RemoteMessage.fromMap(dec.convert(payload)); 
+        await onLaunch(message);
       }
     );
 
-    widget.firebaseMessaging.configure(
-      onMessage: onMessage,
-      onBackgroundMessage: onMessage, 
-      onLaunch: onLaunch,
-      onResume: onLaunch
-    );
+    FirebaseMessaging.onMessage.listen(onMessage);
+    // HACK: não precisa configurar, já que o launch já tá por aqui
+    // FirebaseMessaging.onBackgroundMessage(onMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(onLaunch);
   
     Connectivity().onConnectivityChanged.listen((ConnectivityResult connection){
       setState(() {

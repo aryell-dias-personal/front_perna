@@ -47,7 +47,7 @@ class SideMenu extends StatelessWidget {
               text: AppLocalizations.of(context).translate("history"),
               onPressed: (){
                 Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => StoreConnector<StoreState, Firestore>(
+                    builder: (context) => StoreConnector<StoreState, FirebaseFirestore>(
                       converter: (store) => store.state.firestore,
                       builder:  (context, firestore) => HistoryPage(email: this.email, firestore: firestore)
                     )
@@ -82,7 +82,7 @@ class SideMenu extends StatelessWidget {
               onPressed: () {
                 showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
-                  Colors.pinkAccent, context: context);
+                  Colors.pinkAccent, context);
               },
               icon: Icons.business,
             ),
@@ -92,7 +92,7 @@ class SideMenu extends StatelessWidget {
               onPressed: (){
                 showSnackBar(
                   AppLocalizations.of(context).translate("not_implemented"), 
-                  Colors.pinkAccent, context: context);
+                  Colors.pinkAccent, context);
               },
               icon: Icons.palette,
             ),

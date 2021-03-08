@@ -9,7 +9,7 @@ class StoreState{
   bool logedIn;
   User user;
   String messagingToken;
-  Firestore firestore;
+  FirebaseFirestore firestore;
   UserService userService;
   DriverService driverService;
   SignInService signInService;

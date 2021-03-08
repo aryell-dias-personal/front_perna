@@ -18,7 +18,7 @@ import 'package:perna/widgets/titledValueWidget.dart';
 
 class HistoryPage extends StatefulWidget {
   final String email;
-  final Firestore firestore;
+  final FirebaseFirestore firestore;
 
   HistoryPage({@required this.email, @required this.firestore});
 
@@ -52,7 +52,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return widget.firestore.collection("agent").where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot agentsSnapshot){
         setState(() {
-          this.agents = agentsSnapshot.documents.map((agent){
+          this.agents = agentsSnapshot.docs.map((agent){
             return agent.data;
           }).toList();
           this.isLoadingAgents = false;
@@ -64,7 +64,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return widget.firestore.collection("askedPoint").where('email', isEqualTo: widget.email)
       .snapshots().listen((QuerySnapshot askedPointsSnapshot){
         setState(() {
-          this.askedPoints = askedPointsSnapshot.documents.map((askedPoint){
+          this.askedPoints = askedPointsSnapshot.docs.map((askedPoint){
             return askedPoint.data;
           }).toList();
           this.isLoadingAskedPoints = false;
@@ -170,7 +170,10 @@ class _HistoryPageState extends State<HistoryPage> {
               itemBuilder: (context, index) {
                 List history = getHistory();
                 dynamic operation = history[index];
-                return FlatButton(
+                return TextButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                  ),
                   onPressed: (){
                     Navigator.push(context, 
                       MaterialPageRoute(

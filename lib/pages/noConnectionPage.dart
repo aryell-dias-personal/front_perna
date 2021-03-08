@@ -53,7 +53,7 @@ class NoConnectionPage extends StatelessWidget {
             SizedBox(
               height: 50.0,
             ),
-            RaisedButton(
+            ElevatedButton(
               child: Text(
                 AppLocalizations.of(context).translate("go_to_settings"),
                 style: TextStyle(
@@ -62,9 +62,11 @@ class NoConnectionPage extends StatelessWidget {
                     color: Theme.of(context).backgroundColor),
               ),
               onPressed: (){AppSettings.openWIFISettings();},
-              color: Theme.of(context).primaryColor,
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-              shape: StadiumBorder()
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                padding: MaterialStateProperty.all(EdgeInsets.fromLTRB(20, 10, 20, 10)),
+                shape: MaterialStateProperty.all(StadiumBorder())
+              )
             )
           ],
         )

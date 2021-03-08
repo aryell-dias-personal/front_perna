@@ -43,11 +43,11 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
       widget.clear();
       Navigator.popUntil(context, (route) => route.isFirst);
       showSnackBar(AppLocalizations.of(context).translate("successfully_added_order"), 
-        Colors.greenAccent, isGlobal: true);
+        Colors.greenAccent, context);
     } else {
       setState(() { isLoading = false; });
       showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_order"), 
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
   }
 
@@ -86,7 +86,6 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
               , maxLines: 2
             ),
             SizedBox(width: 5),
-            // payments_outlined 
             Icon(Icons.account_balance, size: 30),
           ]
         ),
@@ -123,6 +122,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                     onTap: ()  {},
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     child: Container(
@@ -215,7 +215,10 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                 )
               ),
               Divider(), 
-              FlatButton(
+              TextButton(
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor)
+                ),
                 onPressed: (){
                   Navigator.of(context).pop();
                 },
@@ -253,6 +256,7 @@ class _AskedPointConfirmationPageState extends State<AskedPointConfirmationPage>
                     borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   child: InkWell(
+                    overlayColor: MaterialStateProperty.all(Theme.of(context).splashColor),
                     onTap: ()  {},
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     child: Container(

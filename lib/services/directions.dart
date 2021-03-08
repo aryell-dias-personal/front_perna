@@ -16,7 +16,7 @@ class DirectionsService{
       return "$acc|$currLocation";
     });
     String url = "${baseUrl}json?origin=${points.first.latitude},${points.first.longitude}&destination=${points.last.latitude},${points.last.longitude}&waypoints=$waypoints&mode=driving&key=$googleApiKey";
-    dynamic response = await get(url);
+    dynamic response = await get(Uri.parse(url));
     if (response?.statusCode == 200) {
       Map<String, dynamic> body = decoder.convert(response.body);
       if(body["status"] == "REQUEST_DENIED") return <LatLng>[];

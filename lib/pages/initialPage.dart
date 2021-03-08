@@ -43,7 +43,7 @@ class _InitialPageState extends State<InitialPage> {
           if(user==null){
             showSnackBar(
               AppLocalizations.of(context).translate("unrecognized_user"), 
-              Colors.redAccent, context: context
+              Colors.redAccent, context
             );
           } else {
             store.dispatch(choice == SignLogin.sign? SignIn(user):LogIn(user));

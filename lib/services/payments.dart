@@ -23,7 +23,7 @@ class PaymentsService{
 
   Future<List<model.CreditCard>> listCard(String token) async { 
     Response res = await post(
-      "${baseUrl}listCreditCard",
+      Uri.parse("${baseUrl}listCreditCard"),
       body: await myDecoder.encode({}),
       headers: {
         'Authorization': token
@@ -41,7 +41,7 @@ class PaymentsService{
   Future<int> confirmAskedPointPayment(AskedPoint askedPoint, String token) async { 
     dynamic body = await myDecoder.encode(askedPoint.toJson());
     Response res = await post(
-      "${baseUrl}confirmAskedPointPayment",
+      Uri.parse("${baseUrl}confirmAskedPointPayment"),
       body: body,
       headers: {
         'Authorization': token
@@ -61,7 +61,7 @@ class PaymentsService{
       'creditCardId': creditCardId
     });
     Response res = await post(
-      "${baseUrl}deleteCreditCard",
+      Uri.parse("${baseUrl}deleteCreditCard"),
       body: body,
       headers: {
         'Authorization': token
@@ -81,7 +81,7 @@ class PaymentsService{
       'creditCardId': creditCardId
     });
     Response res = await post(
-      "${baseUrl}turnDefaultCreditCard",
+      Uri.parse("${baseUrl}turnDefaultCreditCard"),
       body: body,
       headers: {
         'Authorization': token
@@ -106,7 +106,7 @@ class PaymentsService{
         brand: creditCard.brand
       ));
       Response res = await post(
-        "${baseUrl}insertCreditCard", 
+        Uri.parse("${baseUrl}insertCreditCard"), 
         body: await myDecoder.encode({
           'source': tokenWithCard.tokenId
         }),

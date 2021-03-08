@@ -105,7 +105,7 @@ class FormTimePicker extends StatelessWidget {
               return this.validatorMessage;
             }
             DateTime dateTime = format.parse(value.length > 5 ? value : "$value $selectedDay");
-            if(!dateTime.isAfter(this.minTime ?? DateTime.now())) {
+            if(dateTime.isBefore(this.minTime ?? DateTime.now())) {
               return this.validatorMessage;
             }
           }

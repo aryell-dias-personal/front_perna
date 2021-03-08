@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -31,7 +30,7 @@ class ExpedientPage extends StatefulWidget {
   final Function() clear;
   final Function() accept;
   final DriverService driverService;
-  final Future<IdTokenResult> Function() getRefreshToken;
+  final Future<String> Function() getRefreshToken;
 
   const ExpedientPage({
     @required this.driverService, 
@@ -90,11 +89,11 @@ class _ExpedientState extends State<ExpedientPage> {
       widget.clear();
       Navigator.pop(context);
       showSnackBar(AppLocalizations.of(context).translate("successful_work_order"), 
-        Colors.greenAccent, isGlobal: true);
+        Colors.greenAccent, context);
     } else {
       setState(() { isLoading = false; });
       showSnackBar(AppLocalizations.of(context).translate("unsuccessful_work_order"), 
-        Colors.redAccent, context: context);
+        Colors.redAccent, context);
     }
   }
 
@@ -116,17 +115,17 @@ class _ExpedientState extends State<ExpedientPage> {
       if(fromEmail != email) {
         this._askNewAgend(agent);
       } else {
-        IdTokenResult idTokenResult = await widget.getRefreshToken();
-        int statusCode = await widget.driverService.postNewAgent(agent, idTokenResult.token);
+        String token = await widget.getRefreshToken();
+        int statusCode = await widget.driverService.postNewAgent(agent, token);
         if(statusCode==200){
           widget.clear();
           Navigator.pop(context);
           showSnackBar( AppLocalizations.of(context).translate("successfully_added_expedient"), 
-            Colors.greenAccent, isGlobal: true);
+            Colors.greenAccent, context);
         }else{
           setState(() { isLoading = false; });
           showSnackBar(AppLocalizations.of(context).translate("unsuccessfully_added_expedient"), 
-            Colors.redAccent, context: context);
+            Colors.redAccent, context);
         }
       }
     }
@@ -137,12 +136,12 @@ class _ExpedientState extends State<ExpedientPage> {
     (accept? widget.accept(): widget.deny()).then((_){ setState(() { isLoading=false; }); });
   }
   
-  void _onSelectedExpedientOptions(Firestore firestore, ExpedientOptions result) async {
+  void _onSelectedExpedientOptions(FirebaseFirestore firestore, ExpedientOptions result) async {
     setState(() { this.isLoading = true; });
     String email = result == ExpedientOptions.aboutDriver ? this.agent.email : this.agent.fromEmail;
-    QuerySnapshot querySnapshot = await firestore.collection("user").where("email", isEqualTo:email).getDocuments();
-    if(querySnapshot.documents.isNotEmpty){
-      User user = User.fromJson(querySnapshot.documents.first.data);
+    QuerySnapshot querySnapshot = await firestore.collection("user").where("email", isEqualTo:email).get();
+    if(querySnapshot.docs.isNotEmpty){
+      User user = User.fromJson(querySnapshot.docs.first.data());
       await Navigator.push(context, 
         MaterialPageRoute(
           builder: (context) => UserProfilePage(user: user)
@@ -150,7 +149,7 @@ class _ExpedientState extends State<ExpedientPage> {
       );
     } else {
       showSnackBar(AppLocalizations.of(context).translate("not_found_user"), 
-        Colors.redAccent, context: context
+        Colors.redAccent, context
       );
     }
     setState(() {
@@ -278,7 +277,7 @@ class _ExpedientState extends State<ExpedientPage> {
                     children: <Widget>[
                       OutlinedTextFormField(
                         readOnly: widget.readOnly,
-                        initialValue: this.agent.email ?? "",
+                        initialValue: (this.agent.email ?? this.email) ?? "",
                         onChanged: (text){ this.email = text; },
                         textInputType: TextInputType.emailAddress,
                         labelText: AppLocalizations.of(context).translate("driver_email"),
@@ -365,7 +364,7 @@ class _ExpedientState extends State<ExpedientPage> {
                       SizedBox(height: 26),
                       OutlinedTextFormField(
                         readOnly: widget.readOnly,
-                        initialValue: this.agent.places?.toString() ?? "",
+                        initialValue: (this.agent.places?.toString() ?? this.places?.toString()) ?? "",
                         onChanged: (text){ this.places = text; },
                         textInputType: TextInputType.number,
                         labelText: AppLocalizations.of(context).translate("seats_number"),

@@ -82,3 +82,6 @@ ao invés de
 ```List<String> myList = new ArrayList<String>();```
 
 no Java.
+
+- Pode ser importante no futuro para fazer a bolha flutuante:
+> https://github.com/KohlsAdrian/bubble_overlay
