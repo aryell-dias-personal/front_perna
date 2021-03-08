@@ -1,13 +1,16 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
-import 'package:perna/helpers/appLocalizations.dart';
-import 'package:perna/helpers/myDecoder.dart';
+import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/home.dart';
+import 'package:perna/services/directions.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/services/signIn.dart';
+import 'package:perna/services/sign_in.dart';
+import 'package:perna/services/static_map.dart';
 import 'package:perna/services/user.dart';
 import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
@@ -21,24 +24,27 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_flavor/flutter_flavor.dart';
+import 'package:get_it/get_it.dart';
+
+GetIt getIt = GetIt.instance;
 
 GoogleSignIn googleSignIn = GoogleSignIn(
   scopes: <String>[emailUserInfo],
 );
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final persistor = Persistor<StoreState>(
+  final Persistor<StoreState> persistor = Persistor<StoreState>(
     storage: FlutterStorage(),
     serializer: JsonSerializer<StoreState>(StoreState.fromJson),
   );
 
-  final initialState = await persistor.load();
+  final StoreState initialState = await persistor.load();
   
   FlavorConfig(
-      name: "DEVELOP",
-      variables: {
+      name: 'DEVELOP',
+      variables: <String, String>{
         'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
         'appName': 'aryell-test',
         'projectID': 'aryell-test',
@@ -51,20 +57,31 @@ void main() async {
       },
   );
 
-  final FirebaseApp app = await Firebase.initializeApp(
-    name: FlavorConfig.instance.variables['appName'],
-    options: FirebaseOptions(
-      appId: FlavorConfig.instance.variables['googleAppID'],
-      apiKey: FlavorConfig.instance.variables['apiKey'],
-      projectId: FlavorConfig.instance.variables['projectID'],
-      messagingSenderId: FlavorConfig.instance.variables['gcmSenderID'],
-    )
-  );
-  final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instanceFor(app: app);
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  FirebaseApp firebaseApp;
+  FirebaseFirestore firestore;
+  FirebaseAuth firebaseAuth;
+  FirebaseMessaging firebaseMessaging;
+  try {
+    firebaseApp = await Firebase.initializeApp(
+      name: FlavorConfig.instance.variables['appName'] as String,
+      options: FirebaseOptions(
+        appId: FlavorConfig.instance.variables['googleAppID'] as String,
+        apiKey: FlavorConfig.instance.variables['apiKey'] as String,
+        projectId: FlavorConfig.instance.variables['projectID'] as String,
+        messagingSenderId: 
+          FlavorConfig.instance.variables['gcmSenderID'] as String,
+      )
+    );
+  } on FirebaseException {
+    firebaseApp = Firebase.app(FlavorConfig.instance.variables['appName'] as String);
+  } finally {
+    firestore = FirebaseFirestore.instanceFor(app: firebaseApp);
+    firebaseAuth = FirebaseAuth.instanceFor(app: firebaseApp);
+    firebaseMessaging = FirebaseMessaging.instance;
+  }
 
-  NotificationSettings settings = await firebaseMessaging.requestPermission(
+  final NotificationSettings settings = 
+  await firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -82,42 +99,65 @@ void main() async {
       );
   }
 
-  MyDecoder myDecoder = MyDecoder();
-  final store = new Store<StoreState>(
-    reduce, initialState: initialState.copyWith(
-      firestore: firestore, 
-      messagingToken: messagingToken,
-      userService: UserService(
-        myDecoder: myDecoder
-      ),
-      driverService: DriverService(
-        myDecoder: myDecoder
-      ),
-      signInService: SignInService(
-        firebaseAuth: firebaseAuth,
-        googleSignIn: googleSignIn,
-        myDecoder: myDecoder
-      ),
-      paymentsService: PaymentsService(
-        myDecoder: myDecoder
-      )
+  // NOTE: declarado serviços
+  final MyDecoder myDecoder = MyDecoder();
+  getIt.registerSingleton<DirectionsService>(DirectionsService());
+  getIt.registerSingleton<UserService>(
+    UserService(
+      myDecoder: myDecoder
     ),
-    middleware: [persistor.createMiddleware()]
   );
-  runApp(new MyApp(store: store, firebaseMessaging: firebaseMessaging));
+  getIt.registerSingleton<DriverService>(
+    DriverService(
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<PaymentsService>(
+    PaymentsService(
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<SignInService>(
+    SignInService(
+      firebaseAuth: firebaseAuth,
+      googleSignIn: googleSignIn,
+      myDecoder: myDecoder
+    ),
+  );
+  getIt.registerSingleton<StaticMapService>(StaticMapService());
+  getIt.registerSingleton<FirebaseFirestore>(firestore);
+
+  final Store<StoreState> store = Store<StoreState>(
+    reduce, initialState: initialState.copyWith(messagingToken: messagingToken),
+    middleware: <dynamic Function(Store<StoreState>, dynamic, dynamic Function(dynamic))>[persistor.createMiddleware()]
+  );
+
+  
+  final ConnectivityResult initialConnection = await Connectivity().checkConnectivity();
+
+  runApp(MyApp(
+    store: store, firebaseMessaging: firebaseMessaging, 
+    isInitiallyConnected: initialConnection == ConnectivityResult.mobile 
+      || initialConnection == ConnectivityResult.wifi
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  final Store<StoreState> store;
-  final FirebaseMessaging firebaseMessaging;
+  const MyApp({
+    @required this.store, 
+    @required this.firebaseMessaging,
+    @required this.isInitiallyConnected
+  });
 
-  MyApp({@required this.store, @required this.firebaseMessaging});
+  final Store<StoreState> store;
+  final bool isInitiallyConnected;
+  final FirebaseMessaging firebaseMessaging;
 
   @override
   Widget build(BuildContext context) {
-    Color mainLightColor = Color(0xFF1c4966);
-    Color mainDarkColor = Color(0xFFf5feff);
-    SystemChrome.setPreferredOrientations([
+    const Color mainLightColor = Color(0xFF1c4966);
+    const Color mainDarkColor = Color(0xFFf5feff);
+    SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
@@ -126,26 +166,25 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Builder(
-          builder: (context) => Scaffold(
+          builder: (BuildContext context) => Scaffold(
             backgroundColor: Theme.of(context).backgroundColor, 
             body: Home(
-              firebaseMessaging: this.firebaseMessaging, 
-              driverService: store.state.driverService,
-              signInService: store.state.signInService,
+              isInitiallyConnected: isInitiallyConnected,
+              firebaseMessaging: firebaseMessaging
             )
           )
         ),
-        supportedLocales: [
+        supportedLocales: const <Locale>[
           Locale('en', 'US'),
           Locale('pt', 'BR'),
         ],
-        localizationsDelegates: [
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        localeResolutionCallback: (locale, supportedLocales) {
-          for (var supportedLocale in supportedLocales) {
+        localeResolutionCallback: (Locale locale, Iterable<Locale> supportedLocales) {
+          for (final Locale supportedLocale in supportedLocales) {
             if (supportedLocale.languageCode == locale.languageCode &&
                 supportedLocale.countryCode == locale.countryCode) {
               return supportedLocale;
@@ -155,29 +194,31 @@ class MyApp extends StatelessWidget {
         },
         theme: ThemeData(
           brightness: Brightness.light,
-          textTheme: TextTheme(
+          textTheme: const TextTheme(
             bodyText2: TextStyle(color: mainLightColor)
           ),
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: mainLightColor
           ),
+          disabledColor: mainLightColor.withAlpha(66),
           primaryColor: mainLightColor,
           accentColor: mainLightColor.withAlpha(66),
-          fontFamily: "ProductSans",
+          fontFamily: 'ProductSans',
           backgroundColor: Colors.white
         ),
         darkTheme: ThemeData(
           brightness: Brightness.dark,
-          textTheme: TextTheme(
+          textTheme: const TextTheme(
             bodyText2: TextStyle(color: mainDarkColor)
           ),
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: mainDarkColor
           ),
+          disabledColor: mainDarkColor.withAlpha(66),
           primaryColor: mainDarkColor,
           accentColor: mainDarkColor.withAlpha(66),
-          fontFamily: "ProductSans",
-          backgroundColor: Color(0xFF2b2b2b)
+          fontFamily: 'ProductSans',
+          backgroundColor: const Color(0xFF2b2b2b)
         ),
       )
     );

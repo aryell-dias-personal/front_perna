@@ -8,7 +8,14 @@ StoreState reduce(StoreState state, dynamic action){
       logedIn: false,
       user: User()
     );
-  } else if(action is LogIn || action is SignIn){
+  } else if(action is LogIn) {
+    if (action?.user != null) {
+      return state.copyWith(
+        logedIn: true,
+        user: action.user
+      );
+    } 
+  } else if (action is SignIn){
     if (action?.user != null) {
       return state.copyWith(
         logedIn: true,

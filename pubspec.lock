@@ -347,6 +347,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  flutter_spinkit:
+    dependency: "direct main"
+    description:
+      name: flutter_spinkit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -385,6 +392,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.0.0"
   glob:
     dependency: transitive
     description:
@@ -483,13 +497,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.2"
-  loading:
-    dependency: "direct main"
+  lint:
+    dependency: "direct dev"
     description:
-      name: loading
+      name: lint
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.5.3"
   location:
     dependency: "direct main"
     description:
