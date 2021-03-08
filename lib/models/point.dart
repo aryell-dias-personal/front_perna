@@ -17,7 +17,7 @@ class Point {
   DateTime time;
 
   dynamic toJson() => <String, dynamic>{
-    'email': local.toString(),
+    'local': '${local.latitude}, ${local.longitude}',
     'time': time.millisecondsSinceEpoch/1000
   };
 }

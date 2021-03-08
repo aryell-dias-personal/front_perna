@@ -88,13 +88,13 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     return distance;
   }
 
-  void _updateLocation(LocationData locationData) {
+  Future<void> _updateLocation(LocationData locationData) async {
     final LatLng currLatLng = LatLng(locationData.latitude, locationData.longitude);
     if(previousLatLng == null || _calculateDistance(previousLatLng, currLatLng)>1000){
       setState(() {
         previousLatLng = currLatLng;
       });
-      widget.agentIds.map((String documentID) async {
+      for (final String documentID in widget.agentIds) {
         final DocumentReference ref = getIt<FirebaseFirestore>().collection('agent').doc(documentID);
         final DocumentSnapshot documentSnapshot = await ref.get();
         final Agent oldAgent = Agent.fromJson(documentSnapshot.data());
@@ -104,7 +104,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         // de dados sensiveis como email do responsável e route e tal. Uma forma seria criar um model
         // `Position` que seria referenciado pelo agent, mas e a fila e o histórico?? analisar com calma, 
         // talvez um endpoint para update de queue 🤔
-        if(oldAgent?.queue?.isEmpty == null || oldAgent.queue.isEmpty) {
+        if(oldAgent?.queue?.isEmpty == null || oldAgent.queue.isEmpty || !endHasPassed) {
           await ref.update(<String, dynamic>{
             'position': '${locationData.latitude}, ${locationData.longitude}',
             'old': endHasPassed
@@ -112,13 +112,13 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         } else {
           final Agent newAgent = oldAgent.copyWith(
             queue: oldAgent.queue.sublist(1),
-            history: <DateTime>[oldAgent.date] + oldAgent.history,
+            history: <DateTime>[oldAgent.date] + (oldAgent.history ?? <DateTime>[]),
             date: oldAgent.queue.first,
             position: LatLng(locationData.latitude, locationData.longitude)
           );
           await ref.update(newAgent.toJson() as Map<String, dynamic>);
         }
-      });
+      }
     }
   }
   
