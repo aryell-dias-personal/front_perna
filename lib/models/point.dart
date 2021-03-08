@@ -20,4 +20,4 @@ class Point {
     'local': '${local.latitude}, ${local.longitude}',
     'time': time.millisecondsSinceEpoch/1000
   };
-}
+} 
