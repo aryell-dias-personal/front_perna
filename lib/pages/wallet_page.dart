@@ -10,6 +10,7 @@ import 'package:perna/pages/credit_card_page.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
+import 'package:perna/widgets/ripple_credit_card.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -37,6 +38,64 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
           isLoading = false;
         });
       });
+    });
+  }
+
+  Future<void> _onTapDelete() async {
+    setState(() {
+      isLoading = true;
+    });
+    final int statusCode =
+        await getIt<PaymentsService>().deleteCard(selectedCardId, userToken);
+    if (statusCode == 200) {
+      final List<CreditCard> creditCards =
+          await getIt<PaymentsService>().listCard(userToken);
+      setState(() {
+        this.creditCards = creditCards;
+      });
+      showSnackBar(
+          AppLocalizations.of(context).translate('successfully_delete_card'),
+          Colors.greenAccent,
+          context);
+    } else {
+      showSnackBar(
+          AppLocalizations.of(context).translate('unsuccessfully_delete_card'),
+          Colors.redAccent,
+          context);
+    }
+    setState(() {
+      isLoading = false;
+      selectedCardId = null;
+    });
+  }
+
+  Future<void> _onTapMakeDefault() async {
+    setState(() {
+      isLoading = true;
+    });
+    final int statusCode = await getIt<PaymentsService>()
+        .turnCardDefault(selectedCardId, userToken);
+    if (statusCode == 200) {
+      final List<CreditCard> creditCards =
+          await getIt<PaymentsService>().listCard(userToken);
+      setState(() {
+        this.creditCards = creditCards;
+      });
+      showSnackBar(
+          AppLocalizations.of(context)
+              .translate('successfully_turned_card_default'),
+          Colors.greenAccent,
+          context);
+    } else {
+      showSnackBar(
+          AppLocalizations.of(context)
+              .translate('unsuccessfully_turned_card_default'),
+          Colors.redAccent,
+          context);
+    }
+    setState(() {
+      isLoading = false;
+      selectedCardId = null;
     });
   }
 
@@ -111,198 +170,20 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                             return AnimatedSize(
                                 vsync: this,
                                 duration: const Duration(milliseconds: 200),
-                                child: Container(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 5, top: 5, left: 10, right: 10),
-                                    child: Material(
-                                      elevation: 3,
-                                      color: Theme.of(context).primaryColor,
-                                      shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
-                                      child: InkWell(
-                                          overlayColor:
-                                              MaterialStateProperty.all(
-                                                  Theme.of(context)
-                                                      .splashColor),
-                                          onLongPress: () {
-                                            setState(() {
-                                              selectedCardId = selectedCardId !=
-                                                      currCreditCard.id
-                                                  ? currCreditCard.id
-                                                  : null;
-                                            });
-                                          },
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(10)),
-                                          child: Container(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: <Widget>[
-                                                          if (index == 0)
-                                                            Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        left: 5,
-                                                                        right:
-                                                                            10,
-                                                                        top: 3,
-                                                                        bottom:
-                                                                            3),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: const BorderRadius
-                                                                            .all(
-                                                                        Radius.circular(
-                                                                            50)),
-                                                                    color: Theme.of(
-                                                                            context)
-                                                                        .backgroundColor),
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceAround,
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Icon(
-                                                                      Icons
-                                                                          .star_border,
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .primaryColor,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            2),
-                                                                    Text(
-                                                                      AppLocalizations.of(
-                                                                              context)
-                                                                          .translate(
-                                                                              'default_credit_card'),
-                                                                      style: TextStyle(
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          color:
-                                                                              Theme.of(context).primaryColor),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                          if (selectedCardId ==
-                                                              currCreditCard.id)
-                                                            Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceAround,
-                                                              children: <
-                                                                  Widget>[
-                                                                Icon(
-                                                                  Icons
-                                                                      .check_circle_outline,
-                                                                  color: Theme.of(
-                                                                          context)
-                                                                      .backgroundColor,
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 2),
-                                                                Text(
-                                                                  AppLocalizations.of(
-                                                                          context)
-                                                                      .translate(
-                                                                          'selected_credit_card'),
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Theme.of(
-                                                                              context)
-                                                                          .backgroundColor),
-                                                                ),
-                                                              ],
-                                                            )
-                                                        ]),
-                                                    Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            currCreditCard
-                                                                .cardHolderName,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .backgroundColor),
-                                                          ),
-                                                          SizedBox(
-                                                              height: 48,
-                                                              width: 48,
-                                                              child: brandToCardType
-                                                                      .containsKey(
-                                                                          currCreditCard
-                                                                              .brand)
-                                                                  ? Image.asset(
-                                                                      cardTypeIconAsset[
-                                                                          brandToCardType[currCreditCard
-                                                                              .brand]],
-                                                                      height:
-                                                                          48,
-                                                                      width: 48)
-                                                                  : const SizedBox())
-                                                        ]),
-                                                    const SizedBox(height: 10),
-                                                    Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            currCreditCard
-                                                                .cardNumber,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .backgroundColor),
-                                                          ),
-                                                          Text(
-                                                            currCreditCard
-                                                                .expiryDate,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .backgroundColor),
-                                                          ),
-                                                        ]),
-                                                    const SizedBox(height: 10),
-                                                  ]))),
-                                    )));
+                                child: RippleCreditCard(
+                                  creditCard: currCreditCard,
+                                  isDefault: index == 0,
+                                  isSelected:
+                                      selectedCardId == currCreditCard.id,
+                                  onLongPress: () {
+                                    setState(() {
+                                      selectedCardId =
+                                          selectedCardId != currCreditCard.id
+                                              ? currCreditCard.id
+                                              : null;
+                                    });
+                                  },
+                                ));
                           });
                     }))),
         floatingActionButton: Builder(
@@ -340,40 +221,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                 ? <SpeedDialChild>[]
                                 : <SpeedDialChild>[
                                     SpeedDialChild(
-                                      onTap: () async {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        final int statusCode =
-                                            await getIt<PaymentsService>()
-                                                .turnCardDefault(
-                                                    selectedCardId, userToken);
-                                        if (statusCode == 200) {
-                                          final List<CreditCard> creditCards =
-                                              await getIt<PaymentsService>()
-                                                  .listCard(userToken);
-                                          setState(() {
-                                            this.creditCards = creditCards;
-                                          });
-                                          showSnackBar(
-                                              AppLocalizations.of(context)
-                                                  .translate(
-                                                      'successfully_turned_card_default'),
-                                              Colors.greenAccent,
-                                              context);
-                                        } else {
-                                          showSnackBar(
-                                              AppLocalizations.of(context)
-                                                  .translate(
-                                                      'unsuccessfully_turned_card_default'),
-                                              Colors.redAccent,
-                                              context);
-                                        }
-                                        setState(() {
-                                          isLoading = false;
-                                          selectedCardId = null;
-                                        });
-                                      },
+                                      onTap: _onTapMakeDefault,
                                       child: Icon(Icons.star_border,
                                           color: Theme.of(context)
                                               .backgroundColor),
@@ -385,40 +233,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                                   ]) +
                             <SpeedDialChild>[
                               SpeedDialChild(
-                                  onTap: () async {
-                                    setState(() {
-                                      isLoading = true;
-                                    });
-                                    final int statusCode =
-                                        await getIt<PaymentsService>()
-                                            .deleteCard(
-                                                selectedCardId, userToken);
-                                    if (statusCode == 200) {
-                                      final List<CreditCard> creditCards =
-                                          await getIt<PaymentsService>()
-                                              .listCard(userToken);
-                                      setState(() {
-                                        this.creditCards = creditCards;
-                                      });
-                                      showSnackBar(
-                                          AppLocalizations.of(context)
-                                              .translate(
-                                                  'successfully_delete_card'),
-                                          Colors.greenAccent,
-                                          context);
-                                    } else {
-                                      showSnackBar(
-                                          AppLocalizations.of(context)
-                                              .translate(
-                                                  'unsuccessfully_delete_card'),
-                                          Colors.redAccent,
-                                          context);
-                                    }
-                                    setState(() {
-                                      isLoading = false;
-                                      selectedCardId = null;
-                                    });
-                                  },
+                                  onTap: _onTapDelete,
                                   child: Icon(Icons.delete_outline,
                                       color: Theme.of(context).backgroundColor),
                                   label: AppLocalizations.of(context)

@@ -112,8 +112,8 @@ class _HistoryPageState extends State<HistoryPage> {
   List<dynamic> getHistory() {
     final List<dynamic> history = agents + askedPoints;
     history.sort((dynamic first, dynamic second) {
-      final dynamic firstTime = first['askedEndAt'] ?? 0;
-      final dynamic secondTime = second['askedEndAt'] ?? 0;
+      final dynamic firstTime = first['date'] + (first['askedEndAt'] ?? 0);
+      final dynamic secondTime = second['date'] + (second['askedEndAt'] ?? 0);
       final int firstTimeInt =
           firstTime is int ? firstTime : (firstTime as double).round();
       final int secondTimeInt =

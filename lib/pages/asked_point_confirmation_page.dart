@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
@@ -8,6 +7,7 @@ import 'package:perna/main.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
+import 'package:perna/widgets/ripple_credit_card.dart';
 import 'package:perna/widgets/titled_value_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -109,129 +109,11 @@ class _AskedPointConfirmationPageState
                       size: 100.0, color: Theme.of(context).primaryColor))
               : SingleChildScrollView(
                   child: Column(children: <Widget>[
-                  Container(
-                      padding: const EdgeInsets.only(
-                          bottom: 5, top: 15, left: 10, right: 10),
-                      child: Material(
-                        elevation: 3,
-                        color: Theme.of(context).primaryColor,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: InkWell(
-                            overlayColor: MaterialStateProperty.all(
-                                Theme.of(context).splashColor),
-                            onTap: () {},
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            child: Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 10,
-                                                    top: 3,
-                                                    bottom: 3),
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                50)),
-                                                    color: Theme.of(context)
-                                                        .backgroundColor),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: <Widget>[
-                                                    Icon(
-                                                      Icons.star_border,
-                                                      color: Theme.of(context)
-                                                          .primaryColor,
-                                                    ),
-                                                    const SizedBox(width: 2),
-                                                    Text(
-                                                      AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'default_credit_card'),
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .primaryColor),
-                                                    ),
-                                                  ],
-                                                ))
-                                          ]),
-                                      Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              widget.defaultCreditCard
-                                                  .cardHolderName,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Theme.of(context)
-                                                      .backgroundColor),
-                                            ),
-                                            SizedBox(
-                                                height: 48,
-                                                width: 48,
-                                                child: brandToCardType
-                                                        .containsKey(widget
-                                                            .defaultCreditCard
-                                                            .brand)
-                                                    ? Image.asset(
-                                                        cardTypeIconAsset[
-                                                            brandToCardType[widget
-                                                                .defaultCreditCard
-                                                                .brand]],
-                                                        height: 48,
-                                                        width: 48)
-                                                    : const SizedBox())
-                                          ]),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              widget
-                                                  .defaultCreditCard.cardNumber,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Theme.of(context)
-                                                      .backgroundColor),
-                                            ),
-                                            Text(
-                                              widget
-                                                  .defaultCreditCard.expiryDate,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Theme.of(context)
-                                                      .backgroundColor),
-                                            ),
-                                          ]),
-                                      const SizedBox(height: 10),
-                                    ]))),
-                      )),
+                  RippleCreditCard(
+                      creditCard: widget.defaultCreditCard,
+                      onLongPress: () {},
+                      isDefault: true,
+                      isSelected: false),
                   const Divider(),
                   TextButton(
                       style: ButtonStyle(

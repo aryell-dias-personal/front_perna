@@ -1,9 +1,10 @@
 import 'dart:typed_data';
+import 'package:perna/services/static_map.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/main.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/sign_in.dart';
-import 'package:perna/services/static_map.dart';
+import 'package:perna/widgets/expedient_form.dart';
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,12 +17,6 @@ import 'package:perna/models/user.dart';
 import 'package:perna/pages/user_profile_page.dart';
 import 'package:perna/store/state.dart';
 import 'package:intl/intl.dart';
-import 'package:perna/widgets/action_buttons.dart';
-import 'package:perna/widgets/add_button.dart';
-import 'package:perna/widgets/form_container.dart';
-import 'package:perna/widgets/form_date_picker.dart';
-import 'package:perna/widgets/form_time_picker.dart';
-import 'package:perna/widgets/outlined_text_form_field.dart';
 
 enum ExpedientOptions { aboutDriver, aboutRequester }
 
@@ -50,10 +45,6 @@ class _ExpedientState extends State<ExpedientPage> {
     setState(() {
       agent = widget.agent;
     });
-    initialDateTime = DateTime(
-        initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
-    minTime = initialDateTime;
-    date = dateFormat.format(agent.date ?? minTime);
     if (agent.staticMap == null) {
       getIt<StaticMapService>()
           .getUint8List(markerA: agent.garage)
@@ -65,18 +56,10 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
   Agent agent;
-  DateTime initialDateTime = DateTime.now();
-  DateTime minTime;
-  String date;
-  String email;
-  String places;
-  String askedEndAt;
-  String askedStartAt;
   bool isLoading = false;
 
   Future<void> _askNewAgend(Agent agent) async {
@@ -99,8 +82,14 @@ class _ExpedientState extends State<ExpedientPage> {
     }
   }
 
-  Future<void> _onPressed(String email, String fromEmail) async {
-    if (_formKey.currentState.validate()) {
+  Future<void> _onPressed(GlobalKey<FormState> formKey,
+      {String email,
+      String fromEmail,
+      String askedEndAt,
+      String askedStartAt,
+      String date,
+      String places}) async {
+    if (formKey.currentState.validate()) {
       setState(() {
         isLoading = true;
       });
@@ -180,52 +169,6 @@ class _ExpedientState extends State<ExpedientPage> {
     });
   }
 
-  void _updateMinTime(String text) {
-    final DateTime nextMinTime = dateFormat.parse(text);
-    String nextAskedEndAt = askedEndAt;
-    if (askedEndAt != null && askedStartAt != null) {
-      final String minTimeString = dateFormat.format(minTime);
-      final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
-      final DateTime askedEndAtTime = format.parse(askedEndAtString);
-      final Duration shift = nextMinTime.difference(minTime);
-      final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
-      nextAskedEndAt = format.format(nextAskedEndAtTime);
-      if (RegExp(text).hasMatch(nextAskedEndAt)) {
-        nextAskedEndAt = nextAskedEndAt.split(' ')[0];
-      }
-    }
-    setState(() {
-      date = text;
-      minTime = nextMinTime;
-      askedEndAt = nextAskedEndAt;
-    });
-  }
-
-  void _updateStartAt(String nextStartAt) {
-    String nextAskedEndAt = askedEndAt;
-    if (askedEndAt != null && askedStartAt != null) {
-      final String minTimeString = dateFormat.format(minTime);
-      final DateTime oldAskedStartAt =
-          format.parse('$askedStartAt $minTimeString');
-      final DateTime newAskedStartAt =
-          format.parse('$nextStartAt $minTimeString');
-      final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
-      final DateTime askedEndAtTime = format.parse(askedEndAtString);
-      final Duration shift = newAskedStartAt.difference(oldAskedStartAt);
-      final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
-      nextAskedEndAt = format.format(nextAskedEndAtTime);
-      if (RegExp(minTimeString).hasMatch(nextAskedEndAt)) {
-        nextAskedEndAt = nextAskedEndAt.split(' ')[0];
-      }
-    }
-    setState(() {
-      askedStartAt = nextStartAt;
-      askedEndAt = nextAskedEndAt;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return StoreConnector<StoreState, Map<String, dynamic>>(
@@ -282,198 +225,35 @@ class _ExpedientState extends State<ExpedientPage> {
                               size: 100.0,
                               color: Theme.of(context).primaryColor))
                       : SingleChildScrollView(
-                          child:
-                              Column(mainAxisSize: MainAxisSize.min, children: <
-                                  Widget>[
-                          SizedBox(
-                              height: 180,
-                              width: 600,
-                              child: Stack(
-                                children: <Widget>[
-                                  Center(
-                                      child: SpinKitDoubleBounce(
-                                          size: 100.0,
-                                          color:
-                                              Theme.of(context).primaryColor)),
-                                  if (agent.staticMap != null)
-                                    Image.memory(agent.staticMap)
-                                ],
-                              )),
-                          FormContainer(
-                              formkey: _formKey,
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                    OutlinedTextFormField(
-                                      readOnly: widget.readOnly,
-                                      initialValue:
-                                          (agent.email ?? email) ?? '',
-                                      onChanged: (String text) {
-                                        email = text;
-                                      },
-                                      textInputType: TextInputType.emailAddress,
-                                      labelText: AppLocalizations.of(context)
-                                          .translate('driver_email'),
-                                      icon: Icons.email,
-                                      textInputAction: TextInputAction.next,
-                                      validatorMessage:
-                                          AppLocalizations.of(context)
-                                              .translate('enter_driver_email'),
-                                      onFieldSubmitted: (String text) {
-                                        FocusScope.of(context).nextFocus();
-                                      },
-                                    )
-                                  ] +
-                                  (agent.fromEmail != null
-                                      ? <Widget>[
-                                          const SizedBox(height: 26),
-                                          OutlinedTextFormField(
-                                              readOnly: true,
-                                              initialValue: agent.fromEmail,
-                                              textInputType:
-                                                  TextInputType.emailAddress,
-                                              labelText: AppLocalizations.of(
-                                                      context)
-                                                  .translate('requester_email'),
-                                              icon: Icons.email),
-                                        ]
-                                      : <Widget>[]) +
-                                  <Widget>[
-                                    const SizedBox(height: 26),
-                                    Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          FormDatePicker(
-                                            value: date,
-                                            isRequired: true,
-                                            initialValue: initialDateTime,
-                                            onChanged: _updateMinTime,
-                                            labelText:
-                                                AppLocalizations.of(context)
-                                                    .translate('date'),
-                                            icon: Icons.insert_invitation,
-                                            readOnly: widget.readOnly,
-                                            onSubmit: (String text) {
-                                              FocusScope.of(context)
-                                                  .nextFocus();
-                                            },
-                                            validatorMessage:
-                                                AppLocalizations.of(context)
-                                                    .translate('select_a_date'),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          FormTimePicker(
-                                            isRequired: true,
-                                            minTime: initialDateTime,
-                                            onChanged: (String text) {
-                                              final List<String> chuncks =
-                                                  text.split(' ');
-                                              String minTimeString = dateFormat
-                                                  .format(initialDateTime);
-                                              if (chuncks.length == 2) {
-                                                minTimeString = chuncks[1];
-                                              }
-                                              _updateStartAt(chuncks[0]);
-                                              _updateMinTime(minTimeString);
-                                            },
-                                            selectedDay: date,
-                                            value: askedStartAt,
-                                            lastDay: 31,
-                                            initialValue: agent?.date
-                                                ?.add(agent.askedStartAt),
-                                            labelText: AppLocalizations.of(
-                                                    context)
-                                                .translate('expedient_start'),
-                                            icon: Icons.access_time,
-                                            readOnly: widget.readOnly,
-                                            onSubmit: (String text) {
-                                              FocusScope.of(context)
-                                                  .nextFocus();
-                                            },
-                                            validatorMessage: AppLocalizations
-                                                    .of(context)
-                                                .translate(
-                                                    'enter_start_expedient'),
-                                          ),
-                                        ]),
-                                    const SizedBox(height: 26),
-                                    FormTimePicker(
-                                        isRequired: true,
-                                        minTime: minTime,
-                                        selectedDay: date,
-                                        value: askedEndAt,
-                                        initialValue:
-                                            agent?.date?.add(agent.askedEndAt),
-                                        icon: Icons.access_time,
-                                        labelText: AppLocalizations.of(context)
-                                            .translate('expedient_end'),
-                                        onChanged: (String text) {
-                                          final String minTimeString =
-                                              dateFormat.format(minTime);
-                                          setState(() {
-                                            if (RegExp(minTimeString)
-                                                .hasMatch(text)) {
-                                              askedEndAt = text.split(' ')[0];
-                                            } else {
-                                              askedEndAt = text;
-                                            }
-                                          });
-                                        },
-                                        readOnly: widget.readOnly,
-                                        validatorMessage: AppLocalizations.of(
-                                                context)
-                                            .translate('enter_end_expedient'),
-                                        onSubmit: (String text) {
-                                          FocusScope.of(context).nextFocus();
-                                        }),
-                                    const SizedBox(height: 26),
-                                    OutlinedTextFormField(
-                                      readOnly: widget.readOnly,
-                                      initialValue: (agent.places?.toString() ??
-                                              places?.toString()) ??
-                                          '',
-                                      onChanged: (String text) {
-                                        places = text;
-                                      },
-                                      textInputType: TextInputType.number,
-                                      labelText: AppLocalizations.of(context)
-                                          .translate('seats_number'),
-                                      icon: Icons.airline_seat_legroom_normal,
-                                      textInputAction: TextInputAction.done,
-                                      validatorMessage:
-                                          AppLocalizations.of(context)
-                                              .translate('enter_seats_number'),
-                                      onFieldSubmitted: (String text) {
-                                        _onPressed(email,
-                                            resources['email'] as String);
-                                      },
-                                    ),
-                                    const SizedBox(height: 26),
-                                    OutlinedTextFormField(
-                                        readOnly: true,
-                                        initialValue: agent.friendlyGarage,
-                                        labelText: AppLocalizations.of(context)
-                                            .translate('garage'),
-                                        icon: Icons.pin_drop),
-                                    const SizedBox(height: 26)
-                                  ] +
-                                  (widget.accept != null &&
-                                          widget.deny != null &&
-                                          widget.readOnly
-                                      ? <Widget>[
-                                          ActionButtons(accept: () {
-                                            _acceptOrDenny(true);
-                                          }, deny: () {
-                                            _acceptOrDenny(false);
-                                          })
-                                        ]
-                                      : <Widget>[
-                                          AddButton(
-                                            onPressed: () => _onPressed(email,
-                                                resources['email'] as String),
-                                            readOnly: widget.readOnly ||
-                                                agent.staticMap == null,
-                                          ),
-                                        ]))
-                        ]))),
+                              SizedBox(
+                                  height: 180,
+                                  width: 600,
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Center(
+                                          child: SpinKitDoubleBounce(
+                                              size: 100.0,
+                                              color: Theme.of(context)
+                                                  .primaryColor)),
+                                      if (agent.staticMap != null)
+                                        Image.memory(agent.staticMap)
+                                    ],
+                                  )),
+                              ExpedientForm(
+                                acceptPressed: () => _acceptOrDenny(true),
+                                denyPressed: () => _acceptOrDenny(false),
+                                agent: agent,
+                                onAddPressed: _onPressed,
+                                readOnly: widget.readOnly,
+                                fromEmail: resources['email'] as String,
+                                showActionButtons: widget.accept != null &&
+                                    widget.deny != null &&
+                                    widget.readOnly,
+                              )
+                            ]))),
             ));
   }
 }
