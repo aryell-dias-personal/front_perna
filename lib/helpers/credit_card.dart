@@ -1,14 +1,10 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:intl/intl.dart';
 
 class MaskedTextController extends TextEditingController {
-  MaskedTextController({
-    String text, 
-    this.mask, 
-    Map<String, RegExp> translator
-  }) : super(text: text) {
+  MaskedTextController({String text, this.mask, Map<String, RegExp> translator})
+      : super(text: text) {
     this.translator = translator ?? MaskedTextController.getDefaultTranslator();
 
     addListener(() {
@@ -54,9 +50,8 @@ class MaskedTextController extends TextEditingController {
 
   void moveCursorToEnd() {
     final String text = _lastUpdatedText;
-    selection = TextSelection.fromPosition(TextPosition(
-      offset: (text ?? '').length
-    ));
+    selection =
+        TextSelection.fromPosition(TextPosition(offset: (text ?? '').length));
   }
 
   @override
@@ -69,9 +64,9 @@ class MaskedTextController extends TextEditingController {
 
   static Map<String, RegExp> getDefaultTranslator() {
     return <String, RegExp>{
-      'A': RegExp('[A-Za-z]'), 
-      '0': RegExp('[0-9]'), 
-      '@': RegExp('[A-Za-z0-9]'), 
+      'A': RegExp('[A-Za-z]'),
+      '0': RegExp('[0-9]'),
+      '@': RegExp('[A-Za-z0-9]'),
       '*': RegExp('.*')
     };
   }
@@ -140,9 +135,8 @@ CardType detectCCType(String cardNumber) {
           final int ccPrefixAsInt = int.parse(ccPatternStr);
           final int startPatternPrefixAsInt = int.parse(patternRange[0]);
           final int endPatternPrefixAsInt = int.parse(patternRange[1]);
-          if (ccPrefixAsInt >= startPatternPrefixAsInt 
-            && ccPrefixAsInt <= endPatternPrefixAsInt
-          ) {
+          if (ccPrefixAsInt >= startPatternPrefixAsInt &&
+              ccPrefixAsInt <= endPatternPrefixAsInt) {
             cardType = type;
             break;
           }
@@ -159,7 +153,8 @@ CardType detectCCType(String cardNumber) {
   return cardType;
 }
 
-Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback) {
+Widget getCardTypeIcon(
+    String cardNumber, Function(bool, String) isAmexCallback) {
   Widget icon;
   final CardType cardType = detectCCType(cardNumber);
   if (cardType == CardType.otherBrand) {
@@ -169,22 +164,16 @@ Widget getCardTypeIcon(String cardNumber, Function(bool, String) isAmexCallback)
     );
     isAmexCallback(false, '');
   } else {
-    icon = Image.asset(
-      cardTypeIconAsset[cardType],
-      height: 48,
-      width: 48
-    );
+    icon = Image.asset(cardTypeIconAsset[cardType], height: 48, width: 48);
     isAmexCallback(
-      cardType == CardType.americanExpress, 
-      cardTypeToBrand[cardType]
-    );
+        cardType == CardType.americanExpress, cardTypeToBrand[cardType]);
   }
   return icon;
 }
 
 String formatAmount(int amount, String currency, Locale locale) {
-  final String localeName = 
-    '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
+  final String localeName =
+      '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
   final NumberFormat format = NumberFormat.simpleCurrency(locale: localeName);
-  return format.format(amount/100);
+  return format.format(amount / 100);
 }

@@ -8,7 +8,7 @@ import 'package:perna/models/user.dart' as model;
 
 class SignInService {
   SignInService({
-    this.googleSignIn, 
+    this.googleSignIn,
     this.firebaseAuth,
     this.myDecoder,
   });
@@ -24,9 +24,10 @@ class SignInService {
     return token;
   }
 
-  Future<SignInResponse> logOut({model.User user, String messagingToken}) async {
+  Future<SignInResponse> logOut(
+      {model.User user, String messagingToken}) async {
     await googleSignIn.signOut();
-    if(user!=null){
+    if (user != null) {
       await _logoutService(user, messagingToken);
     }
     return null;
@@ -34,9 +35,10 @@ class SignInService {
 
   Future<SignInResponse> logIn(String messagingToken) async {
     final GoogleSignInAccount user = await googleSignIn.signIn();
-    if(user != null){
-      final SignInResponse signInResponse = await _getUser(user, messagingToken);
-      if (signInResponse != null){ 
+    if (user != null) {
+      final SignInResponse signInResponse =
+          await _getUser(user, messagingToken);
+      if (signInResponse != null) {
         await _authFirebase(user);
         return signInResponse;
       }
@@ -46,9 +48,10 @@ class SignInService {
 
   Future<SignInResponse> signIn(String messagingToken, String currency) async {
     final GoogleSignInAccount user = await googleSignIn.signIn();
-    if(user != null){
-      final SignInResponse signInResponse = await _creatUser(user, messagingToken, true, currency);
-      if (signInResponse != null){
+    if (user != null) {
+      final SignInResponse signInResponse =
+          await _creatUser(user, messagingToken, true, currency);
+      if (signInResponse != null) {
         await _authFirebase(user);
         return signInResponse;
       }
@@ -56,38 +59,49 @@ class SignInService {
     return logOut();
   }
 
-  Future<SignInResponse> _creatUser(GoogleSignInAccount user, String messagingToken, bool isProvider, String currency) async {
+  Future<SignInResponse> _creatUser(GoogleSignInAccount user,
+      String messagingToken, bool isProvider, String currency) async {
     final String body = await myDecoder.encode(<String, dynamic>{
       'email': user?.email,
       'isProvider': isProvider,
       'photoUrl': user?.photoUrl,
       'name': user?.displayName,
       'currency': currency,
-      'messagingTokens': messagingToken != null ? <String>[ messagingToken ] : <String>[]
+      'messagingTokens':
+          messagingToken != null ? <String>[messagingToken] : <String>[]
     });
-    final Response res = await post(Uri.parse('${baseUrl}insertUser'), body: body);
+    final Response res =
+        await post(Uri.parse('${baseUrl}insertUser'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>) : null;
+    return res.statusCode == 200
+        ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)
+        : null;
   }
 
-  Future<SignInResponse> _getUser(GoogleSignInAccount user, String messagingToken) async {
+  Future<SignInResponse> _getUser(
+      GoogleSignInAccount user, String messagingToken) async {
     final String body = await myDecoder.encode(<String, String>{
       'email': user?.email,
       'messagingToken': messagingToken
     });
     final Response res = await post(Uri.parse('${baseUrl}getUser'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>) : null;
+    return res.statusCode == 200
+        ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)
+        : null;
   }
 
-  Future<SignInResponse> _logoutService(model.User user, String messagingToken) async {
+  Future<SignInResponse> _logoutService(
+      model.User user, String messagingToken) async {
     final String body = await myDecoder.encode(<String, String>{
       'email': user?.email,
       'messagingToken': messagingToken
     });
     final Response res = await post(Uri.parse('${baseUrl}logout'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
-    return res.statusCode == 200 ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>) : null;
+    return res.statusCode == 200
+        ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)
+        : null;
   }
 
   Future<void> _authFirebase(GoogleSignInAccount user) async {

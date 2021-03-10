@@ -38,7 +38,8 @@ class CreditCardWidget extends StatefulWidget {
   _CreditCardWidgetState createState() => _CreditCardWidgetState();
 }
 
-class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerProviderStateMixin {
+class _CreditCardWidgetState extends State<CreditCardWidget>
+    with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation<double> _frontRotation;
   Animation<double> _backRotation;
@@ -55,7 +56,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
     _frontRotation = TweenSequence<double>(
       <TweenSequenceItem<double>>[
         TweenSequenceItem<double>(
-          tween: Tween<double>(begin: 0.0, end: pi / 2).chain(CurveTween(curve: Curves.easeIn)),
+          tween: Tween<double>(begin: 0.0, end: pi / 2)
+              .chain(CurveTween(curve: Curves.easeIn)),
           weight: 50.0,
         ),
         TweenSequenceItem<double>(
@@ -72,7 +74,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
           weight: 50.0,
         ),
         TweenSequenceItem<double>(
-          tween: Tween<double>(begin: -pi / 2, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
+          tween: Tween<double>(begin: -pi / 2, end: 0.0)
+              .chain(CurveTween(curve: Curves.easeOut)),
           weight: 50.0,
         ),
       ],
@@ -124,8 +127,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
               ],
             ),
             width: widget.width ?? width,
-            height: widget.height ?? 
-              (orientation == Orientation.portrait ? height / 4 : height / 2),
+            height: widget.height ??
+                (orientation == Orientation.portrait ? height / 4 : height / 2),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -142,14 +145,14 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                     child: Text(
                       widget.cardNumber.isEmpty || widget.cardNumber == null
                           ? 'XXXX XXXX XXXX XXXX'
-                          : widget.cardNumber.replaceAll(RegExp(r'(?<=.{4})\d(?=.* )'), '*'),
+                          : widget.cardNumber
+                              .replaceAll(RegExp(r'(?<=.{4})\d(?=.* )'), '*'),
                       style: Theme.of(context).textTheme.headline6.merge(
-                        TextStyle(
-                          color: Theme.of(context).backgroundColor,
-                          fontFamily: 'halter',
-                          fontSize: 16
-                        ),
-                      ),
+                            TextStyle(
+                                color: Theme.of(context).backgroundColor,
+                                fontFamily: 'halter',
+                                fontSize: 16),
+                          ),
                     ),
                   ),
                 ),
@@ -157,37 +160,37 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   child: Padding(
                     padding: const EdgeInsets.only(left: 16),
                     child: Text(
-                      widget.expiryDate.isEmpty || widget.expiryDate == null ? 
-                        widget.labelExpiredDate : widget.expiryDate,
+                      widget.expiryDate.isEmpty || widget.expiryDate == null
+                          ? widget.labelExpiredDate
+                          : widget.expiryDate,
                       style: Theme.of(context).textTheme.headline6.merge(
-                        TextStyle(
-                          color: Theme.of(context).backgroundColor,
-                          fontFamily: 'halter',
-                          fontSize: 16
-                        ),
-                      ),
+                            TextStyle(
+                                color: Theme.of(context).backgroundColor,
+                                fontFamily: 'halter',
+                                fontSize: 16),
+                          ),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: 
-                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    padding:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                     child: Text(
-                      widget.cardHolderName.isEmpty 
-                        || widget.cardHolderName == null ?
-                          AppLocalizations.of(context)
-                            .translate('card_holder').toUpperCase() :
-                          widget.cardHolderName,
+                      widget.cardHolderName.isEmpty ||
+                              widget.cardHolderName == null
+                          ? AppLocalizations.of(context)
+                              .translate('card_holder')
+                              .toUpperCase()
+                          : widget.cardHolderName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.headline6.merge(
-                        TextStyle(
-                          color: Theme.of(context).backgroundColor,
-                          fontFamily: 'halter',
-                          fontSize: 16
-                        ),
-                      ),
+                            TextStyle(
+                                color: Theme.of(context).backgroundColor,
+                                fontFamily: 'halter',
+                                fontSize: 16),
+                          ),
                     ),
                   ),
                 ),
@@ -220,7 +223,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
             ),
             margin: const EdgeInsets.all(16),
             width: widget.width ?? width,
-            height: widget.height ?? (orientation == Orientation.portrait ? height / 4 : height / 2),
+            height: widget.height ??
+                (orientation == Orientation.portrait ? height / 4 : height / 2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,16 +259,16 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                               child: Text(
                                 widget.cvvCode.isEmpty
                                     ? (widget.isAmex ? 'XXXX' : 'XXX')
-                                    : widget.cvvCode.replaceAll(RegExp(r'\d'), '*'),
+                                    : widget.cvvCode
+                                        .replaceAll(RegExp(r'\d'), '*'),
                                 maxLines: 1,
-                                style: 
-                                  Theme.of(context).textTheme.headline6.merge(
-                                    const TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'halter',
-                                      fontSize: 16
-                                    ),
-                                  ),
+                                style:
+                                    Theme.of(context).textTheme.headline6.merge(
+                                          const TextStyle(
+                                              color: Colors.black,
+                                              fontFamily: 'halter',
+                                              fontSize: 16),
+                                        ),
                               ),
                             ),
                           ),
@@ -278,7 +282,8 @@ class _CreditCardWidgetState extends State<CreditCardWidget> with SingleTickerPr
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                      padding: const EdgeInsets.only(
+                          left: 16, right: 16, bottom: 16),
                       child: widget.cardType,
                     ),
                   ),

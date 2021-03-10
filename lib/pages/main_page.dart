@@ -9,7 +9,7 @@ import 'package:redux/redux.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({
-    @required this.email, 
+    @required this.email,
   });
 
   final String email;
@@ -17,28 +17,24 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StoreConnector<StoreState, Map<String, dynamic>>(
-      converter: (Store<StoreState> store) {
-        return <String, dynamic>{
-          'logoutFunction': () {
-            getIt<SignInService>().logOut(
-              user: store.state.user, 
-              messagingToken: store.state.messagingToken
-            );
-            store.dispatch(Logout());
-          },
-          'photoUrl':store.state.user?.photoUrl,
-          'email':store.state.user?.email,
-          'name':store.state.user?.name
-        };
-      },
-      builder: (BuildContext context, Map<String, dynamic> resources) {
-        return MainWidget(
+        converter: (Store<StoreState> store) {
+      return <String, dynamic>{
+        'logoutFunction': () {
+          getIt<SignInService>().logOut(
+              user: store.state.user,
+              messagingToken: store.state.messagingToken);
+          store.dispatch(Logout());
+        },
+        'photoUrl': store.state.user?.photoUrl,
+        'email': store.state.user?.email,
+        'name': store.state.user?.name
+      };
+    }, builder: (BuildContext context, Map<String, dynamic> resources) {
+      return MainWidget(
           email: resources['email'] as String,
           name: resources['name'] as String,
           logout: resources['logoutFunction'] as Function(),
-          photoUrl: resources['photoUrl'] as String
-        );
-      }
-    );
+          photoUrl: resources['photoUrl'] as String);
+    });
   }
 }

@@ -4,8 +4,16 @@ import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/widgets/floating_animated_button.dart';
 
 class ReactiveFloatingButton extends StatelessWidget {
-  const ReactiveFloatingButton({Key key, this.controller, this.defaultFunction, this.length, this.addNewExpedient, this.addNewAsk, this.bottom}) : super(key: key);
-  
+  const ReactiveFloatingButton(
+      {Key key,
+      this.controller,
+      this.defaultFunction,
+      this.length,
+      this.addNewExpedient,
+      this.addNewAsk,
+      this.bottom})
+      : super(key: key);
+
   final AnimationController controller;
   final Function() defaultFunction;
   final int length;
@@ -17,20 +25,21 @@ class ReactiveFloatingButton extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = Theme.of(context).backgroundColor;
     Widget icon = AnimatedIcon(
-      size: 30, icon: AnimatedIcons.menu_home,
-      color: Theme.of(context).primaryColor,
-      progress: controller
-    );
+        size: 30,
+        icon: AnimatedIcons.menu_home,
+        color: Theme.of(context).primaryColor,
+        progress: controller);
     String description = AppLocalizations.of(context).translate('open_menu');
     Function() onPressed = defaultFunction;
-    if(length != 0){
+    if (length != 0) {
       color = Colors.greenAccent;
-      if(length == 1){
+      if (length == 1) {
         icon = Icon(Icons.work, color: Theme.of(context).backgroundColor);
         description = AppLocalizations.of(context).translate('add_expedient');
         onPressed = addNewExpedient;
-      }else{
-        icon = Icon(Icons.scatter_plot, color: Theme.of(context).backgroundColor);
+      } else {
+        icon =
+            Icon(Icons.scatter_plot, color: Theme.of(context).backgroundColor);
         description = AppLocalizations.of(context).translate('add_order');
         onPressed = addNewAsk;
       }

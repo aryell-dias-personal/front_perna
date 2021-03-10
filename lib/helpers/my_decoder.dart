@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class MyDecoder{
+class MyDecoder {
   final JsonEncoder encoder = const JsonEncoder();
   final JsonDecoder decoder = const JsonDecoder();
 

@@ -15,35 +15,26 @@ class ActionButtons extends StatelessWidget {
       children: <Widget>[
         ElevatedButton(
           onPressed: accept,
-           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              Theme.of(context).primaryColor
-            ),
-            shape: MaterialStateProperty.all(const StadiumBorder())
-          ),
-          child: Text(
-            AppLocalizations.of(context).translate('accept'), 
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).backgroundColor
-            )
-          ),
+          style: ButtonStyle(
+              backgroundColor:
+                  MaterialStateProperty.all(Theme.of(context).primaryColor),
+              shape: MaterialStateProperty.all(const StadiumBorder())),
+          child: Text(AppLocalizations.of(context).translate('accept'),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).backgroundColor)),
         ),
         ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              Theme.of(context).backgroundColor
-            ),
+            backgroundColor:
+                MaterialStateProperty.all(Theme.of(context).backgroundColor),
             shape: MaterialStateProperty.all(const StadiumBorder()),
           ),
           onPressed: deny,
-          child: Text(
-            AppLocalizations.of(context).translate('deny'), 
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor
-            )
-          ),
+          child: Text(AppLocalizations.of(context).translate('deny'),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor)),
         )
       ],
     );

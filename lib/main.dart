@@ -44,18 +44,20 @@ Future<void> main() async {
   //TODO: Dados sensíveis devem estar seguros https://stackoverflow.com/questions/51895194/correct-way-of-storing-api-keys-in-flutter-following-best-practises
   // paymentPublishableKey, apiKey, googleAppID?, gcmSenderID?
   FlavorConfig(
-      name: 'DEVELOP',
-      variables: <String, String>{
-        'paymentPublishableKey': 'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
-        'appName': 'aryell-test',
-        'projectID': 'aryell-test',
-        'gcmSenderID': '376560728219',
-        'baseUrl': 'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-',
-        'apiKey': 'AIzaSyC_d-ntsVtnwyO6VhG2qHmDA4pCyFYP0gY',
-        'googleAppID': '1:376560728219:android:82633609a640175003ee3e',
-        'merchantId': 'Test',
-        'androidPayMode': 'test'
-      },
+    name: 'DEVELOP',
+    variables: <String, String>{
+      'paymentPublishableKey':
+          'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
+      'appName': 'aryell-test',
+      'projectID': 'aryell-test',
+      'gcmSenderID': '376560728219',
+      'baseUrl':
+          'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-',
+      'apiKey': 'AIzaSyC_d-ntsVtnwyO6VhG2qHmDA4pCyFYP0gY',
+      'googleAppID': '1:376560728219:android:82633609a640175003ee3e',
+      'merchantId': 'Test',
+      'androidPayMode': 'test'
+    },
   );
 
   FirebaseApp firebaseApp;
@@ -64,25 +66,25 @@ Future<void> main() async {
   FirebaseMessaging firebaseMessaging;
   try {
     firebaseApp = await Firebase.initializeApp(
-      name: FlavorConfig.instance.variables['appName'] as String,
-      options: FirebaseOptions(
-        appId: FlavorConfig.instance.variables['googleAppID'] as String,
-        apiKey: FlavorConfig.instance.variables['apiKey'] as String,
-        projectId: FlavorConfig.instance.variables['projectID'] as String,
-        messagingSenderId: 
-          FlavorConfig.instance.variables['gcmSenderID'] as String,
-      )
-    );
+        name: FlavorConfig.instance.variables['appName'] as String,
+        options: FirebaseOptions(
+          appId: FlavorConfig.instance.variables['googleAppID'] as String,
+          apiKey: FlavorConfig.instance.variables['apiKey'] as String,
+          projectId: FlavorConfig.instance.variables['projectID'] as String,
+          messagingSenderId:
+              FlavorConfig.instance.variables['gcmSenderID'] as String,
+        ));
   } on FirebaseException {
-    firebaseApp = Firebase.app(FlavorConfig.instance.variables['appName'] as String);
+    firebaseApp =
+        Firebase.app(FlavorConfig.instance.variables['appName'] as String);
   } finally {
     firestore = FirebaseFirestore.instanceFor(app: firebaseApp);
     firebaseAuth = FirebaseAuth.instanceFor(app: firebaseApp);
     firebaseMessaging = FirebaseMessaging.instance;
   }
 
-  final NotificationSettings settings = 
-  await firebaseMessaging.requestPermission(
+  final NotificationSettings settings =
+      await firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -93,61 +95,56 @@ Future<void> main() async {
   );
 
   String messagingToken;
-  if(settings.authorizationStatus == AuthorizationStatus.authorized) {
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     messagingToken = await firebaseMessaging.getToken();
-      await firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true,
-      );
+    await firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
   }
 
   final MyDecoder myDecoder = MyDecoder();
   getIt.registerSingleton<DirectionsService>(DirectionsService());
   getIt.registerSingleton<UserService>(
-    UserService(
-      myDecoder: myDecoder
-    ),
+    UserService(myDecoder: myDecoder),
   );
   getIt.registerSingleton<DriverService>(
-    DriverService(
-      myDecoder: myDecoder
-    ),
+    DriverService(myDecoder: myDecoder),
   );
   getIt.registerSingleton<PaymentsService>(
-    PaymentsService(
-      myDecoder: myDecoder
-    ),
+    PaymentsService(myDecoder: myDecoder),
   );
   getIt.registerSingleton<SignInService>(
     SignInService(
-      firebaseAuth: firebaseAuth,
-      googleSignIn: googleSignIn,
-      myDecoder: myDecoder
-    ),
+        firebaseAuth: firebaseAuth,
+        googleSignIn: googleSignIn,
+        myDecoder: myDecoder),
   );
   getIt.registerSingleton<StaticMapService>(StaticMapService());
   getIt.registerSingleton<FirebaseFirestore>(firestore);
 
-  final Store<StoreState> store = Store<StoreState>(
-    reduce, initialState: initialState.copyWith(messagingToken: messagingToken),
-    middleware: <dynamic Function(Store<StoreState>, dynamic, dynamic Function(dynamic))>[persistor.createMiddleware()]
-  );
+  final Store<StoreState> store = Store<StoreState>(reduce,
+      initialState: initialState.copyWith(messagingToken: messagingToken),
+      middleware: <
+          dynamic Function(Store<StoreState>, dynamic,
+              dynamic Function(dynamic))>[persistor.createMiddleware()]);
 
-  
-  final ConnectivityResult initialConnection = await Connectivity().checkConnectivity();
+  final ConnectivityResult initialConnection =
+      await Connectivity().checkConnectivity();
 
   runApp(MyApp(
-    store: store, firebaseMessaging: firebaseMessaging, 
-    isInitiallyConnected: initialConnection == ConnectivityResult.mobile 
-      || initialConnection == ConnectivityResult.wifi
-  ));
+      store: store,
+      firebaseMessaging: firebaseMessaging,
+      isInitiallyConnected: initialConnection == ConnectivityResult.mobile ||
+          initialConnection == ConnectivityResult.wifi));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    @required this.store, 
-    @required this.firebaseMessaging,
-    @required this.isInitiallyConnected
-  });
+  const MyApp(
+      {@required this.store,
+      @required this.firebaseMessaging,
+      @required this.isInitiallyConnected});
 
   final Store<StoreState> store;
   final bool isInitiallyConnected;
@@ -162,65 +159,54 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
     return StoreProvider<StoreState>(
-      store: store,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Builder(
-          builder: (BuildContext context) => Scaffold(
-            backgroundColor: Theme.of(context).backgroundColor, 
-            body: Home(
-              isInitiallyConnected: isInitiallyConnected,
-              firebaseMessaging: firebaseMessaging
-            )
-          )
-        ),
-        supportedLocales: const <Locale>[
-          Locale('en', 'US'),
-          Locale('pt', 'BR'),
-        ],
-        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        localeResolutionCallback: (Locale locale, Iterable<Locale> supportedLocales) {
-          for (final Locale supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale.languageCode &&
-                supportedLocale.countryCode == locale.countryCode) {
-              return supportedLocale;
+        store: store,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Builder(
+              builder: (BuildContext context) => Scaffold(
+                  backgroundColor: Theme.of(context).backgroundColor,
+                  body: Home(
+                      isInitiallyConnected: isInitiallyConnected,
+                      firebaseMessaging: firebaseMessaging))),
+          supportedLocales: const <Locale>[
+            Locale('en', 'US'),
+            Locale('pt', 'BR'),
+          ],
+          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          localeResolutionCallback:
+              (Locale locale, Iterable<Locale> supportedLocales) {
+            for (final Locale supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == locale.languageCode &&
+                  supportedLocale.countryCode == locale.countryCode) {
+                return supportedLocale;
+              }
             }
-          }
-          return supportedLocales.first;
-        },
-        theme: ThemeData(
-          brightness: Brightness.light,
-          textTheme: const TextTheme(
-            bodyText2: TextStyle(color: mainLightColor)
-          ),
-          iconTheme: const IconThemeData(
-            color: mainLightColor
-          ),
-          disabledColor: mainLightColor.withAlpha(66),
-          primaryColor: mainLightColor,
-          accentColor: mainLightColor.withAlpha(66),
-          fontFamily: 'ProductSans',
-          backgroundColor: Colors.white
-        ),
-        darkTheme: ThemeData(
-          brightness: Brightness.dark,
-          textTheme: const TextTheme(
-            bodyText2: TextStyle(color: mainDarkColor)
-          ),
-          iconTheme: const IconThemeData(
-            color: mainDarkColor
-          ),
-          disabledColor: mainDarkColor.withAlpha(66),
-          primaryColor: mainDarkColor,
-          accentColor: mainDarkColor.withAlpha(66),
-          fontFamily: 'ProductSans',
-          backgroundColor: const Color(0xFF2b2b2b)
-        ),
-      )
-    );
+            return supportedLocales.first;
+          },
+          theme: ThemeData(
+              brightness: Brightness.light,
+              textTheme:
+                  const TextTheme(bodyText2: TextStyle(color: mainLightColor)),
+              iconTheme: const IconThemeData(color: mainLightColor),
+              disabledColor: mainLightColor.withAlpha(66),
+              primaryColor: mainLightColor,
+              accentColor: mainLightColor.withAlpha(66),
+              fontFamily: 'ProductSans',
+              backgroundColor: Colors.white),
+          darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              textTheme:
+                  const TextTheme(bodyText2: TextStyle(color: mainDarkColor)),
+              iconTheme: const IconThemeData(color: mainDarkColor),
+              disabledColor: mainDarkColor.withAlpha(66),
+              primaryColor: mainDarkColor,
+              accentColor: mainDarkColor.withAlpha(66),
+              fontFamily: 'ProductSans',
+              backgroundColor: const Color(0xFF2b2b2b)),
+        ));
   }
 }

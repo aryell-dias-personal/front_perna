@@ -12,10 +12,7 @@ import 'package:perna/widgets/add_button.dart';
 import 'package:perna/widgets/credit_card_widget.dart';
 
 class CreditCardPage extends StatefulWidget {
-  
-  const CreditCardPage({
-    @required this.userToken
-  });
+  const CreditCardPage({@required this.userToken});
 
   final String userToken;
 
@@ -35,12 +32,17 @@ class CreditCardPageState extends State<CreditCardPage> {
 
   Future<void> _onPressed(BuildContext context) async {
     if (formKey.currentState.validate()) {
-      setState(() { isLoading = true; });
-      final int statusCode = await getIt<PaymentsService>().addCard(creditCardModel, widget.userToken);
-      if(statusCode == 200) {
+      setState(() {
+        isLoading = true;
+      });
+      final int statusCode = await getIt<PaymentsService>()
+          .addCard(creditCardModel, widget.userToken);
+      if (statusCode == 200) {
         Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
-        showSnackBar(AppLocalizations.of(context).translate('successfully_added_card'), 
-          Colors.greenAccent, context);
+        showSnackBar(
+            AppLocalizations.of(context).translate('successfully_added_card'),
+            Colors.greenAccent,
+            context);
       } else {
         setState(() {
           cardType = const SizedBox(
@@ -50,8 +52,10 @@ class CreditCardPageState extends State<CreditCardPage> {
           creditCardModel = CreditCard();
           isLoading = false;
         });
-        showSnackBar(AppLocalizations.of(context).translate('unsuccessfully_added_card'), 
-          Colors.redAccent, context);
+        showSnackBar(
+            AppLocalizations.of(context).translate('unsuccessfully_added_card'),
+            Colors.redAccent,
+            context);
       }
     }
   }
@@ -62,88 +66,76 @@ class CreditCardPageState extends State<CreditCardPage> {
       appBar: AppBar(
         brightness: Theme.of(context).brightness,
         centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,          
-          children:<Widget>[
-            RichText(
+        title: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+          RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText2.color, 
-                  fontFamily: 'ProductSans'
-                ),
-                children:  <TextSpan>[
+                    color: Theme.of(context).textTheme.bodyText2.color,
+                    fontFamily: 'ProductSans'),
+                children: <TextSpan>[
                   TextSpan(
-                    text: 
-                      AppLocalizations.of(context).translate('credit_card'), 
-                    style: const TextStyle(
-                      fontSize: 30, fontWeight: FontWeight.bold)
-                  ),
+                      text:
+                          AppLocalizations.of(context).translate('credit_card'),
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold)),
                 ],
-              ) 
-              , maxLines: 2
-            ),
-            const SizedBox(width: 5),
-            const Icon(Icons.credit_card, size: 30),
-          ]
-        ),
+              ),
+              maxLines: 2),
+          const SizedBox(width: 5),
+          const Icon(Icons.credit_card, size: 30),
+        ]),
         backgroundColor: Theme.of(context).backgroundColor,
-        iconTheme: IconThemeData(
-          color: Theme.of(context).primaryColor
-        ),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         textTheme: TextTheme(
-          headline6: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 20,
-            fontFamily: Theme.of(context).textTheme.headline6.fontFamily
-          )
-        ),
+            headline6: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 20,
+                fontFamily: Theme.of(context).textTheme.headline6.fontFamily)),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomInset: true,
       body: Builder(
-        builder: (BuildContext context) => isLoading ? Center(
-          child: SpinKitDoubleBounce( 
-            size: 100.0, color: Theme.of(context).primaryColor
-          )
-      ) : SafeArea(
-        child: Column(
-          children: <Widget>[
-            CreditCardWidget(
-              isAmex: isAmex,
-              cardType: cardType,
-              cardNumber: creditCardModel.cardNumber ?? '',
-              expiryDate: creditCardModel.expiryDate ?? '',
-              cardHolderName: creditCardModel.cardHolderName ?? '',
-              cvvCode: creditCardModel.cvvCode ?? '',
-              showBackView: creditCardModel.isCvvFocused ?? false
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
+        builder: (BuildContext context) => isLoading
+            ? Center(
+                child: SpinKitDoubleBounce(
+                    size: 100.0, color: Theme.of(context).primaryColor))
+            : SafeArea(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    CreditCardForm(
+                children: <Widget>[
+                  CreditCardWidget(
                       isAmex: isAmex,
-                      formKey: formKey,
-                      obscureCvv: true,
-                      obscureNumber: true,
-                      onCreditCardChange: onCreditCardChange,
-                      onSubmit: () => _onPressed(context),
+                      cardType: cardType,
+                      cardNumber: creditCardModel.cardNumber ?? '',
+                      expiryDate: creditCardModel.expiryDate ?? '',
+                      cardHolderName: creditCardModel.cardHolderName ?? '',
+                      cvvCode: creditCardModel.cvvCode ?? '',
+                      showBackView: creditCardModel.isCvvFocused ?? false),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          CreditCardForm(
+                            isAmex: isAmex,
+                            formKey: formKey,
+                            obscureCvv: true,
+                            obscureNumber: true,
+                            onCreditCardChange: onCreditCardChange,
+                            onSubmit: () => _onPressed(context),
+                          ),
+                          const SizedBox(height: 26),
+                          AddButton(
+                            onPressed: () => _onPressed(context),
+                            readOnly: false,
+                          )
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 26),
-                    AddButton(
-                        onPressed: () => _onPressed(context),
-                        readOnly: false,
-                      )
-                    ],
                   ),
-                ),
-              ),
-            ],
-          )
-        ),
+                ],
+              )),
       ),
     );
   }
@@ -151,9 +143,10 @@ class CreditCardPageState extends State<CreditCardPage> {
   void onCreditCardChange(CreditCard newCreditCardModel) {
     setState(() {
       creditCardModel = newCreditCardModel;
-      cardType = getCardTypeIcon(newCreditCardModel.cardNumber, (bool willBeAmex, String cardBrand) {
+      cardType = getCardTypeIcon(newCreditCardModel.cardNumber,
+          (bool willBeAmex, String cardBrand) {
         setState(() {
-          isAmex = willBeAmex; 
+          isAmex = willBeAmex;
           creditCardModel.brand = cardBrand;
         });
       });

@@ -5,19 +5,19 @@ import 'package:perna/helpers/credit_card.dart';
 import 'package:perna/models/credit_card.dart';
 
 class CreditCardForm extends StatefulWidget {
-  const CreditCardForm({
-    Key key,
-    this.onSubmit,
-    this.cardNumber,
-    this.expiryDate,
-    this.cardHolderName,
-    this.cvvCode,
-    this.obscureCvv = false,
-    this.obscureNumber = false,
-    @required this.isAmex,
-    @required this.formKey,
-    @required this.onCreditCardChange
-  }) : super(key: key);
+  const CreditCardForm(
+      {Key key,
+      this.onSubmit,
+      this.cardNumber,
+      this.expiryDate,
+      this.cardHolderName,
+      this.cvvCode,
+      this.obscureCvv = false,
+      this.obscureNumber = false,
+      @required this.isAmex,
+      @required this.formKey,
+      @required this.onCreditCardChange})
+      : super(key: key);
 
   final Function() onSubmit;
   final bool isAmex;
@@ -70,12 +70,11 @@ class _CreditCardFormState extends State<CreditCardForm> {
     cvvCode = widget.cvvCode ?? '';
 
     creditCardModel = CreditCard(
-      cardNumber: cardNumber, 
-      expiryDate: expiryDate, 
-      cardHolderName: cardHolderName, 
-      cvvCode: cvvCode, 
-      isCvvFocused: isCvvFocused
-    );
+        cardNumber: cardNumber,
+        expiryDate: expiryDate,
+        cardHolderName: cardHolderName,
+        cvvCode: cvvCode,
+        isCvvFocused: isCvvFocused);
   }
 
   @override
@@ -146,14 +145,16 @@ class _CreditCardFormState extends State<CreditCardForm> {
               },
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                labelText: AppLocalizations.of(context).translate('credit_card_number'),
+                labelText: AppLocalizations.of(context)
+                    .translate('credit_card_number'),
                 hintText: 'XXXX XXXX XXXX XXXX',
               ),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
               validator: (String value) {
                 if (value.isEmpty || value.length < 16) {
-                  return AppLocalizations.of(context).translate('card_number_error');
+                  return AppLocalizations.of(context)
+                      .translate('card_number_error');
                 }
                 return null;
               },
@@ -173,14 +174,16 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     },
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
-                      labelText: AppLocalizations.of(context).translate('credit_card_expire_date'),
+                      labelText: AppLocalizations.of(context)
+                          .translate('credit_card_expire_date'),
                       hintText: 'XX/XX',
                     ),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     validator: (String value) {
                       if (value.isEmpty) {
-                        return AppLocalizations.of(context).translate('card_date_error');
+                        return AppLocalizations.of(context)
+                            .translate('card_date_error');
                       }
 
                       final DateTime now = DateTime.now();
@@ -190,7 +193,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       final DateTime cardDate = DateTime(year, month);
 
                       if (cardDate.isBefore(now) || month > 12 || month == 0) {
-                        return AppLocalizations.of(context).translate('card_date_error');
+                        return AppLocalizations.of(context)
+                            .translate('card_date_error');
                       }
                       return null;
                     },
@@ -211,7 +215,7 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: AppLocalizations.of(context).translate('cvv'),
-                      hintText: widget.isAmex ? 'XXXX' : 'XXX' ,
+                      hintText: widget.isAmex ? 'XXXX' : 'XXX',
                     ),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
@@ -221,8 +225,10 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       });
                     },
                     validator: (String value) {
-                      if (value.isEmpty || value.length != (widget.isAmex ? 4 : 3)) {
-                        return AppLocalizations.of(context).translate('cvv_error');
+                      if (value.isEmpty ||
+                          value.length != (widget.isAmex ? 4 : 3)) {
+                        return AppLocalizations.of(context)
+                            .translate('cvv_error');
                       }
                       return null;
                     },
@@ -239,7 +245,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
               focusNode: cardHolderNode,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
-                labelText: AppLocalizations.of(context).translate('card_holder'),
+                labelText:
+                    AppLocalizations.of(context).translate('card_holder'),
               ),
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.done,
@@ -249,7 +256,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
               onFieldSubmitted: (_) => widget.onSubmit(),
               validator: (String value) {
                 if (value.isEmpty) {
-                  return AppLocalizations.of(context).translate('card_holder_error');
+                  return AppLocalizations.of(context)
+                      .translate('card_holder_error');
                 }
                 return null;
               },

@@ -8,10 +8,10 @@ import 'package:perna/widgets/side_menu.dart';
 
 class MainWidget extends StatefulWidget {
   const MainWidget({
-    Key key, 
-    @required this.photoUrl, 
+    Key key,
+    @required this.photoUrl,
     @required this.name,
-    @required this.email, 
+    @required this.email,
     @required this.logout,
   }) : super(key: key);
 
@@ -26,7 +26,8 @@ class MainWidget extends StatefulWidget {
   }
 }
 
-class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateMixin {
+class _MainWidgetState extends State<MainWidget>
+    with SingleTickerProviderStateMixin {
   Agent visiblePin;
   bool isSideMenuOpen = false;
   bool isPinVisible = false;
@@ -36,7 +37,8 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     setState(() {
-      controller = AnimationController(duration: const Duration(milliseconds: 200), vsync:this);
+      controller = AnimationController(
+          duration: const Duration(milliseconds: 200), vsync: this);
     });
   }
 
@@ -45,38 +47,34 @@ class _MainWidgetState extends State<MainWidget> with SingleTickerProviderStateM
     return Stack(
       children: <Widget>[
         MapsContainer(
-          preExecute: (){ if(isSideMenuOpen) changeSideMenuState(); },
-          changeSideMenuState: changeSideMenuState,
-          controller: controller,
-          email: widget.email,
-          setVisiblePin: (Agent agent, Polyline oldPolyline) { 
-            setState((){
-              isPinVisible = !oldPolyline.visible;
-              visiblePin = agent;
-            });
-          }
-        ),
-        PinInfo(
-          visible: isPinVisible,
-          agent: visiblePin
-        ),
+            preExecute: () {
+              if (isSideMenuOpen) changeSideMenuState();
+            },
+            changeSideMenuState: changeSideMenuState,
+            controller: controller,
+            email: widget.email,
+            setVisiblePin: (Agent agent, Polyline oldPolyline) {
+              setState(() {
+                isPinVisible = !oldPolyline.visible;
+                visiblePin = agent;
+              });
+            }),
+        PinInfo(visible: isPinVisible, agent: visiblePin),
         AnimatedSideMenu(
-          isOpen: isSideMenuOpen,
-          sideMenu: SideMenu(
-            email: widget.email, 
-            name: widget.name, 
-            logout: widget.logout, 
-            photoUrl: widget.photoUrl,
-            textColor: Theme.of(context).primaryColor
-          )
-        )
+            isOpen: isSideMenuOpen,
+            sideMenu: SideMenu(
+                email: widget.email,
+                name: widget.name,
+                logout: widget.logout,
+                photoUrl: widget.photoUrl,
+                textColor: Theme.of(context).primaryColor))
       ],
     );
   }
 
-  void changeSideMenuState(){
+  void changeSideMenuState() {
     setState(() {
-      isSideMenuOpen =! isSideMenuOpen;
+      isSideMenuOpen = !isSideMenuOpen;
       isSideMenuOpen ? controller.forward() : controller.reverse();
     });
   }
