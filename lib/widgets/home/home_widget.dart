@@ -6,8 +6,8 @@ import 'package:perna/widgets/map/pin_info.dart';
 import 'package:perna/widgets/map/maps_container.dart';
 import 'package:perna/widgets/side_menu/side_menu.dart';
 
-class MainWidget extends StatefulWidget {
-  const MainWidget({
+class HomeWidget extends StatefulWidget {
+  const HomeWidget({
     Key key,
     @required this.photoUrl,
     @required this.name,
@@ -21,12 +21,12 @@ class MainWidget extends StatefulWidget {
   final Function() logout;
 
   @override
-  _MainWidgetState createState() {
-    return _MainWidgetState();
+  _HomeWidgetState createState() {
+    return _HomeWidgetState();
   }
 }
 
-class _MainWidgetState extends State<MainWidget>
+class _HomeWidgetState extends State<HomeWidget>
     with SingleTickerProviderStateMixin {
   Agent visiblePin;
   bool isSideMenuOpen = false;
