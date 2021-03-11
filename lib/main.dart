@@ -41,7 +41,6 @@ Future<void> main() async {
   );
 
   final StoreState initialState = await persistor.load();
-  //TODO: Dados sensíveis devem estar seguros: paymentPublishableKey, apiKey.
   FlavorConfig(
     name: 'DEVELOP',
     variables: <String, String>{
