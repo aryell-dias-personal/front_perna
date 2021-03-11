@@ -10,7 +10,7 @@ import 'package:perna/store/state.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:perna/widgets/log_and_sign_in_button.dart';
+import 'package:perna/widgets/button/log_and_sign_in_button.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 

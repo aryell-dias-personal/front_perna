@@ -5,7 +5,7 @@ import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
 import 'package:perna/services/static_map.dart';
 import 'package:perna/services/user.dart';
-import 'package:perna/widgets/asked_point_form.dart';
+import 'package:perna/widgets/form/asked_point_form.dart';
 import 'package:redux/redux.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';

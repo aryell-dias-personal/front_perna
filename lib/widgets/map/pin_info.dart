@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/pages/expedient_page.dart';
-import 'package:perna/widgets/titled_value_widget.dart';
+import 'package:perna/widgets/text/titled_value_widget.dart';
 
 class PinInfo extends StatelessWidget {
   const PinInfo({Key key, this.visible, this.agent}) : super(key: key);

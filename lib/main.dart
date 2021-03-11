@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/my_decoder.dart';
-import 'package:perna/home.dart';
+import 'package:perna/pages/home_page.dart';
 import 'package:perna/services/directions.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';

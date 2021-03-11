@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:perna/widgets/side_menu.dart';
+import 'package:perna/widgets/side_menu/side_menu.dart';
 
 class AnimatedSideMenu extends StatelessWidget {
   const AnimatedSideMenu({Key key, this.sideMenu, this.isOpen})

@@ -7,8 +7,8 @@ import 'package:perna/main.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/widgets/ripple_credit_card.dart';
-import 'package:perna/widgets/titled_value_widget.dart';
+import 'package:perna/widgets/credit_card/ripple_credit_card.dart';
+import 'package:perna/widgets/text/titled_value_widget.dart';
 import 'package:intl/intl.dart';
 
 class AskedPointConfirmationPage extends StatefulWidget {

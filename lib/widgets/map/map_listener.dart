@@ -7,7 +7,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/main.dart';
 import 'package:perna/models/agent.dart';
 import 'package:perna/services/directions.dart';
-import 'package:perna/widgets/my_google_map.dart';
+import 'package:perna/widgets/map/my_google_map.dart';
 import 'package:perna/models/asked_point.dart';
 import 'package:perna/models/point.dart';
 import 'package:perna/pages/asked_point_page.dart';

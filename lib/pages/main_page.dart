@@ -2,7 +2,7 @@ import 'package:perna/main.dart';
 import 'package:perna/services/sign_in.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
-import 'package:perna/widgets/main_widget.dart';
+import 'package:perna/widgets/main/main_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';

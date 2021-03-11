@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
-import 'package:perna/widgets/credit_card_animation.dart';
+import 'package:perna/widgets/credit_card/credit_card_animation.dart';
 
 class CreditCardWidget extends StatefulWidget {
   const CreditCardWidget({

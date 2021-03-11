@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/credit_card.dart';
-import 'package:perna/widgets/card_brand.dart';
+import 'package:perna/widgets/credit_card/card_brand.dart';
 
 class RippleCreditCard extends StatelessWidget {
   const RippleCreditCard(

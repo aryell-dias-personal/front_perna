@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/agent.dart';
-import 'package:perna/widgets/action_buttons.dart';
-import 'package:perna/widgets/add_button.dart';
-import 'package:perna/widgets/form_container.dart';
-import 'package:perna/widgets/form_date_picker.dart';
-import 'package:perna/widgets/form_time_picker.dart';
-import 'package:perna/widgets/outlined_text_form_field.dart';
+import 'package:perna/widgets/button/action_buttons.dart';
+import 'package:perna/widgets/button/add_button.dart';
+import 'package:perna/widgets/form/form_container.dart';
+import 'package:perna/widgets/input/form_date_picker.dart';
+import 'package:perna/widgets/input/form_time_picker.dart';
+import 'package:perna/widgets/input/outlined_text_form_field.dart';
 import 'package:intl/intl.dart';
 
 class ExpedientForm extends StatefulWidget {

@@ -12,7 +12,7 @@ import 'package:perna/models/asked_point.dart';
 import 'package:perna/pages/asked_point_page.dart';
 import 'package:perna/pages/expedient_page.dart';
 import 'package:intl/intl.dart';
-import 'package:perna/widgets/titled_value_widget.dart';
+import 'package:perna/widgets/text/titled_value_widget.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({@required this.email});

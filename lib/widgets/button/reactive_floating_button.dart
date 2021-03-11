@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
-import 'package:perna/widgets/floating_animated_button.dart';
+import 'package:perna/widgets/button/floating_animated_button.dart';
 
 class ReactiveFloatingButton extends StatelessWidget {
   const ReactiveFloatingButton(

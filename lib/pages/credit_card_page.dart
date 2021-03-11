@@ -7,9 +7,9 @@ import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
 import 'package:perna/models/credit_card.dart';
 import 'package:perna/services/payments.dart';
-import 'package:perna/widgets/credit_card_form.dart';
-import 'package:perna/widgets/add_button.dart';
-import 'package:perna/widgets/credit_card_widget.dart';
+import 'package:perna/widgets/form/credit_card_form.dart';
+import 'package:perna/widgets/button/add_button.dart';
+import 'package:perna/widgets/credit_card/credit_card_widget.dart';
 
 class CreditCardPage extends StatefulWidget {
   const CreditCardPage({@required this.userToken});

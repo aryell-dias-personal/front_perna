@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/models/agent.dart';
-import 'package:perna/widgets/animated_side_menu.dart';
-import 'package:perna/widgets/pin_info.dart';
-import 'package:perna/widgets/maps_container.dart';
-import 'package:perna/widgets/side_menu.dart';
+import 'package:perna/widgets/side_menu/animated_side_menu.dart';
+import 'package:perna/widgets/map/pin_info.dart';
+import 'package:perna/widgets/map/maps_container.dart';
+import 'package:perna/widgets/side_menu/side_menu.dart';
 
 class MainWidget extends StatefulWidget {
   const MainWidget({

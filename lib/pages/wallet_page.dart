@@ -10,7 +10,7 @@ import 'package:perna/pages/credit_card_page.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:perna/services/payments.dart';
 import 'package:perna/services/sign_in.dart';
-import 'package:perna/widgets/ripple_credit_card.dart';
+import 'package:perna/widgets/credit_card/ripple_credit_card.dart';
 
 class WalletPage extends StatefulWidget {
   @override

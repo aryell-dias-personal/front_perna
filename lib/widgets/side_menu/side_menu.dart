@@ -6,8 +6,8 @@ import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/pages/help_page.dart';
 import 'package:perna/pages/history_page.dart';
 import 'package:perna/pages/wallet_page.dart';
-import 'package:perna/widgets/side_menu_button.dart';
-import 'package:perna/widgets/visible_rich_text.dart';
+import 'package:perna/widgets/side_menu/side_menu_button.dart';
+import 'package:perna/widgets/text/visible_rich_text.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu(
