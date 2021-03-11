@@ -41,19 +41,18 @@ Future<void> main() async {
   );
 
   final StoreState initialState = await persistor.load();
-  //TODO: Dados sensíveis devem estar seguros https://stackoverflow.com/questions/51895194/correct-way-of-storing-api-keys-in-flutter-following-best-practises
-  // paymentPublishableKey, apiKey, googleAppID?, gcmSenderID?
+  //TODO: Dados sensíveis devem estar seguros: paymentPublishableKey, apiKey.
   FlavorConfig(
     name: 'DEVELOP',
     variables: <String, String>{
       'paymentPublishableKey':
           'pk_test_51IOaRiEHLjxuMcanAIUxWIvwpU90K6GWskTx0iGsHliV7LtxPKZBoBOfj1rfoRIzxt5Xp6EYw1ZFqTHwlnU6t1WL00VfoidTNJ',
+      'apiKey': 'AIzaSyC_d-ntsVtnwyO6VhG2qHmDA4pCyFYP0gY',
       'appName': 'aryell-test',
       'projectID': 'aryell-test',
       'gcmSenderID': '376560728219',
       'baseUrl':
           'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-',
-      'apiKey': 'AIzaSyC_d-ntsVtnwyO6VhG2qHmDA4pCyFYP0gY',
       'googleAppID': '1:376560728219:android:82633609a640175003ee3e',
       'merchantId': 'Test',
       'androidPayMode': 'test'

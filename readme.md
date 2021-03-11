@@ -17,7 +17,8 @@
 
 - colocar key de `Chave de API da Web` em `apiKey` do FlavorConfig
 
-- colocar key de `Chave de API da Web` em `app/src/main/AndroidManifest.xml`
+- colocar key de `Chave de API da Web` em `local.properties` com nome `API_KEY`
+> Nota: leia mais em https://entwicklernotizen.de/blog/how-to-handle-secret-api-keys-in-flutter-for-android-and-i-os/
 
 > Nota: se você já tiver rodado e quiser trocar as credenciais lembre de rodar um `flutter clean` primeiro
 ## Gerencia de ambientes
