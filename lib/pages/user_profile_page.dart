@@ -7,7 +7,7 @@ import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/models/user.dart';
 
 class UserProfilePage extends StatelessWidget {
-  const UserProfilePage({Key key, @required this.user}) : super(key: key);
+  const UserProfilePage({required this.user});
 
   final User user;
 
@@ -31,11 +31,7 @@ class UserProfilePage extends StatelessWidget {
                             color: Colors.transparent,
                             child: CircleAvatar(
                               radius: 60,
-                              backgroundImage: NetworkImage(user.photoUrl),
-                              child:
-                                  user.photoUrl == null || user.photoUrl == ''
-                                      ? const Icon(Icons.person, size: 90)
-                                      : null,
+                              backgroundImage: NetworkImage(user.photoUrl)
                             ))),
                     Builder(builder: (BuildContext context) {
                       final Color unratedColor = Colors.grey.withOpacity(0.2);

@@ -4,12 +4,11 @@ import 'package:perna/helpers/app_localizations.dart';
 
 class AddButton extends StatelessWidget {
   const AddButton(
-      {Key key, this.readOnly, this.addAndcontinue = false, this.onPressed})
-      : super(key: key);
+      {this.readOnly = false, this.addAndcontinue = false, this.onPressed});
 
   final bool readOnly;
   final bool addAndcontinue;
-  final Function() onPressed;
+  final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {

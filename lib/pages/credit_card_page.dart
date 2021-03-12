@@ -12,7 +12,7 @@ import 'package:perna/widgets/button/add_button.dart';
 import 'package:perna/widgets/credit_card/credit_card_widget.dart';
 
 class CreditCardPage extends StatefulWidget {
-  const CreditCardPage({@required this.userToken});
+  const CreditCardPage({required this.userToken});
 
   final String userToken;
 
@@ -31,7 +31,7 @@ class CreditCardPageState extends State<CreditCardPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> _onPressed(BuildContext context) async {
-    if (formKey.currentState.validate()) {
+    if (formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
@@ -71,7 +71,7 @@ class CreditCardPageState extends State<CreditCardPage> {
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
                 style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    color: Theme.of(context).textTheme.bodyText2!.color,
                     fontFamily: 'ProductSans'),
                 children: <TextSpan>[
                   TextSpan(
@@ -91,7 +91,7 @@ class CreditCardPageState extends State<CreditCardPage> {
             headline6: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 20,
-                fontFamily: Theme.of(context).textTheme.headline6.fontFamily)),
+                fontFamily: Theme.of(context).textTheme.headline6!.fontFamily)),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       resizeToAvoidBottomInset: true,
@@ -106,11 +106,11 @@ class CreditCardPageState extends State<CreditCardPage> {
                   CreditCardWidget(
                       isAmex: isAmex,
                       cardType: cardType,
-                      cardNumber: creditCardModel.cardNumber ?? '',
-                      expiryDate: creditCardModel.expiryDate ?? '',
-                      cardHolderName: creditCardModel.cardHolderName ?? '',
-                      cvvCode: creditCardModel.cvvCode ?? '',
-                      showBackView: creditCardModel.isCvvFocused ?? false),
+                      cardNumber: creditCardModel.cardNumber,
+                      expiryDate: creditCardModel.expiryDate,
+                      cardHolderName: creditCardModel.cardHolderName,
+                      cvvCode: creditCardModel.cvvCode,
+                      showBackView: creditCardModel.isCvvFocused),
                   const SizedBox(height: 16),
                   Expanded(
                     child: SingleChildScrollView(
@@ -128,7 +128,6 @@ class CreditCardPageState extends State<CreditCardPage> {
                           const SizedBox(height: 26),
                           AddButton(
                             onPressed: () => _onPressed(context),
-                            readOnly: false,
                           )
                         ],
                       ),

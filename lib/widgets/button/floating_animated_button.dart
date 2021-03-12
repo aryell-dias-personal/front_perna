@@ -3,21 +3,19 @@ import 'package:flutter/material.dart';
 
 class FloatingAnimatedButton extends StatelessWidget {
   const FloatingAnimatedButton(
-      {Key key,
-      this.heroTag,
+      {required this.heroTag,
+      required this.child,
       this.onPressed,
-      this.child,
       this.color,
       this.bottom,
-      this.description})
-      : super(key: key);
+      this.description});
 
-  final Function() onPressed;
+  final Function()? onPressed;
   final Widget child;
   final String heroTag;
-  final String description;
-  final double bottom;
-  final Color color;
+  final String? description;
+  final double? bottom;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {

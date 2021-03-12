@@ -1,8 +1,8 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 
-LatLng decodeLatLng(String encodedLatLng) {
-  if (encodedLatLng != null) {
+LatLng? decodeLatLng(dynamic? encodedLatLng) {
+  if (encodedLatLng is String) {
     final String importantPart =
         encodedLatLng.split(encodedNamesSeparetor).first;
     final List<double> coords = importantPart

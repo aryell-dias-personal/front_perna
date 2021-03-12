@@ -9,7 +9,7 @@ import 'package:redux/redux.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
-    @required this.email,
+    required this.email,
   });
 
   final String email;
@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
         converter: (Store<StoreState> store) {
       return <String, dynamic>{
         'logoutFunction': () {
+          // HACK: nesse ponto é esperado que o usuário esteja definido
           getIt<SignInService>().logOut(
               user: store.state.user,
               messagingToken: store.state.messagingToken);

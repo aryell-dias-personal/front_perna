@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class LogAndSignInButton extends StatelessWidget {
   const LogAndSignInButton(
-      {@required this.text, @required this.onPressed, this.isSignIn = false});
+      {required this.text, required this.onPressed, this.isSignIn = false});
 
   final Function() onPressed;
   final String text;

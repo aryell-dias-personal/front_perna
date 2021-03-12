@@ -6,13 +6,13 @@ import 'package:perna/widgets/credit_card/card_brand.dart';
 
 class RippleCreditCard extends StatelessWidget {
   const RippleCreditCard(
-      {@required this.isDefault,
-      @required this.isSelected,
-      @required this.creditCard,
+      {required this.isDefault,
+      required this.isSelected,
+      required this.creditCard,
       this.onLongPress,
       this.top = 15});
 
-  final Function() onLongPress;
+  final Function()? onLongPress;
   final double top;
   final bool isDefault;
   final bool isSelected;

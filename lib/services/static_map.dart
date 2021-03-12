@@ -10,7 +10,7 @@ class StaticMapService {
   String apiKey = FlavorConfig.instance.variables['apiKey'] as String;
 
   String mountStaticMapUrl(
-      {List<LatLng> route, LatLng markerA, LatLng markerB}) {
+      {List<LatLng>? route, LatLng? markerA, LatLng? markerB}) {
     const String baseUrl = 'https://maps.googleapis.com/maps/api/staticmap';
     final StringBuffer routeParamsBuffer = StringBuffer();
     if (route != null && route.isNotEmpty) {
@@ -33,7 +33,7 @@ class StaticMapService {
   }
 
   Future<Uint8List> getUint8List(
-      {List<LatLng> route, LatLng markerA, LatLng markerB}) async {
+      {List<LatLng>? route, LatLng? markerA, LatLng? markerB}) async {
     final String url =
         mountStaticMapUrl(markerA: markerA, markerB: markerB, route: route);
     final Response response = await get(Uri.parse(url));

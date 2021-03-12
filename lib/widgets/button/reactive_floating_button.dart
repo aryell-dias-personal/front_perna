@@ -5,19 +5,17 @@ import 'package:perna/widgets/button/floating_animated_button.dart';
 
 class ReactiveFloatingButton extends StatelessWidget {
   const ReactiveFloatingButton(
-      {Key key,
-      this.controller,
-      this.defaultFunction,
-      this.length,
-      this.addNewExpedient,
-      this.addNewAsk,
-      this.bottom})
-      : super(key: key);
+      {required this.controller,
+      required this.defaultFunction,
+      required this.length,
+      required this.addNewExpedient,
+      required this.addNewAsk,
+      this.bottom});
 
   final AnimationController controller;
   final Function() defaultFunction;
   final int length;
-  final double bottom;
+  final double? bottom;
   final Function() addNewExpedient;
   final Function() addNewAsk;
 

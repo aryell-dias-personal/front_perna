@@ -1,18 +1,13 @@
-import 'package:perna/models/user.dart';
 import 'package:perna/store/actions.dart';
 import 'package:perna/store/state.dart';
 
 StoreState reduce(StoreState state, dynamic action) {
   if (action is Logout) {
-    return state.copyWith(logedIn: false, user: User());
+    return state.copyWith(logedIn: false);
   } else if (action is LogIn) {
-    if (action?.user != null) {
-      return state.copyWith(logedIn: true, user: action.user);
-    }
+    return state.copyWith(logedIn: true, user: action.user);
   } else if (action is SignIn) {
-    if (action?.user != null) {
-      return state.copyWith(logedIn: true, user: action.user);
-    }
+    return state.copyWith(logedIn: true, user: action.user);
   }
   return state;
 }

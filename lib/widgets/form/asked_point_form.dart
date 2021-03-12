@@ -12,16 +12,19 @@ import 'package:intl/intl.dart';
 
 class AskedPointForm extends StatefulWidget {
   const AskedPointForm(
-      {this.readOnly, this.askedPoint, this.onAddPressed, this.email});
+      {required this.onAddPressed,
+      required this.email,
+      this.readOnly = false,
+      this.askedPoint});
 
   final String email;
   final bool readOnly;
-  final AskedPoint askedPoint;
+  final AskedPoint? askedPoint;
   final void Function(GlobalKey<FormState> formKey,
-      {String email,
-      String askedEndAt,
-      String askedStartAt,
-      String date}) onAddPressed;
+      {required String email,
+      String? askedEndAt,
+      String? askedStartAt,
+      String? date}) onAddPressed;
 
   @override
   _AskedPointFormState createState() => _AskedPointFormState();
@@ -33,13 +36,13 @@ class _AskedPointFormState extends State<AskedPointForm> {
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
-  AskedPoint askedPoint;
+  late DateTime minTime;
   DateTime initialDateTime = DateTime.now();
   DateTime now = DateTime.now();
-  DateTime minTime;
-  String date;
-  String askedEndAt;
-  String askedStartAt;
+  AskedPoint? askedPoint;
+  String? askedEndAt;
+  String? askedStartAt;
+  String? date;
   bool isLoading = false;
 
   @override
@@ -51,16 +54,16 @@ class _AskedPointFormState extends State<AskedPointForm> {
     initialDateTime = DateTime(
         initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
-    date = dateFormat.format(askedPoint.date ?? minTime);
+    date = dateFormat.format(askedPoint?.date ?? minTime);
   }
 
   void _updateMinTime(String text) {
     final DateTime nextMinTime = dateFormat.parse(text);
-    String nextAskedEndAt = askedEndAt;
     if (askedEndAt != null && askedStartAt != null) {
+      String nextAskedEndAt = askedEndAt!;
       final String minTimeString = dateFormat.format(minTime);
       final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
+          askedEndAt!.length > 5 ? askedEndAt! : '$askedEndAt $minTimeString';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final Duration shift = nextMinTime.difference(minTime);
       final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
@@ -68,24 +71,24 @@ class _AskedPointFormState extends State<AskedPointForm> {
       if (RegExp(text).hasMatch(nextAskedEndAt)) {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
+      setState(() {
+        date = text;
+        minTime = nextMinTime;
+        askedEndAt = nextAskedEndAt;
+      });
     }
-    setState(() {
-      date = text;
-      minTime = nextMinTime;
-      askedEndAt = nextAskedEndAt;
-    });
   }
 
   void _updateStartAt(String nextStartAt) {
-    String nextAskedEndAt = askedEndAt;
     if (askedEndAt != null && askedStartAt != null) {
+      String nextAskedEndAt = askedEndAt!;
       final String minTimeString = dateFormat.format(minTime);
       final DateTime oldAskedStartAt =
           format.parse('$askedStartAt $minTimeString');
       final DateTime newAskedStartAt =
           format.parse('$nextStartAt $minTimeString');
       final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
+          askedEndAt!.length > 5 ? askedEndAt! : '$askedEndAt $minTimeString';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final Duration shift = newAskedStartAt.difference(oldAskedStartAt);
       final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
@@ -93,11 +96,11 @@ class _AskedPointFormState extends State<AskedPointForm> {
       if (RegExp(minTimeString).hasMatch(nextAskedEndAt)) {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
+      setState(() {
+        askedStartAt = nextStartAt;
+        askedEndAt = nextAskedEndAt;
+      });
     }
-    setState(() {
-      askedStartAt = nextStartAt;
-      askedEndAt = nextAskedEndAt;
-    });
   }
 
   @override
@@ -107,7 +110,7 @@ class _AskedPointFormState extends State<AskedPointForm> {
         FormDatePicker(
           value: date,
           isRequired: true,
-          initialValue: askedPoint.date ?? initialDateTime,
+          initialValue: askedPoint?.date ?? initialDateTime,
           onChanged: _updateMinTime,
           labelText: AppLocalizations.of(context).translate('date'),
           icon: Icons.insert_invitation,
@@ -119,13 +122,14 @@ class _AskedPointFormState extends State<AskedPointForm> {
               AppLocalizations.of(context).translate('select_a_date'),
         ),
         const SizedBox(height: 26),
-        if (askedPoint.askedStartAt != null || !widget.readOnly)
+        if (askedPoint?.askedStartAt != null || !widget.readOnly)
           const SizedBox(width: 10),
-        if (askedPoint.askedStartAt != null || !widget.readOnly)
+        if (askedPoint?.askedStartAt != null || !widget.readOnly)
           FormTimePicker(
               value: askedStartAt,
               minTime: initialDateTime,
-              initialValue: askedPoint?.date?.add(askedPoint.askedStartAt),
+              initialValue: askedPoint?.date
+                  ?.add(askedPoint?.askedStartAt ?? const Duration()),
               icon: Icons.access_time,
               labelText:
                   AppLocalizations.of(context).translate('desired_start'),
@@ -148,11 +152,12 @@ class _AskedPointFormState extends State<AskedPointForm> {
               })
       ]),
       const SizedBox(height: 26),
-      if (askedPoint.askedEndAt != null || !widget.readOnly)
+      if (askedPoint?.askedEndAt != null || !widget.readOnly)
         FormTimePicker(
-          value: askedEndAt,
+          value: askedEndAt ?? '',
           minTime: minTime,
-          initialValue: askedPoint?.date?.add(askedPoint.askedEndAt),
+          initialValue:
+              askedPoint?.date?.add(askedPoint?.askedEndAt ?? const Duration()),
           onChanged: (String text) {
             final String minTimeString = dateFormat.format(minTime);
             setState(() {
@@ -178,44 +183,44 @@ class _AskedPointFormState extends State<AskedPointForm> {
           validatorMessage:
               AppLocalizations.of(context).translate('enter_desired_end'),
         ),
-      if (askedPoint.askedEndAt != null || !widget.readOnly)
+      if (askedPoint?.askedEndAt != null || !widget.readOnly)
         const SizedBox(height: 26),
-      if (askedPoint.actualStartAt != null)
+      if (askedPoint?.actualStartAt != null)
         FormTimePicker(
             readOnly: true,
             selectedDay: date,
-            initialValue: askedPoint.actualStartAt,
+            initialValue: askedPoint?.actualStartAt,
             labelText: AppLocalizations.of(context).translate('actual_start'),
             icon: Icons.access_time),
-      if (askedPoint.actualStartAt != null) const SizedBox(height: 26),
-      if (askedPoint.actualEndAt != null)
+      if (askedPoint?.actualStartAt != null) const SizedBox(height: 26),
+      if (askedPoint?.actualEndAt != null)
         FormTimePicker(
             readOnly: true,
             selectedDay: date,
-            initialValue: askedPoint.actualEndAt,
+            initialValue: askedPoint?.actualEndAt,
             labelText: AppLocalizations.of(context).translate('actual_end'),
             icon: Icons.access_time),
-      if (askedPoint.actualEndAt != null) const SizedBox(height: 26),
+      if (askedPoint?.actualEndAt != null) const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: true,
-          initialValue: askedPoint.friendlyOrigin,
+          initialValue: askedPoint?.friendlyOrigin,
           labelText: AppLocalizations.of(context).translate('start_place'),
           icon: Icons.pin_drop),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: true,
-          initialValue: askedPoint.friendlyDestiny,
+          initialValue: askedPoint?.friendlyDestiny,
           labelText: AppLocalizations.of(context).translate('end_place'),
           icon: Icons.flag),
       const SizedBox(height: 26),
-      if (askedPoint.amount != null)
+      if (askedPoint?.amount != null && askedPoint?.currency != null)
         OutlinedTextFormField(
             readOnly: true,
-            initialValue: formatAmount(askedPoint.amount, askedPoint.currency,
-                AppLocalizations.of(context).locale),
+            initialValue: formatAmount(askedPoint!.amount!,
+                askedPoint!.currency!, AppLocalizations.of(context).locale),
             labelText: AppLocalizations.of(context).translate('price'),
             icon: Icons.payments_outlined),
-      if (askedPoint.amount != null) const SizedBox(height: 26),
+      if (askedPoint?.amount != null) const SizedBox(height: 26),
       AddButton(
           onPressed: () => widget.onAddPressed(
                 _formKey,

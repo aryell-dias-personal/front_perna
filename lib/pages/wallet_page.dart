@@ -20,24 +20,26 @@ class WalletPage extends StatefulWidget {
 class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
   List<CreditCard> creditCards = <CreditCard>[];
   bool isLoading = true;
-  String userToken;
-  String selectedCardId;
+  String? selectedCardId;
+  late String userToken;
 
   @override
   void initState() {
     super.initState();
-    getIt<SignInService>().getRefreshToken().then((String token) {
-      setState(() {
-        userToken = token;
-      });
-      getIt<PaymentsService>()
-          .listCard(userToken)
-          .then((List<CreditCard> creditCards) {
+    getIt<SignInService>().getRefreshToken().then((String? token) {
+      if (token != null) {
         setState(() {
-          this.creditCards = creditCards;
-          isLoading = false;
+          userToken = token;
         });
-      });
+        getIt<PaymentsService>()
+            .listCard(userToken)
+            .then((List<CreditCard> creditCards) {
+          setState(() {
+            this.creditCards = creditCards;
+            isLoading = false;
+          });
+        });
+      }
     });
   }
 
@@ -46,7 +48,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
       isLoading = true;
     });
     final int statusCode =
-        await getIt<PaymentsService>().deleteCard(selectedCardId, userToken);
+        await getIt<PaymentsService>().deleteCard(selectedCardId!, userToken);
     if (statusCode == 200) {
       final List<CreditCard> creditCards =
           await getIt<PaymentsService>().listCard(userToken);
@@ -74,7 +76,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
       isLoading = true;
     });
     final int statusCode = await getIt<PaymentsService>()
-        .turnCardDefault(selectedCardId, userToken);
+        .turnCardDefault(selectedCardId!, userToken);
     if (statusCode == 200) {
       final List<CreditCard> creditCards =
           await getIt<PaymentsService>().listCard(userToken);
@@ -110,7 +112,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                 overflow: TextOverflow.ellipsis,
                 text: TextSpan(
                   style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyText2.color,
+                      color: Theme.of(context).textTheme.bodyText2!.color,
                       fontFamily: 'ProductSans'),
                   children: <TextSpan>[
                     TextSpan(
@@ -130,7 +132,7 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                   color: Theme.of(context).primaryColor,
                   fontSize: 20,
                   fontFamily:
-                      Theme.of(context).textTheme.headline6.fontFamily)),
+                      Theme.of(context).textTheme.headline6!.fontFamily)),
         ),
         backgroundColor: Theme.of(context).backgroundColor,
         body: isLoading
@@ -217,7 +219,8 @@ class _WalletPageState extends State<WalletPage> with TickerProviderStateMixin {
                         ),
                         heroTag: '3',
                         backgroundColor: Theme.of(context).primaryColor,
-                        children: (creditCards?.first?.id == selectedCardId
+                        children: (creditCards.isNotEmpty &&
+                                    creditCards.first.id == selectedCardId
                                 ? <SpeedDialChild>[]
                                 : <SpeedDialChild>[
                                     SpeedDialChild(

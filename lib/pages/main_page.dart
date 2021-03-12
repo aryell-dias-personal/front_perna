@@ -37,18 +37,15 @@ Future<void> onMessage(RemoteMessage message) async {
       NotificationDetails(android: androidPlatformChannelSpecifics);
   await flutterLocalNotificationsPlugin.show(
       rand.nextInt(1000),
-      message.notification.title,
-      message.notification.body,
+      message.notification?.title,
+      message.notification?.body,
       platformChannelSpecifics,
       payload: enc.convert(<String, dynamic>{'data': message.data}));
 }
 
 class MainPage extends StatefulWidget {
   const MainPage(
-      {@required this.firebaseMessaging,
-      @required this.isInitiallyConnected,
-      Key key})
-      : super(key: key);
+      {required this.firebaseMessaging, required this.isInitiallyConnected});
 
   final FirebaseMessaging firebaseMessaging;
   final bool isInitiallyConnected;
@@ -58,18 +55,18 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  bool isConnected;
+  bool? isConnected;
 
   Future<void> askNewAgentHandler(RemoteMessage message) async {
     const JsonDecoder dec = JsonDecoder();
     final NavigatorState navigatorState = Navigator.of(context);
-    final Agent agent = Agent.fromJson(
+    final Agent? agent = Agent.fromJson(
       dec.convert(message.data['agent'] as String) as Map<String, dynamic>,
     );
     await navigatorState.push(MaterialPageRoute<Scaffold>(
         builder: (BuildContext context) => Scaffold(
             body: ExpedientPage(
-                agent: agent,
+                agent: agent!,
                 readOnly: true,
                 clear: () {},
                 accept: () async {
@@ -80,34 +77,35 @@ class _MainPageState extends State<MainPage> {
                 }))));
   }
 
-  Future<void> answerNewAgentHandler(Agent agent, {bool accepted}) async {
+  Future<void> answerNewAgentHandler(Agent agent,
+      {required bool accepted}) async {
     if (accepted) {
-      final String token = await getIt<SignInService>().getRefreshToken();
+      final String? token = await getIt<SignInService>().getRefreshToken();
       final int statusCodeNewAgent =
-          await getIt<DriverService>().postNewAgent(agent, token);
+          await getIt<DriverService>().postNewAgent(agent, token!);
       if (statusCodeNewAgent != 200) {
         showSnackBar(
             AppLocalizations.of(context).translateFormat(
-                'accept_not_possible', <String>[agent.fromEmail]),
+                'accept_not_possible', <String>[agent.fromEmail!]),
             Colors.redAccent,
             context);
         return;
       }
     }
     final int statusCodeAnswer = await getIt<DriverService>()
-        .answerNewAgent(agent.fromEmail, agent.email, accepted: accepted);
+        .answerNewAgent(agent.fromEmail!, agent.email!, accepted: accepted);
     if (statusCodeAnswer == 200) {
       final String answer = AppLocalizations.of(context)
           .translate(accepted ? 'accepted' : 'denied');
       showSnackBar(
           AppLocalizations.of(context).translateFormat(
-              'answer_order', <String>[answer, agent.fromEmail]),
+              'answer_order', <String>[answer, agent.fromEmail!]),
           Colors.greenAccent,
           context);
     } else {
       showSnackBar(
           AppLocalizations.of(context)
-              .translateFormat('not_answer_order', <String>[agent.fromEmail]),
+              .translateFormat('not_answer_order', <String>[agent.fromEmail!]),
           Colors.redAccent,
           context);
     }
@@ -145,14 +143,14 @@ class _MainPageState extends State<MainPage> {
             'reminder_message', <dynamic>[format.format(date), content]),
         date,
         platformChannelSpecifics,
-        payload: enc.convert(<String, dynamic>{'data': null}),
+        payload: enc.convert(<String, dynamic>{'data': <String, dynamic>{}}),
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime);
   }
 
   Future<void> onLaunch(RemoteMessage message) async {
-    if (message.data != null) {
+    if (message.data.isNotEmpty) {
       if (message.data['time'] != null && message.data['type'] != null) {
         await scheduleMessage(message);
       } else if (message.data['agent'] != null) {
@@ -169,10 +167,15 @@ class _MainPageState extends State<MainPage> {
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (String payload) async {
+        onSelectNotification: (String? payload) async {
       const JsonDecoder dec = JsonDecoder();
-      final RemoteMessage message =
-          RemoteMessage.fromMap(dec.convert(payload) as Map<String, dynamic>);
+      Map<String, dynamic> payloadMap;
+      if (payload != null) {
+        payloadMap = dec.convert(payload) as Map<String, dynamic>;
+      } else {
+        payloadMap = const <String, dynamic>{'data': <String, dynamic>{}};
+      }
+      final RemoteMessage message = RemoteMessage.fromMap(payloadMap);
       await onLaunch(message);
     });
 

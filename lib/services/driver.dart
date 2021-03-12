@@ -4,7 +4,7 @@ import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/models/agent.dart';
 
 class DriverService {
-  DriverService({this.myDecoder});
+  DriverService({required this.myDecoder});
 
   MyDecoder myDecoder;
   String baseUrl = FlavorConfig.instance.variables['baseUrl'] as String;
@@ -17,11 +17,11 @@ class DriverService {
   }
 
   Future<int> answerNewAgent(String fromEmail, String toEmail,
-      {bool accepted}) async {
+      {bool? accepted}) async {
     final String body = await myDecoder.encode(<String, dynamic>{
       'fromEmail': fromEmail,
       'toEmail': toEmail,
-      'accepted': accepted
+      'accepted': accepted ?? false
     });
     final Response res =
         await post(Uri.parse('${baseUrl}answerNewAgent'), body: body);

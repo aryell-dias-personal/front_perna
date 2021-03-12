@@ -6,7 +6,7 @@ import 'package:stripe_payment/stripe_payment.dart';
 import 'package:perna/models/credit_card.dart' as model;
 
 class PaymentsService {
-  PaymentsService({this.myDecoder}) {
+  PaymentsService({required this.myDecoder}) {
     StripePayment.setOptions(StripeOptions(
         publishableKey:
             FlavorConfig.instance.variables['paymentPublishableKey'] as String,

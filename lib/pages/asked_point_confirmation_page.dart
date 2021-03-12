@@ -13,10 +13,10 @@ import 'package:intl/intl.dart';
 
 class AskedPointConfirmationPage extends StatefulWidget {
   const AskedPointConfirmationPage(
-      {@required this.clear,
-      @required this.userToken,
-      @required this.askedPoint,
-      @required this.defaultCreditCard});
+      {required this.clear,
+      required this.userToken,
+      required this.askedPoint,
+      required this.defaultCreditCard});
 
   final String userToken;
   final AskedPoint askedPoint;
@@ -60,13 +60,13 @@ class _AskedPointConfirmationPageState
   }
 
   String parseDuration() {
-    final Duration duration =
+    final Duration? duration =
         widget.askedPoint.askedStartAt ?? widget.askedPoint.askedEndAt;
     if (duration != null) {
-      final DateTime currTime = widget.askedPoint.date.add(duration);
+      final DateTime currTime = widget.askedPoint.date!.add(duration);
       return format.format(currTime);
     }
-    return formatDate.format(widget.askedPoint.date);
+    return formatDate.format(widget.askedPoint.date!);
   }
 
   @override
@@ -80,7 +80,7 @@ class _AskedPointConfirmationPageState
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
                 style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyText2.color,
+                    color: Theme.of(context).textTheme.bodyText2!.color,
                     fontFamily: 'ProductSans'),
                 children: <TextSpan>[
                   TextSpan(
@@ -99,7 +99,7 @@ class _AskedPointConfirmationPageState
             headline6: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 20,
-                fontFamily: Theme.of(context).textTheme.headline6.fontFamily)),
+                fontFamily: Theme.of(context).textTheme.headline6!.fontFamily)),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: Container(
@@ -140,7 +140,7 @@ class _AskedPointConfirmationPageState
                                 )
                               ]),
                           const SizedBox(height: 10),
-                          Image.memory(widget.askedPoint.staticMap),
+                          Image.memory(widget.askedPoint.staticMap!),
                           const SizedBox(height: 10),
                         ],
                       )),
@@ -179,8 +179,8 @@ class _AskedPointConfirmationPageState
                                       ),
                                       Text(
                                         formatAmount(
-                                            widget.askedPoint.amount,
-                                            widget.askedPoint.currency,
+                                            widget.askedPoint.amount!,
+                                            widget.askedPoint.currency!,
                                             AppLocalizations.of(context)
                                                 .locale),
                                         style: TextStyle(

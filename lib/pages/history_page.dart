@@ -15,7 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:perna/widgets/text/titled_value_widget.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({@required this.email});
+  const HistoryPage({required this.email});
 
   final String email;
 
@@ -31,11 +31,11 @@ class _HistoryPageState extends State<HistoryPage> {
   bool isLoadingAgents = false;
   bool passedTime = false;
 
-  StreamSubscription<QuerySnapshot> askedPointsListener;
-  StreamSubscription<QuerySnapshot> agentsListener;
-  List<dynamic> askedPoints;
-  List<dynamic> agents;
-  Timer timer;
+  late StreamSubscription<QuerySnapshot> askedPointsListener;
+  late StreamSubscription<QuerySnapshot> agentsListener;
+  late List<dynamic> askedPoints;
+  late List<dynamic> agents;
+  late Timer timer;
 
   @override
   void dispose() {
@@ -92,17 +92,24 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
+  int? getDynamicIntValue(dynamic value) {
+    if(value is int) {
+      return value;
+    } else if(value is double){
+      return value.round();
+    }
+    return null;
+  }
+
   String parseDuration(dynamic shiftStart, dynamic shiftEnd, dynamic date) {
-    final int shiftStartInt =
-        shiftStart is int ? shiftStart : (shiftStart as double)?.round();
-    final int shiftEndInt =
-        shiftEnd is int ? shiftEnd : (shiftEnd as double)?.round();
+    final int? shiftStartInt = getDynamicIntValue(shiftStart);
+    final int? shiftEndInt = getDynamicIntValue(shiftEnd);
     final int dateInt = date is int ? date : (date as double).round();
-    final int shift = shiftStartInt ?? shiftEndInt;
+    final int? shift = shiftStartInt ?? shiftEndInt;
     final DateTime dateTime =
         DateTime.fromMillisecondsSinceEpoch(dateInt * 1000);
-    final Duration duration = shift == null ? null : Duration(seconds: shift);
-    if (dateTime != null && duration != null) {
+    final Duration? duration = shift == null ? null : Duration(seconds: shift);
+    if (duration != null) {
       final DateTime currTime = dateTime.add(duration);
       return format.format(currTime);
     }
@@ -143,7 +150,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   color: Theme.of(context).primaryColor,
                   fontSize: 20,
                   fontFamily:
-                      Theme.of(context).textTheme.headline6.fontFamily)),
+                      Theme.of(context).textTheme.headline6!.fontFamily)),
         ),
         backgroundColor: Theme.of(context).backgroundColor,
         body: isLoadingAgents || isLoadingAskedPoints || !passedTime
@@ -193,13 +200,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                                         AskedPoint.fromJson(
                                                             operation as Map<
                                                                 String,
-                                                                dynamic>),
+                                                                dynamic>)!,
                                                     readOnly: true,
                                                     clear: () {})
                                                 : ExpedientPage(
                                                     agent: Agent.fromJson(
                                                         operation as Map<String,
-                                                            dynamic>),
+                                                            dynamic>)!,
                                                     readOnly: true,
                                                     clear: () {})));
                               },
@@ -238,8 +245,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                           context)
                                                       .translate('driver'),
                                                   value: operation['email']
-                                                          as String ??
-                                                      '')
+                                                          as String)
                                           ],
                                         ),
                                         Row(

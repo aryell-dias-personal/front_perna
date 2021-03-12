@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:perna/models/help_item.dart';
 
 class HelpPage extends StatelessWidget {
-  const HelpPage({@required this.helpItem});
+  const HelpPage({required this.helpItem});
 
   final HelpItem helpItem;
 
@@ -23,7 +23,7 @@ class HelpPage extends StatelessWidget {
                         text: TextSpan(
                           style: TextStyle(
                               color:
-                                  Theme.of(context).textTheme.bodyText2.color,
+                                  Theme.of(context).textTheme.bodyText2!.color,
                               fontFamily: 'ProductSans'),
                           children: <TextSpan>[
                             TextSpan(
@@ -47,13 +47,13 @@ class HelpPage extends StatelessWidget {
                   color: Theme.of(context).primaryColor,
                   fontSize: 20,
                   fontFamily:
-                      Theme.of(context).textTheme.headline6.fontFamily)),
+                      Theme.of(context).textTheme.headline6!.fontFamily)),
         ),
         backgroundColor: Theme.of(context).backgroundColor,
         body: Builder(builder: (BuildContext context) {
           return ListView.separated(
-              itemCount: (helpItem?.subItems?.length ?? 0) +
-                  (helpItem.content == null ? 0 : 1),
+              itemCount: (helpItem.subItems.length) +
+                  (helpItem.content == '' ? 0 : 1),
               separatorBuilder: (BuildContext context, int index) {
                 return const Divider();
               },
@@ -109,7 +109,7 @@ class HelpPage extends StatelessWidget {
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .textTheme
-                                            .bodyText2
+                                            .bodyText2!
                                             .color,
                                         fontFamily: 'ProductSans'),
                                     children: <TextSpan>[

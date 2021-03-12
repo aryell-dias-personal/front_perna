@@ -5,7 +5,7 @@ import 'package:app_settings/app_settings.dart';
 import 'package:perna/helpers/app_localizations.dart';
 
 class NoConnectionPage extends StatelessWidget {
-  const NoConnectionPage({Key key}) : super(key: key);
+  const NoConnectionPage();
 
   @override
   Widget build(BuildContext context) {

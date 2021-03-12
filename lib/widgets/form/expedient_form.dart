@@ -12,10 +12,10 @@ import 'package:intl/intl.dart';
 
 class ExpedientForm extends StatefulWidget {
   const ExpedientForm(
-      {this.readOnly,
-      this.showActionButtons,
-      this.agent,
-      this.onAddPressed,
+      {required this.agent,
+      required this.onAddPressed,
+      this.readOnly = false,
+      this.showActionButtons = false,
       this.denyPressed,
       this.acceptPressed,
       this.fromEmail});
@@ -23,16 +23,16 @@ class ExpedientForm extends StatefulWidget {
   final bool readOnly;
   final Agent agent;
   final bool showActionButtons;
-  final String fromEmail;
+  final String? fromEmail;
   final void Function(GlobalKey<FormState> formKey,
-      {String email,
-      String fromEmail,
-      String askedEndAt,
-      String askedStartAt,
-      String date,
-      String places}) onAddPressed;
-  final void Function() denyPressed;
-  final void Function() acceptPressed;
+      {String? email,
+      String? fromEmail,
+      String? askedEndAt,
+      String? askedStartAt,
+      String? date,
+      String? places}) onAddPressed;
+  final void Function()? denyPressed;
+  final void Function()? acceptPressed;
 
   @override
   _ExpedientFormState createState() => _ExpedientFormState();
@@ -42,14 +42,14 @@ class _ExpedientFormState extends State<ExpedientForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+  late DateTime minTime;
   DateTime initialDateTime = DateTime.now();
-  DateTime minTime;
-  String date;
-  String email;
-  String places;
-  String askedEndAt;
-  String askedStartAt;
-  Agent agent;
+  String? date;
+  String? email;
+  String? places;
+  String? askedEndAt;
+  String? askedStartAt;
+  Agent? agent;
 
   @override
   void initState() {
@@ -60,16 +60,16 @@ class _ExpedientFormState extends State<ExpedientForm> {
     initialDateTime = DateTime(
         initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
     minTime = initialDateTime;
-    date = dateFormat.format(agent.date ?? minTime);
+    date = dateFormat.format(agent!.date ?? minTime);
   }
 
   void _updateMinTime(String text) {
     final DateTime nextMinTime = dateFormat.parse(text);
-    String nextAskedEndAt = askedEndAt;
+    String nextAskedEndAt = askedEndAt ?? '';
     if (askedEndAt != null && askedStartAt != null) {
       final String minTimeString = dateFormat.format(minTime);
       final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
+          askedEndAt!.length > 5 ? askedEndAt! : '$askedEndAt $minTimeString';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final Duration shift = nextMinTime.difference(minTime);
       final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
@@ -86,15 +86,15 @@ class _ExpedientFormState extends State<ExpedientForm> {
   }
 
   void _updateStartAt(String nextStartAt) {
-    String nextAskedEndAt = askedEndAt;
     if (askedEndAt != null && askedStartAt != null) {
+      String nextAskedEndAt = askedEndAt!;
       final String minTimeString = dateFormat.format(minTime);
       final DateTime oldAskedStartAt =
           format.parse('$askedStartAt $minTimeString');
       final DateTime newAskedStartAt =
           format.parse('$nextStartAt $minTimeString');
       final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $minTimeString';
+          askedEndAt!.length > 5 ? askedEndAt! : '$askedEndAt $minTimeString';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final Duration shift = newAskedStartAt.difference(oldAskedStartAt);
       final DateTime nextAskedEndAtTime = askedEndAtTime.add(shift);
@@ -102,11 +102,11 @@ class _ExpedientFormState extends State<ExpedientForm> {
       if (RegExp(minTimeString).hasMatch(nextAskedEndAt)) {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
+      setState(() {
+        askedStartAt = nextStartAt;
+        askedEndAt = nextAskedEndAt;
+      });
     }
-    setState(() {
-      askedStartAt = nextStartAt;
-      askedEndAt = nextAskedEndAt;
-    });
   }
 
   @override
@@ -114,7 +114,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
     return FormContainer(formkey: _formKey, children: <Widget>[
       OutlinedTextFormField(
         readOnly: widget.readOnly,
-        initialValue: (agent.email ?? email) ?? '',
+        initialValue: (agent?.email ?? email) ?? '',
         onChanged: (String text) {
           email = text;
         },
@@ -128,11 +128,11 @@ class _ExpedientFormState extends State<ExpedientForm> {
           FocusScope.of(context).nextFocus();
         },
       ),
-      if (agent.fromEmail != null) const SizedBox(height: 26),
-      if (agent.fromEmail != null)
+      if (agent?.fromEmail != null) const SizedBox(height: 26),
+      if (agent?.fromEmail != null)
         OutlinedTextFormField(
             readOnly: true,
-            initialValue: agent.fromEmail,
+            initialValue: agent?.fromEmail,
             textInputType: TextInputType.emailAddress,
             labelText:
                 AppLocalizations.of(context).translate('requester_email'),
@@ -169,7 +169,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
           selectedDay: date,
           value: askedStartAt,
           lastDay: 31,
-          initialValue: agent?.date?.add(agent.askedStartAt),
+          initialValue: agent?.date?.add(agent?.askedStartAt ?? const Duration()),
           labelText: AppLocalizations.of(context).translate('expedient_start'),
           icon: Icons.access_time,
           readOnly: widget.readOnly,
@@ -186,7 +186,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
           minTime: minTime,
           selectedDay: date,
           value: askedEndAt,
-          initialValue: agent?.date?.add(agent.askedEndAt),
+          initialValue: agent?.date?.add(agent?.askedEndAt ?? const Duration()),
           icon: Icons.access_time,
           labelText: AppLocalizations.of(context).translate('expedient_end'),
           onChanged: (String text) {
@@ -208,7 +208,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
         readOnly: widget.readOnly,
-        initialValue: (agent.places?.toString() ?? places?.toString()) ?? '',
+        initialValue: (agent?.places?.toString() ?? places?.toString()) ?? '',
         onChanged: (String text) {
           places = text;
         },
@@ -231,12 +231,12 @@ class _ExpedientFormState extends State<ExpedientForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: true,
-          initialValue: agent.friendlyGarage,
+          initialValue: agent?.friendlyGarage,
           labelText: AppLocalizations.of(context).translate('garage'),
           icon: Icons.pin_drop),
       const SizedBox(height: 26),
       if (widget.showActionButtons)
-        ActionButtons(accept: widget.acceptPressed, deny: widget.denyPressed),
+        ActionButtons(accept: widget.acceptPressed!, deny: widget.denyPressed!),
       if (!widget.showActionButtons)
         AddButton(
           onPressed: () => widget.onAddPressed(

@@ -21,11 +21,11 @@ import 'package:perna/pages/expedient_page.dart';
 
 class MapsContainer extends StatefulWidget {
   const MapsContainer({
-    @required this.setVisiblePin,
-    @required this.preExecute,
-    @required this.changeSideMenuState,
-    @required this.controller,
-    @required this.email,
+    required this.setVisiblePin,
+    required this.preExecute,
+    required this.changeSideMenuState,
+    required this.controller,
+    required this.email,
   });
 
   final Function() preExecute;
@@ -41,10 +41,10 @@ class MapsContainer extends StatefulWidget {
 class _MapsContainerState extends State<MapsContainer> {
   Set<Marker> markers = <Marker>{};
   bool isPinVisible = false;
-  BitmapDescriptor originPin;
-  BitmapDescriptor destinyPin;
+  late BitmapDescriptor originPin;
+  late BitmapDescriptor destinyPin;
   List<LatLng> points = <LatLng>[];
-  StreamSubscription<QuerySnapshot> agentsListener;
+  late StreamSubscription<QuerySnapshot> agentsListener;
 
   @override
   void dispose() {
@@ -77,7 +77,7 @@ class _MapsContainerState extends State<MapsContainer> {
   Future<void> addNewExpedient() async {
     if (markers.length == 1) {
       final List<String> snippet1 =
-          markers.first.infoWindow.snippet.split('</>');
+          markers.first.infoWindow.snippet!.split('</>');
       final Agent agent = Agent(
           friendlyGarage: snippet1.first,
           region: snippet1.length > 1 ? <String>[snippet1.last] : null,
@@ -99,9 +99,9 @@ class _MapsContainerState extends State<MapsContainer> {
   Future<void> addNewAsk() async {
     if (markers.length == 2) {
       final List<String> snippet1 =
-          markers.first.infoWindow.snippet.split('</>');
+          markers.first.infoWindow.snippet!.split('</>');
       final List<String> snippet2 =
-          markers.last.infoWindow.snippet.split('</>');
+          markers.last.infoWindow.snippet!.split('</>');
       final AskedPoint askedPoint = AskedPoint(
           friendlyOrigin: snippet1.first,
           friendlyDestiny: snippet2.first,
@@ -202,7 +202,7 @@ class _MapsContainerState extends State<MapsContainer> {
                       putMarker(LatLng(location.latitude, location.longitude),
                           description, MarkerType.destiny, region))
             ] +
-            (points == null || points.length <= 1
+            (points.isEmpty
                 ? <Widget>[]
                 : <Widget>[
                     FloatingAnimatedButton(
@@ -243,10 +243,10 @@ class _MapsContainerState extends State<MapsContainer> {
         .snapshots()
         .listen((QuerySnapshot agentSnapshot) {
       if (agentSnapshot.docs.isNotEmpty) {
-        final Agent agent = Agent.fromJson(agentSnapshot.docs.first.data());
+        final Agent agent = Agent.fromJson(agentSnapshot.docs.first.data())!;
         if (agent.route != null) {
           final List<LatLng> points =
-              agent.route.map<LatLng>((Point point) => point.local).toList();
+              agent.route!.map<LatLng>((Point point) => point.local).toList();
           setState(() {
             this.points.addAll(points);
           });

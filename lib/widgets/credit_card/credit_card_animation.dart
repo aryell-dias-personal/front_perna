@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 
 class AnimationCard extends StatelessWidget {
   const AnimationCard({
-    @required this.child,
-    @required this.animation,
+    required this.child,
+    required this.animation,
   });
 
   final Widget child;
@@ -13,7 +13,7 @@ class AnimationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: animation,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         final Matrix4 transform = Matrix4.identity();
         transform.setEntry(3, 2, 0.001);
         transform.rotateY(animation.value);

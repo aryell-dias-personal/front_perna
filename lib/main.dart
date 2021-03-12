@@ -75,24 +75,15 @@ Future<void> main() async {
   } on FirebaseException {
     firebaseApp =
         Firebase.app(FlavorConfig.instance.variables['appName'] as String);
-  } finally {
-    firestore = FirebaseFirestore.instanceFor(app: firebaseApp);
-    firebaseAuth = FirebaseAuth.instanceFor(app: firebaseApp);
-    firebaseMessaging = FirebaseMessaging.instance;
   }
+  firestore = FirebaseFirestore.instanceFor(app: firebaseApp);
+  firebaseAuth = FirebaseAuth.instanceFor(app: firebaseApp);
+  firebaseMessaging = FirebaseMessaging.instance;
 
   final NotificationSettings settings =
-      await firebaseMessaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
+      await firebaseMessaging.requestPermission();
 
-  String messagingToken;
+  String? messagingToken;
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     messagingToken = await firebaseMessaging.getToken();
     await firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -140,9 +131,9 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp(
-      {@required this.store,
-      @required this.firebaseMessaging,
-      @required this.isInitiallyConnected});
+      {required this.store,
+      required this.firebaseMessaging,
+      required this.isInitiallyConnected});
 
   final Store<StoreState> store;
   final bool isInitiallyConnected;
@@ -176,7 +167,8 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
           ],
           localeResolutionCallback:
-              (Locale locale, Iterable<Locale> supportedLocales) {
+              (Locale? locale, Iterable<Locale> supportedLocales) {
+            if (locale == null) return supportedLocales.first;
             for (final Locale supportedLocale in supportedLocales) {
               if (supportedLocale.languageCode == locale.languageCode &&
                   supportedLocale.countryCode == locale.countryCode) {

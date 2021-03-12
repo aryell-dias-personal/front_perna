@@ -22,17 +22,17 @@ enum ExpedientOptions { aboutDriver, aboutRequester }
 
 class ExpedientPage extends StatefulWidget {
   const ExpedientPage(
-      {@required this.readOnly,
-      @required this.agent,
-      @required this.clear,
+      {required this.readOnly,
+      required this.agent,
+      required this.clear,
       this.accept,
       this.deny});
 
   final Agent agent;
   final bool readOnly;
-  final Function() deny;
+  final Function()? deny;
   final Function() clear;
-  final Function() accept;
+  final Function()? accept;
 
   @override
   _ExpedientState createState() => _ExpedientState();
@@ -59,7 +59,7 @@ class _ExpedientState extends State<ExpedientPage> {
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
-  Agent agent;
+  late Agent agent;
   bool isLoading = false;
 
   Future<void> _askNewAgend(Agent agent) async {
@@ -83,19 +83,14 @@ class _ExpedientState extends State<ExpedientPage> {
   }
 
   Future<void> _onPressed(GlobalKey<FormState> formKey,
-      {String email,
-      String fromEmail,
-      String askedEndAt,
-      String askedStartAt,
-      String date,
-      String places}) async {
-    if (formKey.currentState.validate()) {
+      {String? askedEndAt, String? askedStartAt, String? date, String? email, String? fromEmail, String? places}) async {
+    if (formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
-      final DateTime dateTime = dateFormat.parse(date);
+      final DateTime dateTime = dateFormat.parse(date!);
       final String askedEndAtString =
-          askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $date';
+          askedEndAt!.length > 5 ? askedEndAt : '$askedEndAt! $date!';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final DateTime askedStartAtTime = format.parse('$askedStartAt $date');
       final Agent agent = this.agent.copyWith(
@@ -104,12 +99,12 @@ class _ExpedientState extends State<ExpedientPage> {
           askedStartAt: askedStartAtTime.difference(dateTime),
           askedEndAt: askedEndAtTime.difference(dateTime),
           fromEmail: fromEmail != email ? fromEmail : null,
-          places: int.parse(places));
+          places: int.parse(places!));
       if (fromEmail != email) {
         _askNewAgend(agent);
       } else {
-        final String token = await getIt<SignInService>().getRefreshToken();
-        final int statusCode =
+        final String? token = await getIt<SignInService>().getRefreshToken();
+        final int statusCode = token == null ? 500 :
             await getIt<DriverService>().postNewAgent(agent, token);
         if (statusCode == 200) {
           widget.clear();
@@ -137,7 +132,7 @@ class _ExpedientState extends State<ExpedientPage> {
     setState(() {
       isLoading = true;
     });
-    (accept ? widget.accept() : widget.deny()).then((_) {
+    (accept ? widget.accept!() : widget.deny!()).then((_) {
       setState(() {
         isLoading = false;
       });
@@ -149,13 +144,13 @@ class _ExpedientState extends State<ExpedientPage> {
       isLoading = true;
     });
     final String email =
-        result == ExpedientOptions.aboutDriver ? agent.email : agent.fromEmail;
+        result == ExpedientOptions.aboutDriver ? agent.email! : agent.fromEmail!;
     final QuerySnapshot querySnapshot = await getIt<FirebaseFirestore>()
         .collection('user')
         .where('email', isEqualTo: email)
         .get();
     if (querySnapshot.docs.isNotEmpty) {
-      final User user = User.fromJson(querySnapshot.docs.first.data());
+      final User user = User.fromJson(querySnapshot.docs.first.data()!);
       await Navigator.push(
           context,
           MaterialPageRoute<UserProfilePage>(
@@ -173,7 +168,7 @@ class _ExpedientState extends State<ExpedientPage> {
   Widget build(BuildContext context) {
     return StoreConnector<StoreState, Map<String, dynamic>>(
         converter: (Store<StoreState> store) =>
-            <String, dynamic>{'email': store.state.user.email},
+            <String, dynamic>{'email': store.state.user!.email},
         builder: (BuildContext context, Map<String, dynamic> resources) =>
             Scaffold(
               appBar: AppBar(
@@ -193,7 +188,7 @@ class _ExpedientState extends State<ExpedientPage> {
                         color: Theme.of(context).primaryColor,
                         fontSize: 20,
                         fontFamily:
-                            Theme.of(context).textTheme.headline6.fontFamily)),
+                            Theme.of(context).textTheme.headline6!.fontFamily)),
                 actions: widget.readOnly
                     ? <Widget>[
                         PopupMenuButton<ExpedientOptions>(
@@ -239,7 +234,7 @@ class _ExpedientState extends State<ExpedientPage> {
                                               color: Theme.of(context)
                                                   .primaryColor)),
                                       if (agent.staticMap != null)
-                                        Image.memory(agent.staticMap)
+                                        Image.memory(agent.staticMap!)
                                     ],
                                   )),
                               ExpedientForm(

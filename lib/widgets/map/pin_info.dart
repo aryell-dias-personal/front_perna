@@ -6,10 +6,10 @@ import 'package:perna/pages/expedient_page.dart';
 import 'package:perna/widgets/text/titled_value_widget.dart';
 
 class PinInfo extends StatelessWidget {
-  const PinInfo({Key key, this.visible, this.agent}) : super(key: key);
+  const PinInfo({required this.visible, this.agent});
 
   final bool visible;
-  final Agent agent;
+  final Agent? agent;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class PinInfo extends StatelessWidget {
                           context,
                           MaterialPageRoute<ExpedientPage>(
                             builder: (BuildContext context) => ExpedientPage(
-                                agent: agent, readOnly: true, clear: () {}),
+                                agent: agent!, readOnly: true, clear: () {}),
                           ));
                     },
                     child: Container(

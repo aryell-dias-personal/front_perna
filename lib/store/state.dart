@@ -1,7 +1,7 @@
 import 'package:perna/models/user.dart';
 
 class StoreState {
-  StoreState({this.logedIn, this.user, this.messagingToken});
+  StoreState({required this.logedIn, this.user, this.messagingToken});
 
   // ignore: prefer_constructors_over_static_methods
   static StoreState fromJson(dynamic parsedJson) {
@@ -14,13 +14,13 @@ class StoreState {
   }
 
   bool logedIn;
-  User user;
-  String messagingToken;
+  User? user;
+  String? messagingToken;
 
   StoreState copyWith({
-    User user,
-    bool logedIn,
-    String messagingToken,
+    User? user,
+    bool? logedIn,
+    String? messagingToken,
   }) =>
       StoreState(
         user: user ?? this.user,
@@ -29,6 +29,6 @@ class StoreState {
       );
 
   dynamic toJson() {
-    return <String, dynamic>{'user': user.toJson(), 'logedIn': logedIn};
+    return <String, dynamic>{'user': user?.toJson(), 'logedIn': logedIn};
   }
 }

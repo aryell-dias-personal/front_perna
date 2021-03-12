@@ -2,12 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class VisibleRichText extends StatelessWidget {
-  const VisibleRichText({Key key, this.fontSize, this.text, this.textColor})
-      : super(key: key);
+  const VisibleRichText({this.fontSize, this.text, this.textColor});
 
-  final double fontSize;
-  final Color textColor;
-  final String text;
+  final double? fontSize;
+  final Color? textColor;
+  final String? text;
 
   @override
   Widget build(BuildContext context) {

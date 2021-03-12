@@ -26,9 +26,9 @@ enum AskedPointOptions { aboutExpedient }
 
 class AskedPointPage extends StatefulWidget {
   const AskedPointPage(
-      {@required this.readOnly,
-      @required this.askedPoint,
-      @required this.clear});
+      {required this.readOnly,
+      required this.askedPoint,
+      required this.clear});
 
   final bool readOnly;
   final Function() clear;
@@ -50,8 +50,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
           markerA: askedPoint.origin,
           markerB: askedPoint.destiny,
           route: <LatLng>[
-            askedPoint.origin,
-            askedPoint.destiny
+            askedPoint.origin!,
+            askedPoint.destiny!
           ]).then((Uint8List uint8List) {
         setState(() {
           askedPoint = askedPoint.copyWith(staticMap: uint8List);
@@ -63,22 +63,19 @@ class _AskedPointPageState extends State<AskedPointPage> {
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
-  AskedPoint askedPoint;
+  late AskedPoint askedPoint;
   DateTime now = DateTime.now();
   bool isLoading = false;
 
   Future<void> _onPressed(GlobalKey<FormState> formKey,
-      {String email,
-      String askedEndAt,
-      String askedStartAt,
-      String date}) async {
-    if (formKey.currentState.validate()) {
+      {String? askedEndAt, String? askedStartAt, String? date, required String email}) async {
+    if (formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
-      final String token = await getIt<SignInService>().getRefreshToken();
+      final String? token = await getIt<SignInService>().getRefreshToken();
       final List<CreditCard> creditCards =
-          await getIt<PaymentsService>().listCard(token);
+          await getIt<PaymentsService>().listCard(token!);
       if (creditCards.isEmpty) {
         setState(() {
           isLoading = false;
@@ -89,8 +86,8 @@ class _AskedPointPageState extends State<AskedPointPage> {
             context);
         return;
       }
-      final DateTime dateTime = dateFormat.parse(date);
-      DateTime askedEndAtTime, askedStartAtTime;
+      final DateTime dateTime = dateFormat.parse(date!);
+      DateTime? askedEndAtTime, askedStartAtTime;
       if (askedEndAt != null) {
         final String askedEndAtString =
             askedEndAt.length > 5 ? askedEndAt : '$askedEndAt $date';
@@ -105,7 +102,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
         askedEndAt: askedEndAtTime?.difference(dateTime),
         askedStartAt: askedStartAtTime?.difference(dateTime),
       );
-      final AskedPoint simulatedAskedPoint =
+      final AskedPoint? simulatedAskedPoint =
           await getIt<UserService>().simulateAskedPoint(newAskedPoint, token);
 
       if (simulatedAskedPoint != null) {
@@ -141,13 +138,14 @@ class _AskedPointPageState extends State<AskedPointPage> {
         .collection('agent')
         .doc(askedPoint.agentId)
         .get();
-    if (documentSnapshot.data().isNotEmpty) {
-      final Agent agent = Agent.fromJson(documentSnapshot.data());
+    final Map<String, dynamic>? agentData = documentSnapshot.data();
+    if (agentData != null && agentData.isNotEmpty) {
+      final Agent? agent = Agent.fromJson(agentData);
       await Navigator.push(
           context,
           MaterialPageRoute<ExpedientPage>(
               builder: (BuildContext context) =>
-                  ExpedientPage(agent: agent, readOnly: true, clear: () {})));
+                  ExpedientPage(agent: agent!, readOnly: true, clear: () {})));
     } else {
       showSnackBar(
           AppLocalizations.of(context).translate('not_found_expedient'),
@@ -163,7 +161,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
   Widget build(BuildContext context) => StoreConnector<StoreState,
           Map<String, dynamic>>(
       converter: (Store<StoreState> store) => <String, dynamic>{
-            'email': store.state.user.email,
+            'email': store.state.user!.email,
           },
       builder: (BuildContext context, Map<String, dynamic> resources) =>
           Scaffold(
@@ -184,7 +182,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                         color: Theme.of(context).primaryColor,
                         fontSize: 20,
                         fontFamily:
-                            Theme.of(context).textTheme.headline6.fontFamily)),
+                            Theme.of(context).textTheme.headline6!.fontFamily)),
                 actions: widget.readOnly && askedPoint.agentId != null
                     ? <Widget>[
                         PopupMenuButton<AskedPointOptions>(
@@ -225,7 +223,7 @@ class _AskedPointPageState extends State<AskedPointPage> {
                                                 color: Theme.of(context)
                                                     .primaryColor)),
                                         if (askedPoint.staticMap != null)
-                                          Image.memory(askedPoint.staticMap)
+                                          Image.memory(askedPoint.staticMap!)
                                       ],
                                     )),
                                 AskedPointForm(

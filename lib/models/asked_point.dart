@@ -6,38 +6,38 @@ import 'package:perna/helpers/decoder.dart';
 class AskedPoint {
   AskedPoint(
       {this.date,
-      this.queue,
-      this.history,
       this.email,
       this.origin,
       this.destiny,
-      this.currency,
-      this.amount,
       this.friendlyOrigin,
       this.friendlyDestiny,
+      this.staticMap,
+      this.currency,
+      this.amount,
+      this.agentId,
+      this.queue,
+      this.history,
       this.askedStartAt,
       this.askedEndAt,
       this.actualStartAt,
       this.actualEndAt,
       this.region,
-      this.agentId,
-      this.staticMap});
+      });
 
-  factory AskedPoint.fromJson(Map<String, dynamic> parsedJson) {
-    DateTime parseDate(dynamic value) {
+  static AskedPoint? fromJson(Map<String, dynamic>? parsedJson) {
+    DateTime? parseDate(dynamic? value) {
       if (value == null) return null;
       final int valueInt = value is int ? value : (value as double).round();
       return DateTime.fromMillisecondsSinceEpoch(valueInt * 1000);
     }
 
-    Duration parseDuration(dynamic value) {
+    Duration? parseDuration(dynamic? value) {
       if (value == null) return null;
       final int valueInt = value is int ? value : (value as double).round();
       return Duration(seconds: valueInt);
     }
 
     Uint8List decode64(dynamic staticMap) {
-      if (staticMap == null) return null;
       return base64Decode(staticMap as String);
     }
 
@@ -70,23 +70,23 @@ class AskedPoint {
   }
 
   AskedPoint copyWith(
-          {String email,
-          LatLng origin,
-          LatLng destiny,
-          String friendlyOrigin,
-          String friendlyDestiny,
-          Duration askedStartAt,
-          Duration askedEndAt,
-          DateTime date,
-          List<DateTime> queue,
-          List<DateTime> history,
-          DateTime actualStartAt,
-          DateTime actualEndAt,
-          String agentId,
-          List<String> region,
-          Uint8List staticMap,
-          String currency,
-          int amount}) =>
+          {String? email,
+          LatLng? origin,
+          LatLng? destiny,
+          String? friendlyOrigin,
+          String? friendlyDestiny,
+          Duration? askedStartAt,
+          Duration? askedEndAt,
+          DateTime? date,
+          List<DateTime>? queue,
+          List<DateTime>? history,
+          DateTime? actualStartAt,
+          DateTime? actualEndAt,
+          String? agentId,
+          List<String>? region,
+          Uint8List? staticMap,
+          String? currency,
+          int? amount}) =>
       AskedPoint(
           email: email ?? this.email,
           origin: origin ?? this.origin,
@@ -106,49 +106,49 @@ class AskedPoint {
           amount: amount ?? this.amount,
           staticMap: staticMap ?? this.staticMap);
 
-  DateTime date;
-  List<DateTime> queue;
-  List<DateTime> history;
-  Duration askedEndAt;
-  Duration askedStartAt;
-  LatLng origin;
-  LatLng destiny;
-  String email;
-  String friendlyOrigin;
-  String friendlyDestiny;
-  String currency;
-  int amount;
-  DateTime actualStartAt;
-  DateTime actualEndAt;
-  String agentId;
-  Uint8List staticMap;
-  List<String> region;
+  DateTime? date;
+  LatLng? origin;
+  LatLng? destiny;
+  String? email;
+  String? friendlyOrigin;
+  String? friendlyDestiny;
+  Uint8List? staticMap;
+  List<DateTime>? queue;
+  List<DateTime>? history;
+  Duration? askedEndAt;
+  Duration? askedStartAt;
+  String? currency;
+  int? amount;
+  DateTime? actualStartAt;
+  DateTime? actualEndAt;
+  String? agentId;
+  List<String>? region;
 
   dynamic toJson() => <String, dynamic>{
         'email': email,
-        'origin': '${origin.latitude}, ${origin.longitude}',
-        'destiny': '${destiny.latitude}, ${destiny.longitude}',
+        'origin': '${origin!.latitude}, ${origin!.longitude}',
+        'destiny': '${destiny!.latitude}, ${destiny!.longitude}',
         'friendlyOrigin': friendlyOrigin,
         'friendlyDestiny': friendlyDestiny,
         'queue': queue
             ?.map<double>((DateTime date) => date.millisecondsSinceEpoch / 1000)
-            ?.toList(),
+            .toList(),
         'history': history
             ?.map<double>((DateTime date) => date.millisecondsSinceEpoch / 1000)
-            ?.toList(),
-        'date': date != null ? date.millisecondsSinceEpoch / 1000 : null,
+            .toList(),
+        'date': date!.millisecondsSinceEpoch / 1000,
         'askedStartAt': askedStartAt?.inSeconds,
         'askedEndAt': askedEndAt?.inSeconds,
         'actualStartAt': actualStartAt != null
-            ? actualStartAt.millisecondsSinceEpoch / 1000
+            ? actualStartAt!.millisecondsSinceEpoch / 1000
             : null,
         'actualEndAt': actualStartAt != null
-            ? actualEndAt.millisecondsSinceEpoch / 1000
+            ? actualEndAt!.millisecondsSinceEpoch / 1000
             : null,
         'agentId': agentId,
         'region': region,
         'currency': currency,
         'amount': amount,
-        'staticMap': staticMap != null ? base64Encode(staticMap) : null
+        'staticMap': staticMap != null ? base64Encode(staticMap!) : null
       };
 }

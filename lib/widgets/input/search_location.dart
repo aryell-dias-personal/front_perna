@@ -5,16 +5,15 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 
 class SearchLocation extends StatefulWidget {
   const SearchLocation(
-      {Key key,
-      @required this.onStartPlaceSelected,
-      @required this.onEndPlaceSelected,
-      @required this.markers,
-      @required this.preExecute})
-      : super(key: key);
+      {required this.onStartPlaceSelected,
+      required this.onEndPlaceSelected,
+      required this.preExecute, 
+      required this.markers});
 
   final Function() preExecute;
   final Function(Coordinates, String, String) onStartPlaceSelected;
@@ -49,25 +48,27 @@ class _SearchLocationState extends State<SearchLocation>
         overlayBorderRadius: const BorderRadius.all(Radius.circular(15.0)),
         language: current.languageCode,
         components: <Component>[
-          Component(Component.country, current.countryCode)
+          Component(Component.country, current.countryCode ?? defaultCountryCode)
         ]);
     if (prediction != null) {
       final PlacesDetailsResponse placesDetailsResponse =
           await _places.getDetailsByPlaceId(prediction.placeId);
-      final Location location = placesDetailsResponse.result.geometry.location;
-      final Coordinates coordinates = Coordinates(location.lat, location.lng);
-      final List<Address> addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      final Address address = addresses.first;
-      final String region =
-          '${address.subAdminArea}, ${address.adminArea}, ${address.countryName}';
-      if (position == 0) {
-        widget.onStartPlaceSelected(
-            coordinates, prediction.description, region);
-        initialController.text = prediction.description;
-      } else {
-        widget.onEndPlaceSelected(coordinates, prediction.description, region);
-        endControler.text = prediction.description;
+      final Location? location = placesDetailsResponse.result.geometry?.location;
+      if(location != null) {
+        final Coordinates coordinates = Coordinates(location.lat, location.lng);
+        final List<Address> addresses =
+            await Geocoder.local.findAddressesFromCoordinates(coordinates);
+        final Address address = addresses.first;
+        final String region =
+            '${address.subAdminArea}, ${address.adminArea}, ${address.countryName}';
+        if (position == 0) {
+          widget.onStartPlaceSelected(
+              coordinates, prediction.description, region);
+          initialController.text = prediction.description;
+        } else {
+          widget.onEndPlaceSelected(coordinates, prediction.description, region);
+          endControler.text = prediction.description;
+        }
       }
     }
   }
@@ -75,13 +76,13 @@ class _SearchLocationState extends State<SearchLocation>
   @override
   Widget build(BuildContext context) {
     setState(() {
-      if (widget.markers != null && widget.markers.isNotEmpty) {
-        initialController.text = widget.markers.first.infoWindow.snippet;
+      if (widget.markers.isNotEmpty) {
+        initialController.text = widget.markers.first.infoWindow.snippet!;
       } else {
         initialController.text = '';
       }
-      if (widget.markers != null && widget.markers.length > 1) {
-        endControler.text = widget.markers.last.infoWindow.snippet;
+      if (widget.markers.length > 1) {
+        endControler.text = widget.markers.last.infoWindow.snippet!;
       } else {
         endControler.text = '';
       }

@@ -1,11 +1,11 @@
 class User {
   User(
-      {this.email,
-      this.photoUrl,
-      this.name,
-      this.isProvider,
-      this.token,
-      this.currency});
+      {required this.email,
+      required this.photoUrl,
+      required this.name,
+      required this.isProvider,
+      required this.currency,
+      this.token});
 
   factory User.fromJson(Map<String, dynamic> parsedJson) {
     return User(
@@ -20,17 +20,17 @@ class User {
   String email;
   String photoUrl;
   String name;
-  String token;
+  String? token;
   String currency;
   bool isProvider;
 
   User copyWith(
-          {String email,
-          String photoUrl,
-          String name,
-          String token,
-          String currency,
-          bool isProvider}) =>
+          {String? email,
+          String? photoUrl,
+          String? name,
+          String? token,
+          String? currency,
+          bool? isProvider}) =>
       User(
           email: email ?? this.email,
           photoUrl: photoUrl ?? this.photoUrl,

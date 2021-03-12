@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 class TitledValueWidget extends StatelessWidget {
   const TitledValueWidget(
-      {@required this.title,
-      @required this.value,
+      {required this.title,
+      required this.value,
       this.titleSize = 14,
       this.valueSize = 14});
 
@@ -24,7 +24,7 @@ class TitledValueWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             text: TextSpan(
               style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText2.color,
+                  color: Theme.of(context).textTheme.bodyText2!.color,
                   fontFamily: 'ProductSans'),
               children: <TextSpan>[
                 TextSpan(

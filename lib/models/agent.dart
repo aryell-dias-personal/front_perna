@@ -7,38 +7,38 @@ import 'package:perna/models/point.dart';
 class Agent {
   Agent(
       {this.garage,
-      this.position,
+      this.date,
       this.friendlyGarage,
+      this.email,
+      this.askedEndAt,
+      this.askedStartAt,
+      this.region,
+      this.staticMap,
+      this.position,
       this.places,
       this.route,
-      this.date,
       this.queue,
       this.history,
-      this.askedStartAt,
-      this.askedEndAt,
-      this.email,
       this.fromEmail,
-      this.old = false,
       this.askedPointIds,
+      this.old = false,
       this.watchedBy = const <String>[],
-      this.region,
-      this.staticMap});
+      });
 
-  factory Agent.fromJson(Map<String, dynamic> parsedJson) {
-    DateTime parseDate(dynamic value) {
+  static Agent? fromJson(Map<String, dynamic>? parsedJson) {
+    DateTime? parseDate(dynamic? value) {
       if (value == null) return null;
       final int valueInt = value is int ? value : (value as double).round();
       return DateTime.fromMillisecondsSinceEpoch(valueInt * 1000);
     }
 
-    Duration parseDuration(dynamic value) {
+    Duration? parseDuration(dynamic? value) {
       if (value == null) return null;
       final int valueInt = value is int ? value : (value as double).round();
       return Duration(seconds: valueInt);
     }
 
     Uint8List decode64(dynamic staticMap) {
-      if (staticMap == null) return null;
       return base64Decode(staticMap as String);
     }
 
@@ -47,11 +47,9 @@ class Agent {
     }
 
     return Agent(
-        garage: decodeLatLng(parsedJson['garage'] as String),
+        garage: decodeLatLng(parsedJson['garage']),
         old: parsedJson['old'] as bool,
-        position: parsedJson['position'] != null
-            ? decodeLatLng(parsedJson['position'] as String)
-            : null,
+        position: decodeLatLng(parsedJson['position']),
         places: parsedJson['places'] as int,
         friendlyGarage: parsedJson['friendlyGarage'] as String,
         route: parsedJson['route']
@@ -79,42 +77,42 @@ class Agent {
         staticMap: decode64(parsedJson['staticMap']));
   }
 
-  LatLng garage;
-  LatLng position;
-  String friendlyGarage;
-  List<Point> route;
-  int places;
-  DateTime date;
-  List<DateTime> queue;
-  List<DateTime> history;
-  Duration askedEndAt;
-  Duration askedStartAt;
-  String email;
-  String fromEmail;
-  List<String> askedPointIds;
-  List<String> watchedBy;
-  List<String> region;
-  bool old;
-  Uint8List staticMap;
+  LatLng? garage;
+  String? friendlyGarage;
+  DateTime? date;
+  Duration? askedEndAt;
+  Duration? askedStartAt;
+  String? email;
+  bool? old;
+  Uint8List? staticMap;
+  int? places;
+  LatLng? position;
+  String? fromEmail;
+  List<Point>? route;
+  List<DateTime>? queue;
+  List<DateTime>? history;
+  List<String>? askedPointIds;
+  List<String>? watchedBy;
+  List<String>? region;
 
   Agent copyWith(
-          {LatLng garage,
-          String friendlyGarage,
-          int places,
-          DateTime date,
-          List<DateTime> queue,
-          List<DateTime> history,
-          List<Point> route,
-          Duration askedStartAt,
-          Duration askedEndAt,
-          String email,
-          String fromEmail,
-          List<String> askedPointIds,
-          LatLng position,
-          List<String> watchedBy,
-          List<String> region,
-          bool old,
-          Uint8List staticMap}) =>
+          {LatLng? garage,
+          String? friendlyGarage,
+          int? places,
+          DateTime? date,
+          List<DateTime>? queue,
+          List<DateTime>? history,
+          List<Point>? route,
+          Duration? askedStartAt,
+          Duration? askedEndAt,
+          String? email,
+          String? fromEmail,
+          List<String>? askedPointIds,
+          LatLng? position,
+          List<String>? watchedBy,
+          List<String>? region,
+          bool? old,
+          Uint8List? staticMap}) =>
       Agent(
           garage: garage ?? this.garage,
           position: position ?? this.position,
@@ -135,28 +133,28 @@ class Agent {
           staticMap: staticMap ?? this.staticMap);
 
   dynamic toJson() => <String, dynamic>{
-        'garage': '${garage.latitude}, ${garage.longitude}',
+        'garage': '${garage!.latitude}, ${garage!.longitude}',
         'position': position != null
-            ? '${position.latitude}, ${position.longitude}'
+            ? '${position!.latitude}, ${position!.longitude}'
             : null,
         'places': places,
         'friendlyGarage': friendlyGarage,
-        'route': route?.map<dynamic>((Point point) => point.toJson())?.toList(),
+        'route': route?.map<dynamic>((Point point) => point.toJson()).toList(),
         'queue': queue
             ?.map<double>((DateTime date) => date.millisecondsSinceEpoch / 1000)
-            ?.toList(),
+            .toList(),
         'history': history
             ?.map<double>((DateTime date) => date.millisecondsSinceEpoch / 1000)
-            ?.toList(),
-        'date': date != null ? date.millisecondsSinceEpoch / 1000 : null,
-        'askedStartAt': askedStartAt?.inSeconds,
-        'askedEndAt': askedEndAt?.inSeconds,
+            .toList(),
+        'date': date!.millisecondsSinceEpoch / 1000,
+        'askedStartAt': askedStartAt!.inSeconds,
+        'askedEndAt': askedEndAt!.inSeconds,
         'email': email,
         'fromEmail': fromEmail,
         'askedPointIds': askedPointIds,
         'watchedBy': watchedBy,
         'region': region,
         'old': old,
-        'staticMap': staticMap != null ? base64Encode(staticMap) : null
+        'staticMap': staticMap != null ? base64Encode(staticMap!) : null
       };
 }

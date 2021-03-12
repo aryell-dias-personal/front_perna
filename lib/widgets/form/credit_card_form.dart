@@ -6,18 +6,16 @@ import 'package:perna/models/credit_card.dart';
 
 class CreditCardForm extends StatefulWidget {
   const CreditCardForm(
-      {Key key,
-      this.onSubmit,
-      this.cardNumber,
-      this.expiryDate,
-      this.cardHolderName,
-      this.cvvCode,
+      {required this.onSubmit,
+      required this.isAmex,
+      required this.formKey,
+      required this.onCreditCardChange,
+      this.cardNumber = '',
+      this.expiryDate = '',
+      this.cardHolderName = '',
+      this.cvvCode = '',
       this.obscureCvv = false,
-      this.obscureNumber = false,
-      @required this.isAmex,
-      @required this.formKey,
-      @required this.onCreditCardChange})
-      : super(key: key);
+      this.obscureNumber = false});
 
   final Function() onSubmit;
   final bool isAmex;
@@ -35,14 +33,14 @@ class CreditCardForm extends StatefulWidget {
 }
 
 class _CreditCardFormState extends State<CreditCardForm> {
-  String cardNumber;
-  String expiryDate;
-  String cardHolderName;
-  String cvvCode;
-  bool isCvvFocused = false;
+  late String cardNumber;
+  late String expiryDate;
+  late String cardHolderName;
+  late String cvvCode;
+  late CreditCard creditCardModel;
+  late void Function(CreditCard) onCreditCardChange;
 
-  void Function(CreditCard) onCreditCardChange;
-  CreditCard creditCardModel;
+  bool isCvvFocused = false;
 
   final MaskedTextController _cardNumberController =
       MaskedTextController(mask: '0000 0000 0000 0000');
@@ -64,10 +62,10 @@ class _CreditCardFormState extends State<CreditCardForm> {
   }
 
   void createCreditCard() {
-    cardNumber = widget.cardNumber ?? '';
-    expiryDate = widget.expiryDate ?? '';
-    cardHolderName = widget.cardHolderName ?? '';
-    cvvCode = widget.cvvCode ?? '';
+    cardNumber = widget.cardNumber;
+    expiryDate = widget.expiryDate;
+    cardHolderName = widget.cardHolderName;
+    cvvCode = widget.cvvCode;
 
     creditCardModel = CreditCard(
         cardNumber: cardNumber,
@@ -151,8 +149,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
               ),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
-              validator: (String value) {
-                if (value.isEmpty || value.length < 16) {
+              validator: (String? value) {
+                if (value == null || value.isEmpty || value.length < 16) {
                   return AppLocalizations.of(context)
                       .translate('card_number_error');
                 }
@@ -180,8 +178,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
                     ),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
-                    validator: (String value) {
-                      if (value.isEmpty) {
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
                         return AppLocalizations.of(context)
                             .translate('card_date_error');
                       }
@@ -224,8 +222,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
                         cvvCode = text;
                       });
                     },
-                    validator: (String value) {
-                      if (value.isEmpty ||
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty ||
                           value.length != (widget.isAmex ? 4 : 3)) {
                         return AppLocalizations.of(context)
                             .translate('cvv_error');
@@ -254,8 +252,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
                 onCreditCardChange(creditCardModel);
               },
               onFieldSubmitted: (_) => widget.onSubmit(),
-              validator: (String value) {
-                if (value.isEmpty) {
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
                   return AppLocalizations.of(context)
                       .translate('card_holder_error');
                 }

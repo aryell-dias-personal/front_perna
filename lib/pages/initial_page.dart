@@ -1,4 +1,5 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
@@ -17,7 +18,7 @@ import 'package:redux/redux.dart';
 enum SignLogin { sign, login }
 
 class InitialPage extends StatefulWidget {
-  const InitialPage({@required this.messagingToken});
+  const InitialPage({required this.messagingToken});
 
   final String messagingToken;
 
@@ -37,19 +38,22 @@ class _InitialPageState extends State<InitialPage> {
           : StoreConnector<StoreState, Function(SignLogin)>(
               converter: (Store<StoreState> store) => (SignLogin choice) async {
                     final Locale locale = AppLocalizations.of(context).locale;
+                    final String countryCode =
+                        locale.countryCode ?? defaultCountryCode;
                     final String localeName =
-                        '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
+                        '${locale.languageCode}_${countryCode.toUpperCase()}';
                     final String currencyName =
-                        NumberFormat.simpleCurrency(locale: localeName)
-                            .currencyName
+                        (NumberFormat.simpleCurrency(locale: localeName)
+                                    .currencyName ??
+                                defaultCurrencyName)
                             .toLowerCase();
-                    final SignInResponse signInResponse =
+                    final SignInResponse? signInResponse =
                         choice == SignLogin.sign
                             ? await getIt<SignInService>()
                                 .signIn(widget.messagingToken, currencyName)
                             : await getIt<SignInService>()
                                 .logIn(widget.messagingToken);
-                    final User user = signInResponse?.user;
+                    final User? user = signInResponse?.user;
                     if (user == null) {
                       showSnackBar(
                           AppLocalizations.of(context)

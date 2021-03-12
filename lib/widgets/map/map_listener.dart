@@ -16,12 +16,12 @@ import 'package:flutter_flavor/flutter_flavor.dart';
 
 class MapListener extends StatefulWidget {
   const MapListener(
-      {@required this.email,
-      @required this.preExecute,
-      @required this.putMarker,
-      @required this.points,
-      @required this.markers,
-      @required this.setVisiblePin});
+      {required this.email,
+      required this.preExecute,
+      required this.putMarker,
+      required this.points,
+      required this.markers,
+      required this.setVisiblePin});
 
   final String email;
   final Function preExecute;
@@ -35,7 +35,7 @@ class MapListener extends StatefulWidget {
 }
 
 class _MapListenerState extends State<MapListener> {
-  Function hidePin;
+  Function? hidePin;
   List<String> agentIds = <String>[];
   Set<Polyline> polyline = <Polyline>{};
   Set<Marker> nextPlaces = <Marker>{};
@@ -43,9 +43,9 @@ class _MapListenerState extends State<MapListener> {
   Map<String, List<LatLng>> pointsPerRoute = <String, List<LatLng>>{};
   Map<List<LatLng>, List<LatLng>> routeCoordsCache =
       <List<LatLng>, List<LatLng>>{};
-  StreamSubscription<QuerySnapshot> agentIdsSubscription;
-  StreamSubscription<QuerySnapshot> watchAskedPointSubscription;
-  StreamSubscription<QuerySnapshot> watchAgentsSubscription;
+  late StreamSubscription<QuerySnapshot> agentIdsSubscription;
+  late StreamSubscription<QuerySnapshot> watchAskedPointSubscription;
+  late StreamSubscription<QuerySnapshot> watchAgentsSubscription;
 
   @override
   void dispose() {
@@ -63,13 +63,13 @@ class _MapListenerState extends State<MapListener> {
               FlavorConfig.instance.variables['apiKey'] as String, points);
       if (coords.isNotEmpty) return coords;
     }
-    return null;
+    return <LatLng>[];
   }
 
-  Future<void> _addPolyline(List<LatLng> points, {String name}) async {
+  Future<void> _addPolyline(List<LatLng> points, {String? name}) async {
     if (!routeCoordsCache.containsKey(points)) {
       final List<LatLng> routeCoords = await _buildRouteCoords(points);
-      if (routeCoords != null) {
+      if (routeCoords.isNotEmpty) {
         final PolylineId polylineId = PolylineId(name ?? 'MyRoute');
         setState(() {
           routeCoordsCache[points] = routeCoords;
@@ -109,7 +109,7 @@ class _MapListenerState extends State<MapListener> {
           },
           markerId: MarkerId(askedPoint.origin.toString()),
           icon: bitmapDescriptor,
-          position: askedPoint.origin));
+          position: askedPoint.origin!));
     });
   }
 
@@ -129,9 +129,9 @@ class _MapListenerState extends State<MapListener> {
           agentIds.clear();
           agentIds.addAll(agentSnapshot.docs.fold<List<String>>(<String>[],
               (List<String> acc, DocumentSnapshot document) {
-            final Agent agent = Agent.fromJson(document.data());
+            final Agent agent = Agent.fromJson(document.data())!;
             final DateTime askedStartAtTime =
-                agent.date.add(agent.askedStartAt);
+                agent.date!.add(agent.askedStartAt!);
             if (askedStartAtTime.isBefore(now)) {
               acc.add(document.id);
             }
@@ -151,10 +151,10 @@ class _MapListenerState extends State<MapListener> {
           .snapshots()
           .listen((QuerySnapshot askedPointSnapshot) {
         if (askedPointSnapshot.docs.isNotEmpty) {
-          final AskedPoint askedPoint =
+          final AskedPoint? askedPoint =
               AskedPoint.fromJson(askedPointSnapshot.docs.first.data());
-          if (askedPoint.origin != null) {
-            _addNextPlace(askedPoint);
+          if (askedPoint?.origin != null) {
+            _addNextPlace(askedPoint!);
           }
         }
       });
@@ -168,15 +168,15 @@ class _MapListenerState extends State<MapListener> {
         final DateTime now = DateTime.now();
         final List<Agent> agents = agentSnapshot.docs.fold(<Agent>[],
             (List<Agent> acc, DocumentSnapshot document) {
-          final Agent agent = Agent.fromJson(document.data());
-          final DateTime askedStartAtTime = agent.date.add(agent.askedStartAt);
+          final Agent? agent = Agent.fromJson(document.data());
+          final DateTime askedStartAtTime = agent!.date!.add(agent.askedStartAt!);
           if (askedStartAtTime.isBefore(now)) {
             if (agent.position != null) _addAgentMarker(agent);
-            final List<LatLng> points = agent.route.fold(
+            final List<LatLng>? points = agent.route?.fold(
                 <LatLng>[],
                 (List<LatLng> acc, Point curr) =>
                     acc + <LatLng>[curr.local]).toList();
-            if (!_pointsPerRouteContains(points, widget.email)) {
+            if (points != null && !_pointsPerRouteContains(points, widget.email)) {
               pointsPerRoute[widget.email] = points;
               _addPolyline(points, name: widget.email);
             }
@@ -203,14 +203,18 @@ class _MapListenerState extends State<MapListener> {
     final MarkerId id = MarkerId(widget.email);
     final Marker marker = Marker(
         markerId: id,
-        position: agent.position,
+        position: agent.position!,
         consumeTapEvents: true,
         onTap: () async {
           if (polyline.isNotEmpty) {
-            final Polyline oldestPolyline =
-                polyline.singleWhere(findPolyline, orElse: () {
-              return null;
-            });
+            final Polyline? oldestPolyline = 
+                polyline.fold<Polyline?>(null, (Polyline? acc, Polyline curr) {
+                  final bool foundIt = findPolyline(curr);
+                  if(foundIt) {
+                    return curr;
+                  }
+                  return acc;
+                });
             final Polyline oldPolyline = polyline.singleWhere(findPolyline);
             widget.setVisiblePin(agent, oldPolyline);
             setState(() {
@@ -250,7 +254,7 @@ class _MapListenerState extends State<MapListener> {
 
   bool _pointsPerRouteContains(List<LatLng> points, String email) {
     if (!pointsPerRoute.containsKey(email)) return false;
-    final List<LatLng> previousPoints = pointsPerRoute[widget.email];
+    final List<LatLng> previousPoints = pointsPerRoute[widget.email]!;
     return previousPoints.toString() == points.toString();
   }
 
@@ -266,7 +270,7 @@ class _MapListenerState extends State<MapListener> {
         polyline: polyline,
         preExecute: () {
           if (hidePin != null) {
-            hidePin();
+            hidePin!();
           }
           widget.preExecute();
         },

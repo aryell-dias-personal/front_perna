@@ -3,7 +3,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:intl/intl.dart';
 
 class MaskedTextController extends TextEditingController {
-  MaskedTextController({String text, this.mask, Map<String, RegExp> translator})
+  MaskedTextController({String? text, required this.mask, Map<String, RegExp>? translator})
       : super(text: text) {
     this.translator = translator ?? MaskedTextController.getDefaultTranslator();
 
@@ -22,14 +22,14 @@ class MaskedTextController extends TextEditingController {
 
   String mask;
 
-  Map<String, RegExp> translator;
+  late Map<String, RegExp> translator;
 
   void afterChange(String previous, String next) {}
   bool beforeChange(String previous, String next) => true;
 
   String _lastUpdatedText = '';
 
-  void updateText(String text) {
+  void updateText(String? text) {
     if (text != null) {
       this.text = _applyMask(mask, text);
     } else {
@@ -51,7 +51,7 @@ class MaskedTextController extends TextEditingController {
   void moveCursorToEnd() {
     final String text = _lastUpdatedText;
     selection =
-        TextSelection.fromPosition(TextPosition(offset: (text ?? '').length));
+        TextSelection.fromPosition(TextPosition(offset: text.length));
   }
 
   @override
@@ -97,7 +97,7 @@ class MaskedTextController extends TextEditingController {
       }
 
       if (translator.containsKey(maskChar)) {
-        if (translator[maskChar].hasMatch(valueChar)) {
+        if (translator[maskChar]!.hasMatch(valueChar)) {
           resultBuffer.write(valueChar);
           maskCharIndex += 1;
         }
@@ -164,16 +164,24 @@ Widget getCardTypeIcon(
     );
     isAmexCallback(false, '');
   } else {
-    icon = Image.asset(cardTypeIconAsset[cardType], height: 48, width: 48);
+    final String? iconUrl = cardTypeIconAsset[cardType];
+    if (iconUrl == null) {
+      return const SizedBox(
+        height: 48,
+        width: 48,
+      );
+    }
+    icon = Image.asset(iconUrl, height: 48, width: 48);
     isAmexCallback(
-        cardType == CardType.americanExpress, cardTypeToBrand[cardType]);
+        cardType == CardType.americanExpress, cardTypeToBrand[cardType]!);
   }
   return icon;
 }
 
 String formatAmount(int amount, String currency, Locale locale) {
+  final String countryCode = locale.countryCode ?? defaultCountryCode;
   final String localeName =
-      '${locale.languageCode}_${locale.countryCode.toUpperCase()}';
+      '${locale.languageCode}_${countryCode.toUpperCase()}';
   final NumberFormat format = NumberFormat.simpleCurrency(locale: localeName);
   return format.format(amount / 100);
 }

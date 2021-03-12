@@ -50,7 +50,7 @@ class DirectionsService {
   }
 
   int getComponent(String encoded, int initialIndex,
-      {void Function(int) callback}) {
+      {void Function(int)? callback}) {
     int b, shift = 0, result = 0;
     int index = initialIndex;
     do {

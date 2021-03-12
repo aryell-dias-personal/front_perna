@@ -8,12 +8,11 @@ import 'package:perna/widgets/side_menu/side_menu.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({
-    Key key,
-    @required this.photoUrl,
-    @required this.name,
-    @required this.email,
-    @required this.logout,
-  }) : super(key: key);
+    required this.photoUrl,
+    required this.name,
+    required this.email,
+    required this.logout,
+  });
 
   final String name;
   final String email;
@@ -28,10 +27,10 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget>
     with SingleTickerProviderStateMixin {
-  Agent visiblePin;
+  Agent? visiblePin;
   bool isSideMenuOpen = false;
   bool isPinVisible = false;
-  AnimationController controller;
+  late AnimationController controller;
 
   @override
   void initState() {

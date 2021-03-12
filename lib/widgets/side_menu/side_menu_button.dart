@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 
 class SideMenuButton extends StatelessWidget {
   const SideMenuButton(
-      {@required this.text,
-      @required this.onPressed,
-      @required this.icon,
-      @required this.textColor});
+      {required this.text,
+      required this.onPressed,
+      required this.icon,
+      this.textColor});
 
   final Function() onPressed;
   final String text;
   final IconData icon;
-  final Color textColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {

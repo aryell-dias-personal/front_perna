@@ -4,12 +4,12 @@ import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/models/asked_point.dart';
 
 class UserService {
-  UserService({this.myDecoder});
+  UserService({required this.myDecoder});
 
   MyDecoder myDecoder;
   String baseUrl = FlavorConfig.instance.variables['baseUrl'] as String;
 
-  Future<AskedPoint> simulateAskedPoint(
+  Future<AskedPoint?> simulateAskedPoint(
       AskedPoint askedPoint, String token) async {
     final Response res = await post(Uri.parse('${baseUrl}simulateAskedPoint'),
         body: await myDecoder.encode(askedPoint.toJson()),

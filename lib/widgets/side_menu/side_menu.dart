@@ -11,13 +11,13 @@ import 'package:perna/widgets/text/visible_rich_text.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu(
-      {this.email, this.name, this.photoUrl, this.logout, this.textColor});
+      {required this.email, required this.name, required this.photoUrl, required this.logout, this.textColor});
 
   final String email;
   final String name;
   final String photoUrl;
   final Function() logout;
-  final Color textColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +29,6 @@ class SideMenu extends StatelessWidget {
           radius: 50,
           backgroundColor: textColor,
           backgroundImage: NetworkImage(photoUrl),
-          child: photoUrl == null || photoUrl == ''
-              ? const Icon(Icons.person, size: 90)
-              : null,
         ),
         const SizedBox(height: 10),
         VisibleRichText(fontSize: 22, text: _getName(), textColor: textColor),

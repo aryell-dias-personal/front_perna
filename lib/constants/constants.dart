@@ -58,3 +58,7 @@ Map<CardType, Set<List<String>>> cardNumPatterns =
 
 enum MenuOption { logout, clear }
 enum MarkerType { origin, destiny }
+
+String defaultLanguageCode = 'en';
+String defaultCountryCode = 'US';
+String defaultCurrencyName = 'US';

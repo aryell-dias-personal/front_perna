@@ -1,12 +1,12 @@
 class CreditCard {
   CreditCard(
-      {this.id,
-      this.cardNumber,
-      this.expiryDate,
-      this.cardHolderName,
-      this.cvvCode,
-      this.brand,
-      this.isCvvFocused});
+      {this.id = '',
+      this.cardNumber = '',
+      this.expiryDate = '',
+      this.cardHolderName = '',
+      this.cvvCode = '',
+      this.brand = '',
+      this.isCvvFocused = false});
 
   factory CreditCard.fromJson(Map<String, dynamic> parsedJson) {
     return CreditCard(
@@ -18,11 +18,11 @@ class CreditCard {
         brand: parsedJson['brand'] as String);
   }
 
-  String id = '';
-  String cardNumber = '';
-  String expiryDate = '';
-  String cardHolderName = '';
-  String cvvCode = '';
-  String brand = '';
-  bool isCvvFocused = false;
+  String id;
+  String cardNumber;
+  String expiryDate;
+  String cardHolderName;
+  String cvvCode;
+  String brand;
+  bool isCvvFocused;
 }

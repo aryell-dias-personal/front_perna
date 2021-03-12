@@ -13,11 +13,11 @@ class SignInResponse {
         error: parsedJson['error'] as String);
   }
 
-  String message;
-  User user;
-  String error;
+  String? message;
+  User? user;
+  String? error;
 
-  SignInResponse copyWith({String message, User user, String error}) =>
+  SignInResponse copyWith({String? message, User? user, String? error}) =>
       SignInResponse(
           message: message ?? this.message,
           user: user ?? this.user,
@@ -25,7 +25,7 @@ class SignInResponse {
 
   dynamic toJson() => <String, dynamic>{
         'message': message,
-        'user': user.toJson(),
+        'user': user?.toJson(),
         'error': error
       };
 }

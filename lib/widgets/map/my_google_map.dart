@@ -13,15 +13,15 @@ import 'package:perna/models/agent.dart';
 
 class MyGoogleMap extends StatefulWidget {
   const MyGoogleMap(
-      {@required this.email,
-      @required this.preExecute,
-      @required this.putMarker,
-      @required this.points,
-      @required this.markers,
-      @required this.polyline,
-      @required this.nextPlaces,
-      @required this.watchedMarkers,
-      @required this.agentIds});
+      {required this.email,
+      required this.preExecute,
+      required this.putMarker,
+      required this.points,
+      required this.markers,
+      required this.polyline,
+      required this.nextPlaces,
+      required this.watchedMarkers,
+      required this.agentIds});
 
   final String email;
   final Function preExecute;
@@ -38,11 +38,11 @@ class MyGoogleMap extends StatefulWidget {
 }
 
 class _MyGoogleMapState extends State<MyGoogleMap> {
-  Marker lastMarker;
-  GoogleMapController mapsController;
-  StreamSubscription<LocationData> locationStream;
-  LatLng previousLatLng;
-  LocationData currentLocation;
+  late GoogleMapController? mapsController;
+  late StreamSubscription<LocationData> locationStream;
+  late LocationData currentLocation;
+  Marker? lastMarker;
+  LatLng? previousLatLng;
 
   @override
   void dispose() {
@@ -85,7 +85,10 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         });
       });
       final LocationData locationData = await location.getLocation();
-      _centralize(LatLng(locationData.latitude, locationData.longitude));
+      if (locationData.latitude != null &&
+            locationData.longitude != null){
+        _centralize(LatLng(locationData.latitude!, locationData.longitude!));
+      }
     }
   }
 
@@ -99,10 +102,13 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
   }
 
   Future<void> _updateLocation(LocationData locationData) async {
+    if (locationData.latitude == null || locationData.longitude == null) {
+      return;
+    }
     final LatLng currLatLng =
-        LatLng(locationData.latitude, locationData.longitude);
+        LatLng(locationData.latitude!, locationData.longitude!);
     if (previousLatLng == null ||
-        _calculateDistance(previousLatLng, currLatLng) > 1000) {
+        _calculateDistance(previousLatLng!, currLatLng) > 1000) {
       setState(() {
         previousLatLng = currLatLng;
       });
@@ -110,11 +116,13 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         final DocumentReference ref =
             getIt<FirebaseFirestore>().collection('agent').doc(documentID);
         final DocumentSnapshot documentSnapshot = await ref.get();
-        final Agent oldAgent = Agent.fromJson(documentSnapshot.data());
-        final DateTime askedEndAtTime = oldAgent.date.add(oldAgent.askedEndAt);
-        final bool endHasPassed = DateTime.now().isAfter(askedEndAtTime);
+        final Agent? oldAgent = Agent.fromJson(documentSnapshot.data());
+        final DateTime? askedEndAtTime =
+            oldAgent?.date!.add(oldAgent.askedEndAt!);
+        final bool endHasPassed =
+            askedEndAtTime != null && DateTime.now().isAfter(askedEndAtTime);
         if (oldAgent?.queue?.isEmpty == null ||
-            oldAgent.queue.isEmpty ||
+            oldAgent!.queue!.isEmpty ||
             !endHasPassed) {
           await ref.update(<String, dynamic>{
             'position': '${locationData.latitude}, ${locationData.longitude}',
@@ -122,11 +130,12 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
           });
         } else {
           final Agent newAgent = oldAgent.copyWith(
-              queue: oldAgent.queue.sublist(1),
-              history: <DateTime>[oldAgent.date] +
+              queue: oldAgent.queue!.sublist(1),
+              history: <DateTime>[oldAgent.date!] +
                   (oldAgent.history ?? <DateTime>[]),
-              date: oldAgent.queue.first,
-              position: LatLng(locationData.latitude, locationData.longitude));
+              date: oldAgent.queue!.first,
+              position:
+                  LatLng(locationData.latitude!, locationData.longitude!));
           await ref.update(newAgent.toJson() as Map<String, dynamic>);
         }
       }
@@ -148,10 +157,12 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
   }
 
   Future<void> _centralize(LatLng latLng) async {
-    mapsController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: latLng,
-      zoom: 20,
-    )));
+    if(mapsController != null) {
+      mapsController!.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: latLng,
+        zoom: 20,
+      )));
+    }
   }
 
   Future<void> _refreshMap() async {
@@ -159,17 +170,18 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     bool findFunction(Polyline polyline) => polyline.polylineId == polylineId;
     if (mapsController != null) {
       final Brightness brightness =
-          WidgetsBinding.instance.window.platformBrightness;
+          WidgetsBinding.instance?.window.platformBrightness ??
+              Brightness.light;
       if (brightness == Brightness.dark) {
-        await mapsController.setMapStyle(darkStyle);
+        await mapsController!.setMapStyle(darkStyle);
       } else {
-        await mapsController.setMapStyle('[]');
+        await mapsController!.setMapStyle('[]');
       }
     }
     if (widget.polyline.isNotEmpty) {
       final List<Polyline> oldPolylines =
           widget.polyline.where(findFunction).toList();
-      final Polyline oldPolyline =
+      final Polyline? oldPolyline =
           oldPolylines.isEmpty ? null : oldPolylines.first;
       if (oldPolyline != null &&
           oldPolyline.color != Theme.of(context).primaryColor) {
@@ -191,8 +203,13 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
       _centralize(widget.markers.last.position);
     }
     return GoogleMap(
-      onTap: (_) => _centralize(
-          LatLng(currentLocation.latitude, currentLocation.longitude)),
+      onTap: (_) {
+        if (currentLocation.latitude != null &&
+            currentLocation.longitude != null){
+          _centralize(
+              LatLng(currentLocation.latitude!, currentLocation.longitude!));
+            }
+      },
       onLongPress: onLongPress,
       onCameraMove: (CameraPosition location) {
         widget.preExecute();

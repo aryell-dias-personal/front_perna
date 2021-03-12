@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
 
 class ActionButtons extends StatelessWidget {
-  const ActionButtons({Key key, this.accept, this.deny}) : super(key: key);
+  const ActionButtons({required this.accept, required this.deny});
 
   final Function() accept;
   final Function() deny;

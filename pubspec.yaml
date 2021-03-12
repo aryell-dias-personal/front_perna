@@ -1,15 +1,15 @@
 name: perna
 description: A new Flutter project.
 
-version: 2.0.1
+version: 2.0.2
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   android_intent: ^2.0.0
   app_settings: ^4.1.0
-  avatar_glow: ^1.2.0
+  avatar_glow: ^2.0.0
   cloud_firestore: ^1.0.0
   connectivity: ^3.0.2
   cupertino_icons: ^0.1.2
