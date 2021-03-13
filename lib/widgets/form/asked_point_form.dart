@@ -97,10 +97,12 @@ class _AskedPointFormState extends State<AskedPointForm> {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
       setState(() {
-        askedStartAt = nextStartAt;
         askedEndAt = nextAskedEndAt;
       });
     }
+    setState(() {
+      askedStartAt = nextStartAt;
+    });
   }
 
   @override

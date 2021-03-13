@@ -10,7 +10,7 @@ class SignInResponse {
         message: parsedJson['message'] as String,
         user: User.fromJson(decoder.convert(parsedJson['user'] as String)
             as Map<String, dynamic>),
-        error: parsedJson['error'] as String);
+        error: parsedJson['error'] != null ? parsedJson['error'] as String : null);
   }
 
   String? message;

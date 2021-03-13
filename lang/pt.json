@@ -138,5 +138,6 @@
     "successfully_delete_card": "Cartão deletado com sucesso",
     "unsuccessfully_delete_card": "Não foi possível deletar o cartão",
     "continue": "Continuar",
-    "edit_credit_card": "Editar"
+    "edit_credit_card": "Editar",
+    "provider": "Empresa"
 }

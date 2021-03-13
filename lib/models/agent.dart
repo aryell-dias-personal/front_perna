@@ -5,25 +5,25 @@ import 'package:perna/helpers/decoder.dart';
 import 'package:perna/models/point.dart';
 
 class Agent {
-  Agent(
-      {this.garage,
-      this.date,
-      this.friendlyGarage,
-      this.email,
-      this.askedEndAt,
-      this.askedStartAt,
-      this.region,
-      this.staticMap,
-      this.position,
-      this.places,
-      this.route,
-      this.queue,
-      this.history,
-      this.fromEmail,
-      this.askedPointIds,
-      this.old = false,
-      this.watchedBy = const <String>[],
-      });
+  Agent({
+    this.garage,
+    this.date,
+    this.friendlyGarage,
+    this.email,
+    this.askedEndAt,
+    this.askedStartAt,
+    this.region,
+    this.staticMap,
+    this.position,
+    this.places,
+    this.route,
+    this.queue,
+    this.history,
+    this.fromEmail,
+    this.askedPointIds,
+    this.old = false,
+    this.watchedBy = const <String>[],
+  });
 
   static Agent? fromJson(Map<String, dynamic>? parsedJson) {
     DateTime? parseDate(dynamic? value) {
@@ -55,25 +55,27 @@ class Agent {
         route: parsedJson['route']
             ?.map<Point>((dynamic point) =>
                 Point.fromJson(point as Map<String, dynamic>))
-            ?.toList() as List<Point>,
+            ?.toList() as List<Point>?,
         date: parseDate(parsedJson['date']),
         askedStartAt: parseDuration(parsedJson['askedStartAt']),
         askedEndAt: parseDuration(parsedJson['askedEndAt']),
-        queue: parsedJson['queue']?.map<DateTime>(parseDate)?.toList()
-            as List<DateTime>,
-        history: parsedJson['history']?.map<DateTime>(parseDate)?.toList()
-            as List<DateTime>,
+        queue: parsedJson['queue']
+            ?.map<DateTime>((dynamic date) => parseDate(date)!)
+            ?.toList() as List<DateTime>?,
+        history: parsedJson['history']
+            ?.map<DateTime>((dynamic date) => parseDate(date)!)
+            ?.toList() as List<DateTime>?,
         email: parsedJson['email'] as String,
-        fromEmail: parsedJson['fromEmail'] as String,
+        fromEmail: parsedJson['fromEmail'] != null
+            ? parsedJson['fromEmail'] as String
+            : null,
         watchedBy: parsedJson['watchedBy']
             ?.map<String>((dynamic email) => '$email')
             ?.toList() as List<String>,
         region: parsedJson['region']
             ?.map<String>((dynamic region) => '$region')
             ?.toList() as List<String>,
-        askedPointIds: parsedJson['askedPointIds']
-            ?.map<String>((dynamic id) => '$id')
-            ?.toList() as List<String>,
+        askedPointIds: parsedJson['askedPointIds']?.map<String>((dynamic id) => '$id')?.toList() as List<String>?,
         staticMap: decode64(parsedJson['staticMap']));
   }
 

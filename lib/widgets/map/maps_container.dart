@@ -3,7 +3,7 @@ import 'package:android_intent/android_intent.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:flutter_geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
@@ -41,8 +41,8 @@ class MapsContainer extends StatefulWidget {
 class _MapsContainerState extends State<MapsContainer> {
   Set<Marker> markers = <Marker>{};
   bool isPinVisible = false;
-  late BitmapDescriptor originPin;
-  late BitmapDescriptor destinyPin;
+  BitmapDescriptor? originPin;
+  BitmapDescriptor? destinyPin;
   List<LatLng> points = <LatLng>[];
   late StreamSubscription<QuerySnapshot> agentsListener;
 
@@ -134,7 +134,7 @@ class _MapsContainerState extends State<MapsContainer> {
     final MarkerId markerId = MarkerId(position.toString());
     final Marker marker = Marker(
         markerId: markerId,
-        icon: type == MarkerType.origin ? originPin : destinyPin,
+        icon: type == MarkerType.origin ? originPin! : destinyPin!,
         infoWindow: InfoWindow(title: title, snippet: '$description</>$region'),
         consumeTapEvents: true,
         onTap: () => _onTapMarker(markerId, position),
@@ -191,16 +191,23 @@ class _MapsContainerState extends State<MapsContainer> {
                     widget.setVisiblePin(agent, oldPolyline);
                   }),
               SearchLocation(
-                  preExecute: widget.preExecute,
-                  markers: markers,
-                  onStartPlaceSelected: (Coordinates location,
-                          String description, String region) =>
-                      putMarker(LatLng(location.latitude, location.longitude),
-                          description, MarkerType.origin, region),
-                  onEndPlaceSelected: (Coordinates location, String description,
-                          String region) =>
-                      putMarker(LatLng(location.latitude, location.longitude),
-                          description, MarkerType.destiny, region))
+                preExecute: widget.preExecute,
+                markers: markers,
+                onStartPlaceSelected:
+                    (Coordinates location, String description, String region) {
+                  if (location.latitude != null && location.longitude != null) {
+                    putMarker(LatLng(location.latitude!, location.longitude!),
+                        description, MarkerType.origin, region);
+                  }
+                },
+                onEndPlaceSelected:
+                    (Coordinates location, String description, String region) {
+                  if (location.latitude != null && location.longitude != null) {
+                    putMarker(LatLng(location.latitude!, location.longitude!),
+                        description, MarkerType.destiny, region);
+                  }
+                },
+              )
             ] +
             (points.isEmpty
                 ? <Widget>[]

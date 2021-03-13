@@ -40,7 +40,10 @@ Future<void> main() async {
     serializer: JsonSerializer<StoreState>(StoreState.fromJson),
   );
 
-  final StoreState initialState = await persistor.load();
+  final StoreState initialState = await persistor.load() ??
+      StoreState(
+        logedIn: false,
+      );
   FlavorConfig(
     name: 'DEVELOP',
     variables: <String, String>{

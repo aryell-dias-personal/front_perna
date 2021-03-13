@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:flutter_geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:perna/constants/constants.dart';
@@ -38,9 +38,9 @@ class MyGoogleMap extends StatefulWidget {
 }
 
 class _MyGoogleMapState extends State<MyGoogleMap> {
-  late GoogleMapController? mapsController;
   late StreamSubscription<LocationData> locationStream;
   late LocationData currentLocation;
+  GoogleMapController? mapsController;
   Marker? lastMarker;
   LatLng? previousLatLng;
 
@@ -57,12 +57,12 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     final List<Address> addresses =
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     final Address address = addresses.first;
-    final String description = address.addressLine;
+    final String? description = address.addressLine;
     final String region =
         '${address.subAdminArea}, ${address.adminArea}, ${address.countryName}';
     widget.putMarker(
         location,
-        description,
+        description ?? region,
         widget.markers.isEmpty ? MarkerType.origin : MarkerType.destiny,
         region);
   }

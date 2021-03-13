@@ -90,7 +90,7 @@ class _ExpedientState extends State<ExpedientPage> {
       });
       final DateTime dateTime = dateFormat.parse(date!);
       final String askedEndAtString =
-          askedEndAt!.length > 5 ? askedEndAt : '$askedEndAt! $date!';
+          askedEndAt!.length > 5 ? askedEndAt : '$askedEndAt $date';
       final DateTime askedEndAtTime = format.parse(askedEndAtString);
       final DateTime askedStartAtTime = format.parse('$askedStartAt $date');
       final Agent agent = this.agent.copyWith(

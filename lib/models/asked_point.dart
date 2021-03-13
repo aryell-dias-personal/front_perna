@@ -4,25 +4,25 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 
 class AskedPoint {
-  AskedPoint(
-      {this.date,
-      this.email,
-      this.origin,
-      this.destiny,
-      this.friendlyOrigin,
-      this.friendlyDestiny,
-      this.staticMap,
-      this.currency,
-      this.amount,
-      this.agentId,
-      this.queue,
-      this.history,
-      this.askedStartAt,
-      this.askedEndAt,
-      this.actualStartAt,
-      this.actualEndAt,
-      this.region,
-      });
+  AskedPoint({
+    this.date,
+    this.email,
+    this.origin,
+    this.destiny,
+    this.friendlyOrigin,
+    this.friendlyDestiny,
+    this.staticMap,
+    this.currency,
+    this.amount,
+    this.agentId,
+    this.queue,
+    this.history,
+    this.askedStartAt,
+    this.askedEndAt,
+    this.actualStartAt,
+    this.actualEndAt,
+    this.region,
+  });
 
   static AskedPoint? fromJson(Map<String, dynamic>? parsedJson) {
     DateTime? parseDate(dynamic? value) {
@@ -56,16 +56,20 @@ class AskedPoint {
         date: parseDate(parsedJson['date']),
         askedStartAt: parseDuration(parsedJson['askedStartAt']),
         askedEndAt: parseDuration(parsedJson['askedEndAt']),
-        queue: parsedJson['queue']?.map<DateTime>(parseDate)?.toList()
-            as List<DateTime>,
-        history: parsedJson['history']?.map<DateTime>(parseDate)?.toList()
-            as List<DateTime>,
+        queue: parsedJson['queue']
+            ?.map<DateTime>((dynamic date) => parseDate(date)!)
+            ?.toList() as List<DateTime>?,
+        history: parsedJson['history']
+            ?.map<DateTime>((dynamic date) => parseDate(date)!)
+            ?.toList() as List<DateTime>?,
         actualStartAt: parseDate(parsedJson['actualStartAt']),
         actualEndAt: parseDate(parsedJson['actualEndAt']),
         region: parsedJson['region']
             ?.map<String>((dynamic region) => '$region')
             ?.toList() as List<String>,
-        agentId: parsedJson['agentId'] as String,
+        agentId: parsedJson['agentId'] != null
+            ? parsedJson['agentId'] as String
+            : null,
         staticMap: decode64(parsedJson['staticMap']));
   }
 

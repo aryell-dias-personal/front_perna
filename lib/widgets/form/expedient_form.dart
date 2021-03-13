@@ -103,10 +103,12 @@ class _ExpedientFormState extends State<ExpedientForm> {
         nextAskedEndAt = nextAskedEndAt.split(' ')[0];
       }
       setState(() {
-        askedStartAt = nextStartAt;
         askedEndAt = nextAskedEndAt;
       });
     }
+    setState(() {
+      askedStartAt = nextStartAt;
+    });
   }
 
   @override

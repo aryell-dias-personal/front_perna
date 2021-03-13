@@ -60,7 +60,7 @@ class SideMenu extends StatelessWidget {
         ),
         SideMenuButton(
           textColor: textColor,
-          text: 'Empresa',
+          text: AppLocalizations.of(context).translate('provider'),
           onPressed: () {
             showSnackBar(
                 AppLocalizations.of(context).translate('not_implemented'),

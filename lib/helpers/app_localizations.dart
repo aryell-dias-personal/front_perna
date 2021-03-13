@@ -6,8 +6,11 @@ import 'package:perna/constants/constants.dart';
 
 class AppLocalizations {
   AppLocalizations(this.locale);
-  AppLocalizations.of(BuildContext context) {
-    locale = Localizations.localeOf(context);
+
+  // ignore: prefer_constructors_over_static_methods
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations) ??
+        AppLocalizations(const Locale('es', 'US'));
   }
 
   late Locale locale;
