@@ -3,6 +3,8 @@
 [![style: lint](https://img.shields.io/badge/style-lint-4BC0F5.svg)](https://pub.dev/packages/lint)
 ## Antes de rodar
 
+- Não esqueça de baixar o `google-services.json`
+
 - Garanta que o Firestore esteja ativo
 
 - Garanta que o Authentication esteja ativo
@@ -15,7 +17,8 @@
 
 - colocar key de `Chave de API da Web` em `apiKey` do FlavorConfig
 
-- colocar key de `Chave de API da Web` em `app/src/main/AndroidManifest.xml`
+- colocar key de `Chave de API da Web` em `local.properties` com nome `API_KEY`
+> Nota: leia mais em https://entwicklernotizen.de/blog/how-to-handle-secret-api-keys-in-flutter-for-android-and-i-os/
 
 > Nota: se você já tiver rodado e quiser trocar as credenciais lembre de rodar um `flutter clean` primeiro
 ## Gerencia de ambientes
@@ -32,7 +35,7 @@ FlavorConfig(
         'appName': 'perna-app',
         'projectID': 'perna-app',
         'gcmSenderID': '172739913177',
-        'baseUrl': 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-',
+        'baseUrl': 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-server',
         'apiKey': 'AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA',
         'googleAppID': '1:172739913177:android:38f4c6eb4f67cb674b25c8',
         'merchantId': 'Test',
@@ -82,3 +85,6 @@ ao invés de
 ```List<String> myList = new ArrayList<String>();```
 
 no Java.
+
+- Pode ser importante no futuro para fazer a bolha flutuante:
+> https://github.com/KohlsAdrian/bubble_overlay

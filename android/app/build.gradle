@@ -1,9 +1,23 @@
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
+    project.logger.info('Load local properties from local file')
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
+} else {
+    project.logger.info('Load local properties from environment')
+    try {
+        localProperties['API_KEY'] = System.getenv('API_KEY')
+    } catch(NullPointerException e) {
+        project.logger.warn('Failed to load API_KEY from environment.', e)
+    }
+}
+
+def apiKey = localProperties.getProperty('API_KEY')
+if(apiKey == null){
+    apiKey = ""
+    project.logger.error('Api Key not configured. Set it in `local.properties` or in the environment variable `API_KEY`')
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
@@ -45,12 +59,13 @@ android {
 
     defaultConfig {
         applicationId "com.bluehands.perna"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 29
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [API_KEY: apiKey]
     }
 
     signingConfigs {

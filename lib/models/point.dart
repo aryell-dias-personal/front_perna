@@ -2,19 +2,21 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:perna/helpers/decoder.dart';
 
 class Point {
-  LatLng local;
-  DateTime time;
   Point({this.local, this.time});
 
-  factory Point.fromJson(Map<String, dynamic> parsedJson){
+  factory Point.fromJson(Map<String, dynamic> parsedJson) {
+    final dynamic time = parsedJson['time'];
+    final int timeInt = time is int ? time : (time as double).round();
     return Point(
-      local: decodeLatLng(parsedJson["local"]),
-      time: DateTime.fromMillisecondsSinceEpoch(parsedJson["time"].round()*1000)
-    );
+        local: decodeLatLng(parsedJson['local'] as String),
+        time: DateTime.fromMillisecondsSinceEpoch(timeInt * 1000));
   }
 
-  dynamic toJson() => {
-    "email": local.toString(),
-    "time": time.millisecondsSinceEpoch/1000
-  };
+  LatLng local;
+  DateTime time;
+
+  dynamic toJson() => <String, dynamic>{
+        'local': '${local.latitude}, ${local.longitude}',
+        'time': time.millisecondsSinceEpoch / 1000
+      };
 }
