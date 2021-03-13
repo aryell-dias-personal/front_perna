@@ -10,7 +10,7 @@ class DriverService {
   String baseUrl = FlavorConfig.instance.variables['baseUrl'] as String;
 
   Future<int> postNewAgent(Agent agent, String token) async {
-    final Response res = await post(Uri.parse('${baseUrl}insertAgent'),
+    final Response res = await post(Uri.parse('$baseUrl/insertAgent'),
         body: await myDecoder.encode(agent.toJson()),
         headers: <String, String>{'Authorization': token});
     return res.statusCode;
@@ -24,12 +24,12 @@ class DriverService {
       'accepted': accepted
     });
     final Response res =
-        await post(Uri.parse('${baseUrl}answerNewAgent'), body: body);
+        await post(Uri.parse('$baseUrl/answerNewAgent'), body: body);
     return res.statusCode;
   }
 
   Future<int> askNewAgent(Agent agent) async {
-    final Response res = await post(Uri.parse('${baseUrl}askNewAgent'),
+    final Response res = await post(Uri.parse('$baseUrl/askNewAgent'),
         body: await myDecoder.encode(agent.toJson()));
     return res.statusCode;
   }

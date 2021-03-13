@@ -71,7 +71,7 @@ class SignInService {
           messagingToken != null ? <String>[messagingToken] : <String>[]
     });
     final Response res =
-        await post(Uri.parse('${baseUrl}insertUser'), body: body);
+        await post(Uri.parse('$baseUrl/insertUser'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
     return res.statusCode == 200
         ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)
@@ -84,7 +84,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    final Response res = await post(Uri.parse('${baseUrl}getUser'), body: body);
+    final Response res = await post(Uri.parse('$baseUrl/getUser'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
     return res.statusCode == 200
         ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)
@@ -97,7 +97,7 @@ class SignInService {
       'email': user?.email,
       'messagingToken': messagingToken
     });
-    final Response res = await post(Uri.parse('${baseUrl}logout'), body: body);
+    final Response res = await post(Uri.parse('$baseUrl/logout'), body: body);
     final dynamic jsonResBody = await myDecoder.decode(res.body);
     return res.statusCode == 200
         ? SignInResponse.fromJson(jsonResBody as Map<String, dynamic>)

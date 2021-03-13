@@ -35,7 +35,7 @@ FlavorConfig(
         'appName': 'perna-app',
         'projectID': 'perna-app',
         'gcmSenderID': '172739913177',
-        'baseUrl': 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-',
+        'baseUrl': 'https://us-east1-perna-app.cloudfunctions.net/perna-app-dev-server',
         'apiKey': 'AIzaSyCI3N12gg2CfJWVAyJ6BwFB8KnWIWhETfA',
         'googleAppID': '1:172739913177:android:38f4c6eb4f67cb674b25c8',
         'merchantId': 'Test',

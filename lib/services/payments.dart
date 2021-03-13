@@ -19,7 +19,7 @@ class PaymentsService {
   String baseUrl = FlavorConfig.instance.variables['baseUrl'] as String;
 
   Future<List<model.CreditCard>> listCard(String token) async {
-    final Response res = await post(Uri.parse('${baseUrl}listCreditCard'),
+    final Response res = await post(Uri.parse('$baseUrl/listCreditCard'),
         body: await myDecoder.encode(<String, dynamic>{}),
         headers: <String, String>{'Authorization': token});
     if (res.statusCode == 200) {
@@ -36,7 +36,7 @@ class PaymentsService {
       AskedPoint askedPoint, String token) async {
     final dynamic body = await myDecoder.encode(askedPoint.toJson());
     final Response res = await post(
-        Uri.parse('${baseUrl}confirmAskedPointPayment'),
+        Uri.parse('$baseUrl/confirmAskedPointPayment'),
         body: body,
         headers: <String, String>{'Authorization': token});
     if (res.statusCode == 200) {
@@ -51,7 +51,7 @@ class PaymentsService {
   Future<int> deleteCard(String creditCardId, String token) async {
     final dynamic body =
         await myDecoder.encode(<String, String>{'creditCardId': creditCardId});
-    final Response res = await post(Uri.parse('${baseUrl}deleteCreditCard'),
+    final Response res = await post(Uri.parse('$baseUrl/deleteCreditCard'),
         body: body, headers: <String, String>{'Authorization': token});
     if (res.statusCode == 200) {
       final dynamic response = await myDecoder.decode(res.body);
@@ -66,7 +66,7 @@ class PaymentsService {
     final dynamic body =
         await myDecoder.encode(<String, String>{'creditCardId': creditCardId});
     final Response res = await post(
-        Uri.parse('${baseUrl}turnDefaultCreditCard'),
+        Uri.parse('$baseUrl/turnDefaultCreditCard'),
         body: body,
         headers: <String, String>{'Authorization': token});
     return res.statusCode;
@@ -87,7 +87,7 @@ class PaymentsService {
               expMonth: expMonth,
               last4: cardNumber.substring(12),
               brand: creditCard.brand));
-      final Response res = await post(Uri.parse('${baseUrl}insertCreditCard'),
+      final Response res = await post(Uri.parse('$baseUrl/insertCreditCard'),
           body: await myDecoder
               .encode(<String, String>{'source': tokenWithCard.tokenId}),
           headers: <String, String>{'Authorization': token});

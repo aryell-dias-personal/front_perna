@@ -11,7 +11,7 @@ class UserService {
 
   Future<AskedPoint> simulateAskedPoint(
       AskedPoint askedPoint, String token) async {
-    final Response res = await post(Uri.parse('${baseUrl}simulateAskedPoint'),
+    final Response res = await post(Uri.parse('$baseUrl/simulateAskedPoint'),
         body: await myDecoder.encode(askedPoint.toJson()),
         headers: <String, String>{'Authorization': token});
     if (res.statusCode == 200) {

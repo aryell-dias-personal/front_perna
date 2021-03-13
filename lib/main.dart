@@ -51,7 +51,7 @@ Future<void> main() async {
       'projectID': 'aryell-test',
       'gcmSenderID': '376560728219',
       'baseUrl':
-          'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-',
+          'https://us-east1-aryell-test.cloudfunctions.net/perna-app-dev-server',
       'googleAppID': '1:376560728219:android:82633609a640175003ee3e',
       'merchantId': 'Test',
       'androidPayMode': 'test'
