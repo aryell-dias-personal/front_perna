@@ -65,10 +65,8 @@ class PaymentsService {
   Future<int> turnCardDefault(String creditCardId, String token) async {
     final dynamic body =
         await myDecoder.encode(<String, String>{'creditCardId': creditCardId});
-    final Response res = await post(
-        Uri.parse('$baseUrl/turnDefaultCreditCard'),
-        body: body,
-        headers: <String, String>{'Authorization': token});
+    final Response res = await post(Uri.parse('$baseUrl/turnDefaultCreditCard'),
+        body: body, headers: <String, String>{'Authorization': token});
     return res.statusCode;
   }
 
