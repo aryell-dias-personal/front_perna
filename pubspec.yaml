@@ -21,6 +21,7 @@ dependencies:
   datetime_picker_formfield: ^2.0.0
   firebase_auth: ^1.0.0
   firebase_core: ^1.0.0
+  # NOTE: firebase_messaging ta com uma issue com in-app messages https://github.com/FirebaseExtended/flutterfire/issues/5331
   firebase_messaging: ^9.0.0  
   flutter:
     sdk: flutter
@@ -64,7 +65,7 @@ dependencies:
   # TODO: Em https://github.com/kevmeyer/redux_persist.git, verificar se mergiou
   redux_persist:
     git:
-      url: https://github.com/Aryelld/redux_persist.git
+      url: https://github.com/kevmeyer/redux_persist.git
       path: packages/redux_persist
       ref: km_null_safety
   # TODO: Em https://github.com/kevmeyer/redux_persist.git, verificar se mergiou
