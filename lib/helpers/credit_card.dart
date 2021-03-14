@@ -3,7 +3,8 @@ import 'package:perna/constants/constants.dart';
 import 'package:intl/intl.dart';
 
 class MaskedTextController extends TextEditingController {
-  MaskedTextController({String? text, required this.mask, Map<String, RegExp>? translator})
+  MaskedTextController(
+      {String? text, required this.mask, Map<String, RegExp>? translator})
       : super(text: text) {
     this.translator = translator ?? MaskedTextController.getDefaultTranslator();
 
@@ -50,8 +51,7 @@ class MaskedTextController extends TextEditingController {
 
   void moveCursorToEnd() {
     final String text = _lastUpdatedText;
-    selection =
-        TextSelection.fromPosition(TextPosition(offset: text.length));
+    selection = TextSelection.fromPosition(TextPosition(offset: text.length));
   }
 
   @override

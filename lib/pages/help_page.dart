@@ -52,8 +52,8 @@ class HelpPage extends StatelessWidget {
         backgroundColor: Theme.of(context).backgroundColor,
         body: Builder(builder: (BuildContext context) {
           return ListView.separated(
-              itemCount: (helpItem.subItems.length) +
-                  (helpItem.content == '' ? 0 : 1),
+              itemCount:
+                  (helpItem.subItems.length) + (helpItem.content == '' ? 0 : 1),
               separatorBuilder: (BuildContext context, int index) {
                 return const Divider();
               },

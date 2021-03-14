@@ -12,7 +12,7 @@ class SearchLocation extends StatefulWidget {
   const SearchLocation(
       {required this.onStartPlaceSelected,
       required this.onEndPlaceSelected,
-      required this.preExecute, 
+      required this.preExecute,
       required this.markers});
 
   final Function() preExecute;
@@ -48,13 +48,15 @@ class _SearchLocationState extends State<SearchLocation>
         overlayBorderRadius: const BorderRadius.all(Radius.circular(15.0)),
         language: current.languageCode,
         components: <Component>[
-          Component(Component.country, current.countryCode ?? defaultCountryCode)
+          Component(
+              Component.country, current.countryCode ?? defaultCountryCode)
         ]);
     if (prediction != null) {
       final PlacesDetailsResponse placesDetailsResponse =
           await _places.getDetailsByPlaceId(prediction.placeId);
-      final Location? location = placesDetailsResponse.result.geometry?.location;
-      if(location != null) {
+      final Location? location =
+          placesDetailsResponse.result.geometry?.location;
+      if (location != null) {
         final Coordinates coordinates = Coordinates(location.lat, location.lng);
         final List<Address> addresses =
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
@@ -66,7 +68,8 @@ class _SearchLocationState extends State<SearchLocation>
               coordinates, prediction.description, region);
           initialController.text = prediction.description;
         } else {
-          widget.onEndPlaceSelected(coordinates, prediction.description, region);
+          widget.onEndPlaceSelected(
+              coordinates, prediction.description, region);
           endControler.text = prediction.description;
         }
       }

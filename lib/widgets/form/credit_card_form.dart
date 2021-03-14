@@ -223,7 +223,8 @@ class _CreditCardFormState extends State<CreditCardForm> {
                       });
                     },
                     validator: (String? value) {
-                      if (value == null || value.isEmpty ||
+                      if (value == null ||
+                          value.isEmpty ||
                           value.length != (widget.isAmex ? 4 : 3)) {
                         return AppLocalizations.of(context)
                             .translate('cvv_error');

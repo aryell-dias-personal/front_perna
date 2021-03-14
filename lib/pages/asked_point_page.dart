@@ -26,9 +26,7 @@ enum AskedPointOptions { aboutExpedient }
 
 class AskedPointPage extends StatefulWidget {
   const AskedPointPage(
-      {required this.readOnly,
-      required this.askedPoint,
-      required this.clear});
+      {required this.readOnly, required this.askedPoint, required this.clear});
 
   final bool readOnly;
   final Function() clear;
@@ -68,7 +66,10 @@ class _AskedPointPageState extends State<AskedPointPage> {
   bool isLoading = false;
 
   Future<void> _onPressed(GlobalKey<FormState> formKey,
-      {String? askedEndAt, String? askedStartAt, String? date, required String email}) async {
+      {String? askedEndAt,
+      String? askedStartAt,
+      String? date,
+      required String email}) async {
     if (formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;

@@ -30,9 +30,8 @@ class UserProfilePage extends StatelessWidget {
                             shape: const CircleBorder(),
                             color: Colors.transparent,
                             child: CircleAvatar(
-                              radius: 60,
-                              backgroundImage: NetworkImage(user.photoUrl)
-                            ))),
+                                radius: 60,
+                                backgroundImage: NetworkImage(user.photoUrl)))),
                     Builder(builder: (BuildContext context) {
                       final Color unratedColor = Colors.grey.withOpacity(0.2);
                       return RatingBar(

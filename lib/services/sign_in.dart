@@ -20,7 +20,7 @@ class SignInService {
 
   Future<String?> getRefreshToken() async {
     final User? firebaseUser = firebaseAuth.currentUser;
-    if(firebaseUser == null) return null;
+    if (firebaseUser == null) return null;
     final String token = await firebaseUser.getIdToken();
     return token;
   }

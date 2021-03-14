@@ -83,7 +83,12 @@ class _ExpedientState extends State<ExpedientPage> {
   }
 
   Future<void> _onPressed(GlobalKey<FormState> formKey,
-      {String? askedEndAt, String? askedStartAt, String? date, String? email, String? fromEmail, String? places}) async {
+      {String? askedEndAt,
+      String? askedStartAt,
+      String? date,
+      String? email,
+      String? fromEmail,
+      String? places}) async {
     if (formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
@@ -104,8 +109,9 @@ class _ExpedientState extends State<ExpedientPage> {
         _askNewAgend(agent);
       } else {
         final String? token = await getIt<SignInService>().getRefreshToken();
-        final int statusCode = token == null ? 500 :
-            await getIt<DriverService>().postNewAgent(agent, token);
+        final int statusCode = token == null
+            ? 500
+            : await getIt<DriverService>().postNewAgent(agent, token);
         if (statusCode == 200) {
           widget.clear();
           Navigator.pop(context);
@@ -143,8 +149,9 @@ class _ExpedientState extends State<ExpedientPage> {
     setState(() {
       isLoading = true;
     });
-    final String email =
-        result == ExpedientOptions.aboutDriver ? agent.email! : agent.fromEmail!;
+    final String email = result == ExpedientOptions.aboutDriver
+        ? agent.email!
+        : agent.fromEmail!;
     final QuerySnapshot querySnapshot = await getIt<FirebaseFirestore>()
         .collection('user')
         .where('email', isEqualTo: email)

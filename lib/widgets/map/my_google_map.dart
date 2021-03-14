@@ -85,8 +85,7 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
         });
       });
       final LocationData locationData = await location.getLocation();
-      if (locationData.latitude != null &&
-            locationData.longitude != null){
+      if (locationData.latitude != null && locationData.longitude != null) {
         _centralize(LatLng(locationData.latitude!, locationData.longitude!));
       }
     }
@@ -157,8 +156,9 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
   }
 
   Future<void> _centralize(LatLng latLng) async {
-    if(mapsController != null) {
-      mapsController!.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+    if (mapsController != null) {
+      mapsController!
+          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: latLng,
         zoom: 20,
       )));
@@ -205,10 +205,10 @@ class _MyGoogleMapState extends State<MyGoogleMap> {
     return GoogleMap(
       onTap: (_) {
         if (currentLocation.latitude != null &&
-            currentLocation.longitude != null){
+            currentLocation.longitude != null) {
           _centralize(
               LatLng(currentLocation.latitude!, currentLocation.longitude!));
-            }
+        }
       },
       onLongPress: onLongPress,
       onCameraMove: (CameraPosition location) {

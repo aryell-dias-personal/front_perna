@@ -35,7 +35,8 @@ class OutlinedTextFormField extends StatelessWidget {
           labelText: labelText,
           suffixIcon: Icon(icon)),
       textInputAction: textInputAction,
-      validator: (String? value) => value != null && value.isNotEmpty ? null : validatorMessage,
+      validator: (String? value) =>
+          value != null && value.isNotEmpty ? null : validatorMessage,
       onFieldSubmitted: onFieldSubmitted,
     );
   }

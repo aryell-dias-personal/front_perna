@@ -56,11 +56,11 @@ class FormTimePicker extends StatelessWidget {
             onTap: () async {
               if (!readOnly) {
                 final DateTime initialTime = minTime ?? DateTime.now();
-                final DateTime currentTime = value != '' && value != null &&
-                        selectedDay != null
-                    ? format
-                        .parse(value!.length > 5 ? value! : '$value $selectedDay')
-                    : initialTime;
+                final DateTime currentTime =
+                    value != '' && value != null && selectedDay != null
+                        ? format.parse(
+                            value!.length > 5 ? value! : '$value $selectedDay')
+                        : initialTime;
                 final DateTime selectedDate =
                     await DatePicker.showDateTimePicker(context,
                         minTime: initialTime,
@@ -96,8 +96,9 @@ class FormTimePicker extends StatelessWidget {
             keyboardType: TextInputType.datetime,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
-              labelText:
-                  initialValue == null && value == null || value == '' ? null : labelText,
+              labelText: initialValue == null && value == null || value == ''
+                  ? null
+                  : labelText,
               hintText: value == null || value == '' ? labelText : null,
               suffixIcon: Icon(icon),
             ),

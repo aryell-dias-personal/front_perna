@@ -93,9 +93,9 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   int? getDynamicIntValue(dynamic value) {
-    if(value is int) {
+    if (value is int) {
       return value;
-    } else if(value is double){
+    } else if (value is double) {
       return value.round();
     }
     return null;
@@ -245,7 +245,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                           context)
                                                       .translate('driver'),
                                                   value: operation['email']
-                                                          as String)
+                                                      as String)
                                           ],
                                         ),
                                         Row(

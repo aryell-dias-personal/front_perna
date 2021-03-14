@@ -11,7 +11,11 @@ import 'package:perna/widgets/text/visible_rich_text.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu(
-      {required this.email, required this.name, required this.photoUrl, required this.logout, this.textColor});
+      {required this.email,
+      required this.name,
+      required this.photoUrl,
+      required this.logout,
+      this.textColor});
 
   final String email;
   final String name;

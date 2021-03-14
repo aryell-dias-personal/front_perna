@@ -169,14 +169,16 @@ class _MapListenerState extends State<MapListener> {
         final List<Agent> agents = agentSnapshot.docs.fold(<Agent>[],
             (List<Agent> acc, DocumentSnapshot document) {
           final Agent? agent = Agent.fromJson(document.data());
-          final DateTime askedStartAtTime = agent!.date!.add(agent.askedStartAt!);
+          final DateTime askedStartAtTime =
+              agent!.date!.add(agent.askedStartAt!);
           if (askedStartAtTime.isBefore(now)) {
             if (agent.position != null) _addAgentMarker(agent);
             final List<LatLng>? points = agent.route?.fold(
                 <LatLng>[],
                 (List<LatLng> acc, Point curr) =>
                     acc + <LatLng>[curr.local]).toList();
-            if (points != null && !_pointsPerRouteContains(points, widget.email)) {
+            if (points != null &&
+                !_pointsPerRouteContains(points, widget.email)) {
               pointsPerRoute[widget.email] = points;
               _addPolyline(points, name: widget.email);
             }
@@ -207,14 +209,14 @@ class _MapListenerState extends State<MapListener> {
         consumeTapEvents: true,
         onTap: () async {
           if (polyline.isNotEmpty) {
-            final Polyline? oldestPolyline = 
+            final Polyline? oldestPolyline =
                 polyline.fold<Polyline?>(null, (Polyline? acc, Polyline curr) {
-                  final bool foundIt = findPolyline(curr);
-                  if(foundIt) {
-                    return curr;
-                  }
-                  return acc;
-                });
+              final bool foundIt = findPolyline(curr);
+              if (foundIt) {
+                return curr;
+              }
+              return acc;
+            });
             final Polyline oldPolyline = polyline.singleWhere(findPolyline);
             widget.setVisiblePin(agent, oldPolyline);
             setState(() {

@@ -258,13 +258,15 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                     : widget.cvvCode
                                         .replaceAll(RegExp(r'\d'), '*'),
                                 maxLines: 1,
-                                style:
-                                    Theme.of(context).textTheme.headline6!.merge(
-                                          const TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: 'halter',
-                                              fontSize: 16),
-                                        ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .merge(
+                                      const TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'halter',
+                                          fontSize: 16),
+                                    ),
                               ),
                             ),
                           ),
