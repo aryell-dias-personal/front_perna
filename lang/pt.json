@@ -139,5 +139,20 @@
     "unsuccessfully_delete_card": "Não foi possível deletar o cartão",
     "continue": "Continuar",
     "edit_credit_card": "Editar",
-    "provider": "Empresa"
+    "provider": "Empresa",
+    "business_type": "Tipo de Negócio",
+    "company_name": "Nome da Empresa",
+    "manager": "Gerente",
+    "company_number": "Número da Empresa",
+    "phone": "Telefone",
+    "address": "Endereço",
+    "structure": "Estrutura",
+    "account_holder_type": "Tipo de Titular da Conta",
+    "account_holder_name": "Nome do Titular da Conta",
+    "country": "País",
+    "currency": "Moeda",
+    "bank_code": "Código Bancário",
+    "branch_code": "Código da Agência",
+    "account_number": "Número da Conta",
+    "bank": "Banco"
 }

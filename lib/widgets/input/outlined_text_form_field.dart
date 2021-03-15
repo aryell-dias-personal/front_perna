@@ -25,7 +25,8 @@ class OutlinedTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return Flexible(
+        child: TextFormField(
       keyboardType: textInputType,
       readOnly: readOnly,
       initialValue: initialValue,
@@ -37,6 +38,6 @@ class OutlinedTextFormField extends StatelessWidget {
       textInputAction: textInputAction,
       validator: (String value) => value.isNotEmpty ? null : validatorMessage,
       onFieldSubmitted: onFieldSubmitted,
-    );
+    ));
   }
 }

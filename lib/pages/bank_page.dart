@@ -4,12 +4,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/widgets/form/bank_form.dart';
 
-class Bank extends StatefulWidget {
+class BankPage extends StatefulWidget {
   @override
-  _BankState createState() => _BankState();
+  _BankPageState createState() => _BankPageState();
 }
 
-class _BankState extends State<Bank> {
+class _BankPageState extends State<BankPage> {
   bool isLoading = false;
 
   @override
@@ -19,11 +19,11 @@ class _BankState extends State<Bank> {
           brightness: Theme.of(context).brightness,
           centerTitle: true,
           title: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            Text(AppLocalizations.of(context).translate('provider'),
+            Text(AppLocalizations.of(context).translate('bank'),
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 30.0)),
             const SizedBox(width: 5),
-            const Icon(Icons.scatter_plot, size: 30),
+            const Icon(Icons.account_balance_outlined, size: 30),
           ]),
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: IconThemeData(color: Theme.of(context).primaryColor),

@@ -139,5 +139,20 @@
     "unsuccessfully_delete_card": "Couldn't delete card",
     "continue": "Continue",
     "edit_credit_card": "Edit",
-    "provider": "Company"
+    "provider": "Company",
+    "business_type": "Business Type",
+    "company_name": "Company Name",
+    "manager": "Manager",
+    "company_number": "Company Number",
+    "phone": "Phone",
+    "address": "Address",
+    "structure": "Structure",
+    "account_holder_type": "Account Holder Type",
+    "account_holder_name": "Account Holder Name",
+    "country": "Country",
+    "currency": "Currency",
+    "bank_code": "Bank Code",
+    "branch_code": "Branch Code",
+    "account_number": "Account Number",
+    "bank": "Bank"
 }

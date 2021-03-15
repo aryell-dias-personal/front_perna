@@ -4,12 +4,16 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/widgets/form/company_form.dart';
 
-class Company extends StatefulWidget {
+class CompanyPage extends StatefulWidget {
+  const CompanyPage({this.readOnly = false});
+
+  final bool readOnly;
+
   @override
-  _CompanyState createState() => _CompanyState();
+  _CompanyPageState createState() => _CompanyPageState();
 }
 
-class _CompanyState extends State<Company> {
+class _CompanyPageState extends State<CompanyPage> {
   bool isLoading = false;
 
   @override
@@ -23,7 +27,9 @@ class _CompanyState extends State<Company> {
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 30.0)),
             const SizedBox(width: 5),
-            const Icon(Icons.scatter_plot, size: 30),
+            if (widget.readOnly) const Icon(Icons.business, size: 30),
+            if (!widget.readOnly)
+              const Icon(Icons.add_business_outlined, size: 30),
           ]),
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
@@ -43,7 +49,9 @@ class _CompanyState extends State<Company> {
                     child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                        CompanyForm(),
+                        CompanyForm(
+                          readOnly: widget.readOnly,
+                        ),
                       ]))));
   }
 }

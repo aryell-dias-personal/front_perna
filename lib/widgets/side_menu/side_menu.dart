@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/help_helper.dart';
 import 'package:perna/helpers/app_localizations.dart';
-import 'package:perna/helpers/show_snack_bar.dart';
+import 'package:perna/pages/company_list_page.dart';
 import 'package:perna/pages/help_page.dart';
 import 'package:perna/pages/history_page.dart';
 import 'package:perna/pages/wallet_page.dart';
@@ -65,10 +65,11 @@ class SideMenu extends StatelessWidget {
           textColor: textColor,
           text: AppLocalizations.of(context).translate('provider'),
           onPressed: () {
-            showSnackBar(
-                AppLocalizations.of(context).translate('not_implemented'),
-                Colors.pinkAccent,
-                context);
+            Navigator.push(
+                context,
+                MaterialPageRoute<CompanyListPage>(
+                    builder: (BuildContext context) =>
+                        CompanyListPage()));
           },
           icon: Icons.business,
         ),

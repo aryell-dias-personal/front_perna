@@ -20,87 +20,54 @@ class _BankFormState extends State<BankForm> {
   Widget build(BuildContext context) {
     return FormContainer(formkey: _formKey, children: <Widget>[
       // TODO: selector de tipos de empresa de um enum
-      Expanded(
-          child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        margin: const EdgeInsets.only(left: 5, top: 6, right: 16),
-        child: OutlinedTextFormField(
-            readOnly: true,
-            labelText: AppLocalizations.of(context).translate('account_holder_type'),
-            icon: Icons.ac_unit),
-      )),
-      Expanded(
-          child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        margin: const EdgeInsets.only(left: 5, top: 6, right: 16),
-        child: OutlinedTextFormField(
-            readOnly: true,
-            labelText: AppLocalizations.of(context).translate('account_holder_name'),
-            icon: Icons.ac_unit),
-      )),
+      OutlinedTextFormField(
+          readOnly: true,
+          labelText:
+              AppLocalizations.of(context).translate('account_holder_type'),
+          icon: Icons.ac_unit),
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: true,
+          labelText:
+              AppLocalizations.of(context).translate('account_holder_name'),
+          icon: Icons.short_text),
+      const SizedBox(height: 26),
       Row(
+        mainAxisSize: MainAxisSize.min, 
         children: <Widget>[
           // TODO: selector do pais de um enum
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              margin: const EdgeInsets.only(left: 16, top: 6, right: 5),
-              child: OutlinedTextFormField(
-                readOnly: true,
-                labelText: AppLocalizations.of(context).translate('country'),
-                icon: Icons.ac_unit),
-            ),
-          ),
+          OutlinedTextFormField(
+              readOnly: true,
+              labelText: AppLocalizations.of(context).translate('country'),
+              icon: Icons.map_outlined),
+          const SizedBox(width: 10),
           // TODO: seleção automática apartir do coutry e visse versa
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              margin: const EdgeInsets.only(left: 16, top: 6, right: 5),
-              child: OutlinedTextFormField(
-                readOnly: true,
-                labelText: AppLocalizations.of(context).translate('currency'),
-                icon: Icons.ac_unit),
-            ),
-          ),
+          OutlinedTextFormField(
+              readOnly: true,
+              labelText: AppLocalizations.of(context).translate('currency'),
+              icon: Icons.attach_money),
         ],
       ),
+      const SizedBox(height: 26),
       Row(
+        mainAxisSize: MainAxisSize.min, 
         children: <Widget>[
           // TODO: selector de banco de um enum
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              margin: const EdgeInsets.only(left: 16, top: 6, right: 5),
-              child: OutlinedTextFormField(
-                readOnly: true,
-                labelText: AppLocalizations.of(context).translate('bank_code'),
-                icon: Icons.ac_unit),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              margin: const EdgeInsets.only(left: 16, top: 6, right: 5),
-              child: OutlinedTextFormField(
-                readOnly: true,
-                labelText: AppLocalizations.of(context).translate('branch_code'),
-                icon: Icons.ac_unit),
-            ),
-          ),
+          OutlinedTextFormField(
+              readOnly: true,
+              labelText: AppLocalizations.of(context).translate('bank_code')),
+          const SizedBox(width: 10),
+          OutlinedTextFormField(
+              readOnly: true,
+              labelText: AppLocalizations.of(context).translate('branch_code')),
         ],
       ),
-      Expanded(
-          child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        margin: const EdgeInsets.only(left: 5, top: 6, right: 16),
-        child: OutlinedTextFormField(
-            readOnly: true,
-            labelText: AppLocalizations.of(context).translate('account_number'),
-            icon: Icons.ac_unit),
-      )),
-      Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[AddButton(onPressed: () {}, addAndcontinue: true)])
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: true,
+          labelText: AppLocalizations.of(context).translate('account_number')),
+      const SizedBox(height: 26),
+      AddButton(readOnly: false, onPressed: () {})
     ]);
   }
 }
