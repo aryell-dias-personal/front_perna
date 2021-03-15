@@ -78,6 +78,7 @@ class HelpPage extends StatelessWidget {
                 }
                 final HelpItem subHelpItem = helpItem.subItems[index - 1];
                 return TextButton(
+                  key: UniqueKey(),
                   style: ButtonStyle(
                       overlayColor: MaterialStateProperty.all(
                           Theme.of(context).splashColor)),

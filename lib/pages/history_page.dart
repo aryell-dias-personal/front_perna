@@ -179,6 +179,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           final List<dynamic> history = getHistory();
                           final dynamic operation = history[index];
                           return TextButton(
+                              key: UniqueKey(),
                               style: ButtonStyle(
                                   overlayColor: MaterialStateProperty.all(
                                       Theme.of(context).splashColor)),
