@@ -77,7 +77,6 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
           return null;
         },
         textFieldConfiguration: TextFieldConfiguration(
-          enableInteractiveSelection: true,
           controller: textEditingController,
           focusNode: widget.focusNode,
           enabled: !widget.readOnly,
