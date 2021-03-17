@@ -9,6 +9,7 @@ class OutlinedTextFormField extends StatelessWidget {
       this.onChanged,
       this.labelText,
       this.validatorMessage,
+      this.isRequired = false,
       this.onFieldSubmitted,
       this.icon,
       this.focusNode,
@@ -16,6 +17,7 @@ class OutlinedTextFormField extends StatelessWidget {
 
   final bool readOnly;
   final FocusNode focusNode;
+  final bool isRequired;
   final String initialValue;
   final Function(String) onChanged;
   final String labelText;
@@ -39,7 +41,14 @@ class OutlinedTextFormField extends StatelessWidget {
           labelText: labelText,
           suffixIcon: Icon(icon)),
       textInputAction: textInputAction,
-      validator: (String value) => value.isNotEmpty ? null : validatorMessage,
+      validator: (String value) {
+        if (isRequired) {
+          if (value.isEmpty) {
+            return validatorMessage;
+          }
+        }
+        return null;
+      },
       onFieldSubmitted: onFieldSubmitted,
     ));
   }

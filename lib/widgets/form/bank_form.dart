@@ -9,8 +9,11 @@ import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
 
 class BankForm extends StatefulWidget {
-  const BankForm({this.bankAccount, this.readOnly = false});
+  BankForm({this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
+    if(!readOnly) assert(onSubmmitBankAccount != null);
+  }
 
+  final Function(BankAccount) onSubmmitBankAccount;
   final BankAccount bankAccount;
   final bool readOnly;
 
@@ -38,6 +41,8 @@ class _BankFormState extends State<BankForm> {
     return FormContainer(formkey: _formKey, children: <Widget>[
       AutoCompleteField(
           readOnly: widget.readOnly,
+          isRequired: true,
+          validatorMessage: AppLocalizations.of(context).translate('account_holder_type_error'),
           labelText:
               AppLocalizations.of(context).translate('account_holder_type'),
           textInputAction: TextInputAction.next,
@@ -52,6 +57,8 @@ class _BankFormState extends State<BankForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          isRequired: true,
+          validatorMessage: AppLocalizations.of(context).translate('account_holder_name_error'),
           focusNode: accountHolderNameFocus,
           labelText:
               AppLocalizations.of(context).translate('account_holder_name'),
@@ -63,6 +70,8 @@ class _BankFormState extends State<BankForm> {
         children: <Widget>[
           AutoCompleteField(
               readOnly: widget.readOnly,
+              isRequired: true,
+              validatorMessage: AppLocalizations.of(context).translate('country_error'),
               labelText: AppLocalizations.of(context).translate('country'),
               textInputAction: TextInputAction.next,
               options: countries,
@@ -73,6 +82,8 @@ class _BankFormState extends State<BankForm> {
           const SizedBox(width: 10),
           AutoCompleteField(
               readOnly: widget.readOnly,
+              isRequired: true,
+              validatorMessage: AppLocalizations.of(context).translate('currency_error'),
               focusNode: countryFocus,
               labelText: AppLocalizations.of(context).translate('currency'),
               textInputAction: TextInputAction.next,
@@ -89,6 +100,8 @@ class _BankFormState extends State<BankForm> {
         children: <Widget>[
           OutlinedTextFormField(
               readOnly: widget.readOnly,
+              isRequired: true,
+              validatorMessage: AppLocalizations.of(context).translate('bank_code_error'),
               focusNode: currencyFocus,
               textInputAction: TextInputAction.next,
               labelText: AppLocalizations.of(context).translate('bank_code')),
@@ -96,16 +109,25 @@ class _BankFormState extends State<BankForm> {
           OutlinedTextFormField(
               readOnly: widget.readOnly,
               textInputAction: TextInputAction.next,
+              isRequired: true,
+              validatorMessage: AppLocalizations.of(context).translate('branch_code_error'),
               labelText: AppLocalizations.of(context).translate('branch_code')),
         ],
       ),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          isRequired: true,
+          validatorMessage: AppLocalizations.of(context).translate('account_number_error'),
           textInputAction: TextInputAction.done,
           labelText: AppLocalizations.of(context).translate('account_number')),
       const SizedBox(height: 26),
-      AddButton(readOnly: widget.readOnly, onPressed: () {})
+      AddButton(readOnly: widget.readOnly, onPressed: () {
+        final bool valide = _formKey.currentState.validate();
+        if(valide) {
+          
+        }
+      })
     ]);
   }
 }

@@ -190,7 +190,7 @@ class MyApp extends StatelessWidget {
               textTheme:
                   const TextTheme(bodyText2: TextStyle(color: mainLightColor)),
               iconTheme: const IconThemeData(color: mainLightColor),
-              disabledColor: mainLightColor.withAlpha(66),
+              disabledColor: const Color(0xFF808080),
               primaryColor: mainLightColor,
               accentColor: mainLightColor.withAlpha(66),
               fontFamily: 'ProductSans',
@@ -200,7 +200,7 @@ class MyApp extends StatelessWidget {
               textTheme:
                   const TextTheme(bodyText2: TextStyle(color: mainDarkColor)),
               iconTheme: const IconThemeData(color: mainDarkColor),
-              disabledColor: mainDarkColor.withAlpha(66),
+              disabledColor: const Color(0xFF808080),
               primaryColor: mainDarkColor,
               accentColor: mainDarkColor.withAlpha(66),
               fontFamily: 'ProductSans',

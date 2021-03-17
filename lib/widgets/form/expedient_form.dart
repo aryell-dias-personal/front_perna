@@ -122,6 +122,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
         labelText: AppLocalizations.of(context).translate('driver_email'),
         icon: Icons.email,
         textInputAction: TextInputAction.next,
+        isRequired: true,
         validatorMessage:
             AppLocalizations.of(context).translate('enter_driver_email'),
         onFieldSubmitted: (String text) {
@@ -141,7 +142,6 @@ class _ExpedientFormState extends State<ExpedientForm> {
       Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
         FormDatePicker(
           value: date,
-          isRequired: true,
           initialValue: initialDateTime,
           onChanged: _updateMinTime,
           labelText: AppLocalizations.of(context).translate('date'),
@@ -150,12 +150,12 @@ class _ExpedientFormState extends State<ExpedientForm> {
           onSubmit: (String text) {
             FocusScope.of(context).nextFocus();
           },
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('select_a_date'),
         ),
         const SizedBox(width: 10),
         FormTimePicker(
-          isRequired: true,
           minTime: initialDateTime,
           onChanged: (String text) {
             final List<String> chuncks = text.split(' ');
@@ -176,13 +176,13 @@ class _ExpedientFormState extends State<ExpedientForm> {
           onSubmit: (String text) {
             FocusScope.of(context).nextFocus();
           },
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('enter_start_expedient'),
         ),
       ]),
       const SizedBox(height: 26),
       FormTimePicker(
-          isRequired: true,
           minTime: minTime,
           selectedDay: date,
           value: askedEndAt,
@@ -200,6 +200,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
             });
           },
           readOnly: widget.readOnly,
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('enter_end_expedient'),
           onSubmit: (String text) {
@@ -216,6 +217,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
         labelText: AppLocalizations.of(context).translate('seats_number'),
         icon: Icons.airline_seat_legroom_normal,
         textInputAction: TextInputAction.done,
+        isRequired: true,
         validatorMessage:
             AppLocalizations.of(context).translate('enter_seats_number'),
         onFieldSubmitted: (String text) => widget.onAddPressed(

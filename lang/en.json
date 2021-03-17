@@ -122,6 +122,7 @@
     "card_holder_error": "Please input a card holder",
     "card_date_error": "Please input a valid date",
     "card_number_error": "Please input a valid number",
+    "auto_complete_error": "Please input a valid text",
     "cvv": "CVV",
     "card_holder": "Card Holder",
     "date": "Date",
@@ -156,5 +157,12 @@
     "account_number": "Account Number",
     "bank": "Bank",
     "individual": "Individual",
-    "company": "Company"
+    "company": "Company",
+    "account_holder_type_error": "Please input a account holder type",
+    "account_holder_name_error": "Please input a account holder name",
+    "country_error": "Please input a country",
+    "currency_error": "Please input a currency",
+    "bank_code_error": "Please input a bank code",
+    "branch_code_error": "Please input a branch code",
+    "account_number_error": "Please input a account number"
 }

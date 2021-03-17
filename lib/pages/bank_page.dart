@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/models/bank_account.dart';
 import 'package:perna/widgets/form/bank_form.dart';
 
 class BankPage extends StatefulWidget {
@@ -43,7 +44,10 @@ class _BankPageState extends State<BankPage> {
                     child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                        BankForm(),
+                        BankForm(
+                          readOnly: true,
+                          onSubmmitBankAccount: (BankAccount bankAccount) {},
+                        ),
                       ]))));
   }
 }

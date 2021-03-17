@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:perna/helpers/app_localizations.dart';
 
 class AutoCompleteField extends StatefulWidget {
   const AutoCompleteField(
@@ -68,10 +69,15 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
             if (value.isEmpty) {
               return widget.validatorMessage;
             }
+            if (!widget.options.contains(value)) {
+              return AppLocalizations.of(context)
+                  .translate('auto_complete_error');
+            }
           }
           return null;
         },
         textFieldConfiguration: TextFieldConfiguration(
+          enableInteractiveSelection: true,
           controller: textEditingController,
           focusNode: widget.focusNode,
           enabled: !widget.readOnly,
@@ -83,24 +89,23 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
             }
           },
           textInputAction: widget.textInputAction,
-          style: const TextStyle(
-            fontSize: 16,
-            fontFamily: 'ProductSans'
-          ),
+          style: const TextStyle(fontSize: 16, fontFamily: 'ProductSans'),
           decoration: InputDecoration(
+              disabledBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: Theme.of(context).disabledColor)),
               border: const OutlineInputBorder(),
               labelText: widget.labelText,
-              labelStyle: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'ProductSans'
-              ),
+              labelStyle:
+                  const TextStyle(fontSize: 16, fontFamily: 'ProductSans'),
               suffixIcon: Icon(widget.icon)),
         ),
         suggestionsCallback: (String pattern) async {
           List<String> currOptions;
           if (typing) {
             currOptions = widget.options
-                .where((String option) => RegExp(pattern.toLowerCase()).hasMatch(option.toLowerCase()))
+                .where((String option) => RegExp(pattern.toLowerCase())
+                    .hasMatch(option.toLowerCase()))
                 .toList();
           } else {
             currOptions = widget.options;
@@ -115,7 +120,7 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
         onSuggestionSelected: (String suggestion) {
           searchValue = suggestion;
           textEditingController.text = suggestion;
-          if(widget.onFieldSubmitted != null) {
+          if (widget.onFieldSubmitted != null) {
             widget.onFieldSubmitted(searchValue);
           }
         },

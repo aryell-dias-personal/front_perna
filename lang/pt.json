@@ -122,6 +122,7 @@
     "card_holder_error": "Insira o titular do cartão",
     "card_date_error": "Insira uma data válida",
     "card_number_error": "Insira um número válido",
+    "auto_complete_error": "Insira um texto válido",
     "cvv": "CVC",
     "card_holder": "Titular do Cartão",
     "date": "Data",
@@ -156,5 +157,12 @@
     "account_number": "Número da Conta",
     "bank": "Banco",
     "individual": "Individual",
-    "company": "Empresarial"
+    "company": "Empresarial",
+    "account_holder_type_error": "Insira um tipo de titular da conta",
+    "account_holder_name_error": "Insira um nome do titular da conta",
+    "country_error": "Insira um país",
+    "currency_error": "Insira um moeda",
+    "bank_code_error": "Insira um código bancário",
+    "branch_code_error": "Insira um código da agência",
+    "account_number_error": "Insira um número da conta"
 }
