@@ -1,12 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/bank_account.dart';
 import 'package:perna/widgets/button/add_button.dart';
 import 'package:perna/widgets/form/form_container.dart';
+import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
 
 class BankForm extends StatefulWidget {
+  const BankForm({this.bankAccount, this.readOnly = false});
+
+  final BankAccount bankAccount;
+  final bool readOnly;
+
   @override
   _BankFormState createState() => _BankFormState();
 }
@@ -14,60 +21,91 @@ class BankForm extends StatefulWidget {
 class _BankFormState extends State<BankForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   BankAccount bankAccount;
+  FocusNode accountHolderNameFocus = FocusNode();
+  FocusNode countryFocus = FocusNode();
+  FocusNode currencyFocus = FocusNode();
 
-  // TODO: modificar bankAccount quando alterar os campos (inclusive montar o routingNumber) e definir icones
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      bankAccount = widget.bankAccount ?? BankAccount();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FormContainer(formkey: _formKey, children: <Widget>[
-      // TODO: selector de tipos de empresa de um enum
-      OutlinedTextFormField(
-          readOnly: true,
+      AutoCompleteField(
+          readOnly: widget.readOnly,
           labelText:
               AppLocalizations.of(context).translate('account_holder_type'),
-          icon: Icons.ac_unit),
+          textInputAction: TextInputAction.next,
+          options: <String>[
+            AppLocalizations.of(context).translate('individual'),
+            AppLocalizations.of(context).translate('company'),
+          ],
+          onFieldSubmitted: (String value) {
+            accountHolderNameFocus.requestFocus();
+          },
+          icon: Icons.label_rounded),
       const SizedBox(height: 26),
       OutlinedTextFormField(
-          readOnly: true,
+          readOnly: widget.readOnly,
+          focusNode: accountHolderNameFocus,
           labelText:
               AppLocalizations.of(context).translate('account_holder_name'),
+          textInputAction: TextInputAction.next,
           icon: Icons.short_text),
       const SizedBox(height: 26),
       Row(
-        mainAxisSize: MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          // TODO: selector do pais de um enum
-          OutlinedTextFormField(
-              readOnly: true,
+          AutoCompleteField(
+              readOnly: widget.readOnly,
               labelText: AppLocalizations.of(context).translate('country'),
+              textInputAction: TextInputAction.next,
+              options: countries,
+              onFieldSubmitted: (String value) {
+                countryFocus.requestFocus();
+              },
               icon: Icons.map_outlined),
           const SizedBox(width: 10),
-          // TODO: seleção automática apartir do coutry e visse versa
-          OutlinedTextFormField(
-              readOnly: true,
+          AutoCompleteField(
+              readOnly: widget.readOnly,
+              focusNode: countryFocus,
               labelText: AppLocalizations.of(context).translate('currency'),
+              textInputAction: TextInputAction.next,
+              options: currencies,
+              onFieldSubmitted: (String value) {
+                currencyFocus.requestFocus();
+              },
               icon: Icons.attach_money),
         ],
       ),
       const SizedBox(height: 26),
       Row(
-        mainAxisSize: MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          // TODO: selector de banco de um enum
           OutlinedTextFormField(
-              readOnly: true,
+              readOnly: widget.readOnly,
+              focusNode: currencyFocus,
+              textInputAction: TextInputAction.next,
               labelText: AppLocalizations.of(context).translate('bank_code')),
           const SizedBox(width: 10),
           OutlinedTextFormField(
-              readOnly: true,
+              readOnly: widget.readOnly,
+              textInputAction: TextInputAction.next,
               labelText: AppLocalizations.of(context).translate('branch_code')),
         ],
       ),
       const SizedBox(height: 26),
       OutlinedTextFormField(
-          readOnly: true,
+          readOnly: widget.readOnly,
+          textInputAction: TextInputAction.done,
           labelText: AppLocalizations.of(context).translate('account_number')),
       const SizedBox(height: 26),
-      AddButton(readOnly: false, onPressed: () {})
+      AddButton(readOnly: widget.readOnly, onPressed: () {})
     ]);
   }
 }

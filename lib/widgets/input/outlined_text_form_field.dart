@@ -11,9 +11,11 @@ class OutlinedTextFormField extends StatelessWidget {
       this.validatorMessage,
       this.onFieldSubmitted,
       this.icon,
+      this.focusNode,
       this.textInputType});
 
   final bool readOnly;
+  final FocusNode focusNode;
   final String initialValue;
   final Function(String) onChanged;
   final String labelText;
@@ -27,6 +29,7 @@ class OutlinedTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
         child: TextFormField(
+      focusNode: focusNode,
       keyboardType: textInputType,
       readOnly: readOnly,
       initialValue: initialValue,

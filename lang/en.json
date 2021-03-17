@@ -154,5 +154,7 @@
     "bank_code": "Bank Code",
     "branch_code": "Branch Code",
     "account_number": "Account Number",
-    "bank": "Bank"
+    "bank": "Bank",
+    "individual": "Individual",
+    "company": "Company"
 }

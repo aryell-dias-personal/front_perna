@@ -154,5 +154,7 @@
     "bank_code": "Código Bancário",
     "branch_code": "Código da Agência",
     "account_number": "Número da Conta",
-    "bank": "Banco"
+    "bank": "Banco",
+    "individual": "Individual",
+    "company": "Empresarial"
 }
