@@ -164,5 +164,12 @@
     "currency_error": "Insira um moeda",
     "bank_code_error": "Insira um código bancário",
     "branch_code_error": "Insira um código da agência",
-    "account_number_error": "Insira um número da conta"
+    "account_number_error": "Insira um número da conta",
+    "business_type_error": "Insira um tipo de negócio",
+    "company_name_error": "Insira um nome da empresa",
+    "manager_error": "Insira um Email do gerente",
+    "company_number_error": "Insira um Número da empresa",
+    "phone_error": "Insira um telefone",
+    "address_error": "Insira um endereço",
+    "structure_error": "Insira um estrutura"
 }

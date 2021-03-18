@@ -10,12 +10,12 @@ import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
 
 class CompanyForm extends StatefulWidget {
-  CompanyForm({this.bankAccount, this.readOnly = false, this.onSubmmitCompany}) {
+  CompanyForm({this.company, this.readOnly = false, this.onSubmmitCompany}) {
     if (!readOnly) assert(onSubmmitCompany != null);
   }
 
-  final Function(Company) onSubmmitCompany;
-  final Company bankAccount;
+  final void Function(Company) onSubmmitCompany;
+  final Company company;
   final bool readOnly;
 
   @override
@@ -28,83 +28,116 @@ class _CompanyFormState extends State<CompanyForm> {
   Company company;
 
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      company = widget.company ?? Company();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FormContainer(formkey: _formKey, children: <Widget>[
-      AutoCompleteField(  
+      AutoCompleteField(
           readOnly: widget.readOnly,
           isRequired: true,
           onFieldSubmitted: (String value) {
             companyNameFocus.requestFocus();
             company = company.copyWith(businessType: value);
           },
+          onChanged: (String value) {
+            company = company.copyWith(businessType: value);
+          },
+          textInputAction: TextInputAction.next,
+          options: const <String>[
+            'individual',
+            'company',
+            'non_profit',
+            'government_entity'
+          ],
           labelText: AppLocalizations.of(context).translate('business_type'),
+          validatorMessage: AppLocalizations.of(context).translate('business_type_error'),
           icon: Icons.business_center),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
+          textInputAction: TextInputAction.next,
           focusNode: companyNameFocus,
-          onFieldSubmitted: (String value) {
+          onChanged: (String value) {
             company = company.copyWith(companyName: value);
           },
           labelText: AppLocalizations.of(context).translate('company_name'),
+          validatorMessage: AppLocalizations.of(context).translate('company_name_error'),
           icon: Icons.short_text),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
-          onFieldSubmitted: (String value) {
+          textInputType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          onChanged: (String value) {
             company = company.copyWith(manager: value);
           },
           labelText: AppLocalizations.of(context).translate('manager'),
+          validatorMessage: AppLocalizations.of(context).translate('manager_error'),
           icon: Icons.admin_panel_settings),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
+          textInputAction: TextInputAction.next,
           textInputType: TextInputType.number,
-          onFieldSubmitted: (String value) {
+          onChanged: (String value) {
             company = company.copyWith(companyNumber: value);
           },
           labelText: AppLocalizations.of(context).translate('company_number'),
+          validatorMessage: AppLocalizations.of(context).translate('company_number_error'),
           icon: Icons.business),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
+          textInputAction: TextInputAction.next,
           textInputType: TextInputType.number,
-          onFieldSubmitted: (String value) {
+          onChanged: (String value) {
             company = company.copyWith(phone: value);
           },
           labelText: AppLocalizations.of(context).translate('phone'),
+          validatorMessage: AppLocalizations.of(context).translate('phone_error'),
           icon: Icons.contact_phone),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
-          onFieldSubmitted: (String value) {
+          textInputAction: TextInputAction.next,
+          onChanged: (String value) {
             company = company.copyWith(address: value);
           },
           labelText: AppLocalizations.of(context).translate('address'),
+          validatorMessage: AppLocalizations.of(context).translate('address_error'),
           icon: Icons.markunread_mailbox_rounded),
       const SizedBox(height: 26),
       AutoCompleteField(
           readOnly: widget.readOnly,
           isRequired: true,
+          onChanged: (String value) {
+            company = company.copyWith(structure: value);
+          },
           onFieldSubmitted: (String value) {
             company = company.copyWith(structure: value);
-            Navigator.push(
-                context,
-                MaterialPageRoute<BankPage>(
-                    builder: (BuildContext context) => BankPage(
-                      onSubmmitBankAccount: (BankAccount bankAccount) {
-                        widget.onSubmmitCompany(company.copyWith(
-                          bankAccount: bankAccount,
-                        ));
-                      },
-                    )));
           },
+          options: const <String>[
+            'government instrumentality',
+            'governmental unit',
+            'incorporated non profit',
+            'limited liability partnership',
+            'multi member llc',
+            'private company',
+            'private corporation'
+          ],
           labelText: AppLocalizations.of(context).translate('structure'),
+          validatorMessage: AppLocalizations.of(context).translate('structure_error'),
           icon: Icons.assignment_rounded),
       const SizedBox(height: 26),
       Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
@@ -112,16 +145,20 @@ class _CompanyFormState extends State<CompanyForm> {
           addAndcontinue: widget.readOnly,
           readOnly: widget.readOnly,
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute<BankPage>(
-                    builder: (BuildContext context) => BankPage(
-                      onSubmmitBankAccount: (BankAccount bankAccount) {
-                        widget.onSubmmitCompany(company.copyWith(
-                          bankAccount: bankAccount,
-                        ));
-                      },
-                    )));
+            final bool valide = _formKey.currentState.validate();
+            if (valide) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute<BankPage>(
+                      builder: (BuildContext context) => BankPage(
+                            onSubmmitBankAccount: (BankAccount bankAccount) {
+                              widget.onSubmmitCompany(company.copyWith(
+                                  bankAccount: bankAccount,
+                                  country: bankAccount.countryCode,
+                                  currency: bankAccount.currency));
+                            },
+                          )));
+            }
           },
         )
       ])

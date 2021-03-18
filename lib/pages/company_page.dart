@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/models/company.dart';
 import 'package:perna/widgets/form/company_form.dart';
 
 class CompanyPage extends StatefulWidget {
@@ -50,7 +51,10 @@ class _CompanyPageState extends State<CompanyPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         CompanyForm(
-                          readOnly: widget.readOnly,
+                          onSubmmitCompany: (Company company) {
+                            print(company
+                                .copyWith(employees: <String>[company.manager]).toJson());
+                          },
                         ),
                       ]))));
   }

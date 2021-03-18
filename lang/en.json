@@ -164,5 +164,12 @@
     "currency_error": "Please input a currency",
     "bank_code_error": "Please input a bank code",
     "branch_code_error": "Please input a branch code",
-    "account_number_error": "Please input a account number"
+    "account_number_error": "Please input a account number",
+    "business_type_error": "Please input a business type",
+    "company_name_error": "Please input a company name",
+    "manager_error": "Please input a manager",
+    "company_number_error": "Please input a company number",
+    "phone_error": "Please input a phone",
+    "address_error": "Please input a address",
+    "structure_error": "Please input a structure"
 }

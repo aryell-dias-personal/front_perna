@@ -11,7 +11,7 @@ class BankPage extends StatefulWidget {
     if (!readOnly) assert(onSubmmitBankAccount != null);
   }
 
-  final Function(BankAccount) onSubmmitBankAccount;
+  final void Function(BankAccount) onSubmmitBankAccount;
   final BankAccount bankAccount;
   final bool readOnly;
 

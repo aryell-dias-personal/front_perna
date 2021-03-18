@@ -61,12 +61,12 @@ class BankAccount {
           routingNumber: routingNumber ?? this.routingNumber);
 
   dynamic toJson() => <String, dynamic>{
-        accountHolderName: accountHolderName,
-        accountHolderType: accountHolderType,
-        bankName: bankName,
-        accountNumber: accountNumber,
-        countryCode: countryCode,
-        currency: currency,
-        routingNumber: routingNumber,
+        'accountHolderName': accountHolderName,
+        'accountHolderType': accountHolderType,
+        'bankName': bankName,
+        'accountNumber': accountNumber,
+        'countryCode': countryCode,
+        'currency': currency,
+        'routingNumber': routingNumber,
       };
 }

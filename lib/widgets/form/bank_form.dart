@@ -14,7 +14,7 @@ class BankForm extends StatefulWidget {
     if (!readOnly) assert(onSubmmitBankAccount != null);
   }
 
-  final Function(BankAccount) onSubmmitBankAccount;
+  final void Function(BankAccount) onSubmmitBankAccount;
   final BankAccount bankAccount;
   final bool readOnly;
 
@@ -106,12 +106,14 @@ class _BankFormState extends State<BankForm> {
               labelText: AppLocalizations.of(context).translate('currency'),
               textInputAction: TextInputAction.next,
               onChanged: (String value) {
-                bankAccount = bankAccount.copyWith(currency: value.toLowerCase());
+                bankAccount =
+                    bankAccount.copyWith(currency: value.toLowerCase());
               },
               options: currencies,
               onFieldSubmitted: (String value) {
                 currencyFocus.requestFocus();
-                bankAccount = bankAccount.copyWith(currency: value.toLowerCase());
+                bankAccount =
+                    bankAccount.copyWith(currency: value.toLowerCase());
               },
               icon: Icons.attach_money),
         ],
@@ -170,8 +172,10 @@ class _BankFormState extends State<BankForm> {
           onPressed: () {
             final bool valide = _formKey.currentState.validate();
             if (valide) {
-              bankAccount = bankAccount.copyWith(routingNumber: '$bankCode-$branchCode');
+              bankAccount =
+                  bankAccount.copyWith(routingNumber: '$bankCode-$branchCode');
               widget.onSubmmitBankAccount(bankAccount);
+              Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
             }
           })
     ]);
