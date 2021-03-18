@@ -143,7 +143,7 @@
     "provider": "Empresa",
     "business_type": "Tipo de Negócio",
     "company_name": "Nome da Empresa",
-    "manager": "Gerente",
+    "manager": "Email do Gerente",
     "company_number": "Número da Empresa",
     "phone": "Telefone",
     "address": "Endereço",

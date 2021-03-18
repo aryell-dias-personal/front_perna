@@ -46,10 +46,6 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
   @override
   void initState() {
     super.initState();
-    focusNode = widget.focusNode ?? FocusNode();
-    focusNode.addListener(() {
-      typing = false;
-    });
   }
 
   @override
@@ -87,6 +83,9 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
               widget.onChanged(value);
             }
           },
+          onSubmitted: (String value) {
+            typing = false;
+          },
           textInputAction: widget.textInputAction,
           style: const TextStyle(fontSize: 16, fontFamily: 'ProductSans'),
           decoration: InputDecoration(
@@ -117,6 +116,7 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
           );
         },
         onSuggestionSelected: (String suggestion) {
+          typing = false;
           searchValue = suggestion;
           textEditingController.text = suggestion;
           if (widget.onFieldSubmitted != null) {

@@ -6,6 +6,15 @@ import 'package:perna/models/bank_account.dart';
 import 'package:perna/widgets/form/bank_form.dart';
 
 class BankPage extends StatefulWidget {
+  BankPage(
+      {this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
+    if (!readOnly) assert(onSubmmitBankAccount != null);
+  }
+
+  final Function(BankAccount) onSubmmitBankAccount;
+  final BankAccount bankAccount;
+  final bool readOnly;
+
   @override
   _BankPageState createState() => _BankPageState();
 }
@@ -45,8 +54,8 @@ class _BankPageState extends State<BankPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         BankForm(
-                          readOnly: true,
-                          onSubmmitBankAccount: (BankAccount bankAccount) {},
+                          readOnly: widget.readOnly,
+                          onSubmmitBankAccount: widget.onSubmmitBankAccount,
                         ),
                       ]))));
   }

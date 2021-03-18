@@ -9,8 +9,9 @@ import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
 
 class BankForm extends StatefulWidget {
-  BankForm({this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
-    if(!readOnly) assert(onSubmmitBankAccount != null);
+  BankForm(
+      {this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
+    if (!readOnly) assert(onSubmmitBankAccount != null);
   }
 
   final Function(BankAccount) onSubmmitBankAccount;
@@ -24,6 +25,8 @@ class BankForm extends StatefulWidget {
 class _BankFormState extends State<BankForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   BankAccount bankAccount;
+  String bankCode = '';
+  String branchCode = '';
   FocusNode accountHolderNameFocus = FocusNode();
   FocusNode countryFocus = FocusNode();
   FocusNode currencyFocus = FocusNode();
@@ -42,7 +45,8 @@ class _BankFormState extends State<BankForm> {
       AutoCompleteField(
           readOnly: widget.readOnly,
           isRequired: true,
-          validatorMessage: AppLocalizations.of(context).translate('account_holder_type_error'),
+          validatorMessage: AppLocalizations.of(context)
+              .translate('account_holder_type_error'),
           labelText:
               AppLocalizations.of(context).translate('account_holder_type'),
           textInputAction: TextInputAction.next,
@@ -50,19 +54,27 @@ class _BankFormState extends State<BankForm> {
             AppLocalizations.of(context).translate('individual'),
             AppLocalizations.of(context).translate('company'),
           ],
+          onChanged: (String value) {
+            bankAccount = bankAccount.copyWith(accountHolderType: value);
+          },
           onFieldSubmitted: (String value) {
             accountHolderNameFocus.requestFocus();
+            bankAccount = bankAccount.copyWith(accountHolderType: value);
           },
           icon: Icons.label_rounded),
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
-          validatorMessage: AppLocalizations.of(context).translate('account_holder_name_error'),
+          validatorMessage: AppLocalizations.of(context)
+              .translate('account_holder_name_error'),
           focusNode: accountHolderNameFocus,
           labelText:
               AppLocalizations.of(context).translate('account_holder_name'),
           textInputAction: TextInputAction.next,
+          onChanged: (String value) {
+            bankAccount = bankAccount.copyWith(accountHolderName: value);
+          },
           icon: Icons.short_text),
       const SizedBox(height: 26),
       Row(
@@ -71,25 +83,35 @@ class _BankFormState extends State<BankForm> {
           AutoCompleteField(
               readOnly: widget.readOnly,
               isRequired: true,
-              validatorMessage: AppLocalizations.of(context).translate('country_error'),
+              validatorMessage:
+                  AppLocalizations.of(context).translate('country_error'),
               labelText: AppLocalizations.of(context).translate('country'),
               textInputAction: TextInputAction.next,
+              onChanged: (String value) {
+                bankAccount = bankAccount.copyWith(countryCode: value);
+              },
               options: countries,
               onFieldSubmitted: (String value) {
                 countryFocus.requestFocus();
+                bankAccount = bankAccount.copyWith(countryCode: value);
               },
               icon: Icons.map_outlined),
           const SizedBox(width: 10),
           AutoCompleteField(
               readOnly: widget.readOnly,
               isRequired: true,
-              validatorMessage: AppLocalizations.of(context).translate('currency_error'),
+              validatorMessage:
+                  AppLocalizations.of(context).translate('currency_error'),
               focusNode: countryFocus,
               labelText: AppLocalizations.of(context).translate('currency'),
               textInputAction: TextInputAction.next,
+              onChanged: (String value) {
+                bankAccount = bankAccount.copyWith(currency: value.toLowerCase());
+              },
               options: currencies,
               onFieldSubmitted: (String value) {
                 currencyFocus.requestFocus();
+                bankAccount = bankAccount.copyWith(currency: value.toLowerCase());
               },
               icon: Icons.attach_money),
         ],
@@ -101,16 +123,26 @@ class _BankFormState extends State<BankForm> {
           OutlinedTextFormField(
               readOnly: widget.readOnly,
               isRequired: true,
-              validatorMessage: AppLocalizations.of(context).translate('bank_code_error'),
+              textInputType: TextInputType.number,
+              validatorMessage:
+                  AppLocalizations.of(context).translate('bank_code_error'),
               focusNode: currencyFocus,
               textInputAction: TextInputAction.next,
+              onChanged: (String value) {
+                bankCode = value;
+              },
               labelText: AppLocalizations.of(context).translate('bank_code')),
           const SizedBox(width: 10),
           OutlinedTextFormField(
               readOnly: widget.readOnly,
               textInputAction: TextInputAction.next,
               isRequired: true,
-              validatorMessage: AppLocalizations.of(context).translate('branch_code_error'),
+              textInputType: TextInputType.number,
+              onChanged: (String value) {
+                branchCode = value;
+              },
+              validatorMessage:
+                  AppLocalizations.of(context).translate('branch_code_error'),
               labelText: AppLocalizations.of(context).translate('branch_code')),
         ],
       ),
@@ -118,16 +150,30 @@ class _BankFormState extends State<BankForm> {
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
-          validatorMessage: AppLocalizations.of(context).translate('account_number_error'),
+          textInputType: TextInputType.number,
+          validatorMessage:
+              AppLocalizations.of(context).translate('account_number_error'),
           textInputAction: TextInputAction.done,
+          onChanged: (String value) {
+            bankAccount = bankAccount.copyWith(accountNumber: value);
+          },
+          onFieldSubmitted: (String value) {
+            final bool valide = _formKey.currentState.validate();
+            if (valide) {
+              widget.onSubmmitBankAccount(bankAccount);
+            }
+          },
           labelText: AppLocalizations.of(context).translate('account_number')),
       const SizedBox(height: 26),
-      AddButton(readOnly: widget.readOnly, onPressed: () {
-        final bool valide = _formKey.currentState.validate();
-        if(valide) {
-          
-        }
-      })
+      AddButton(
+          readOnly: widget.readOnly,
+          onPressed: () {
+            final bool valide = _formKey.currentState.validate();
+            if (valide) {
+              bankAccount = bankAccount.copyWith(routingNumber: '$bankCode-$branchCode');
+              widget.onSubmmitBankAccount(bankAccount);
+            }
+          })
     ]);
   }
 }
