@@ -25,6 +25,7 @@ class CompanyForm extends StatefulWidget {
 class _CompanyFormState extends State<CompanyForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FocusNode companyNameFocus = FocusNode();
+  FocusNode structureFocus = FocusNode();
   Company company;
 
   @override
@@ -42,7 +43,7 @@ class _CompanyFormState extends State<CompanyForm> {
           readOnly: widget.readOnly,
           isRequired: true,
           onFieldSubmitted: (String value) {
-            companyNameFocus.requestFocus();
+            structureFocus.requestFocus();
             company = company.copyWith(businessType: value);
           },
           onChanged: (String value) {
@@ -57,68 +58,9 @@ class _CompanyFormState extends State<CompanyForm> {
             'government_entity'
           ],
           labelText: AppLocalizations.of(context).translate('business_type'),
-          validatorMessage: AppLocalizations.of(context).translate('business_type_error'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('business_type_error'),
           icon: Icons.business_center),
-      const SizedBox(height: 26),
-      OutlinedTextFormField(
-          readOnly: widget.readOnly,
-          isRequired: true,
-          textInputAction: TextInputAction.next,
-          focusNode: companyNameFocus,
-          onChanged: (String value) {
-            company = company.copyWith(companyName: value);
-          },
-          labelText: AppLocalizations.of(context).translate('company_name'),
-          validatorMessage: AppLocalizations.of(context).translate('company_name_error'),
-          icon: Icons.short_text),
-      const SizedBox(height: 26),
-      // TODO: avaliar se num vai ser sempre o email do requerente
-      OutlinedTextFormField(
-          readOnly: widget.readOnly,
-          isRequired: true,
-          textInputType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          onChanged: (String value) {
-            company = company.copyWith(manager: value);
-          },
-          labelText: AppLocalizations.of(context).translate('manager'),
-          validatorMessage: AppLocalizations.of(context).translate('manager_error'),
-          icon: Icons.admin_panel_settings),
-      const SizedBox(height: 26),
-      OutlinedTextFormField(
-          readOnly: widget.readOnly,
-          isRequired: true,
-          textInputAction: TextInputAction.next,
-          textInputType: TextInputType.number,
-          onChanged: (String value) {
-            company = company.copyWith(companyNumber: value);
-          },
-          labelText: AppLocalizations.of(context).translate('company_number'),
-          validatorMessage: AppLocalizations.of(context).translate('company_number_error'),
-          icon: Icons.business),
-      const SizedBox(height: 26),
-      OutlinedTextFormField(
-          readOnly: widget.readOnly,
-          isRequired: true,
-          textInputAction: TextInputAction.next,
-          textInputType: TextInputType.number,
-          onChanged: (String value) {
-            company = company.copyWith(phone: value);
-          },
-          labelText: AppLocalizations.of(context).translate('phone'),
-          validatorMessage: AppLocalizations.of(context).translate('phone_error'),
-          icon: Icons.contact_phone),
-      const SizedBox(height: 26),
-      OutlinedTextFormField(
-          readOnly: widget.readOnly,
-          isRequired: true,
-          textInputAction: TextInputAction.next,
-          onChanged: (String value) {
-            company = company.copyWith(address: value);
-          },
-          labelText: AppLocalizations.of(context).translate('address'),
-          validatorMessage: AppLocalizations.of(context).translate('address_error'),
-          icon: Icons.markunread_mailbox_rounded),
       const SizedBox(height: 26),
       AutoCompleteField(
           readOnly: widget.readOnly,
@@ -127,8 +69,11 @@ class _CompanyFormState extends State<CompanyForm> {
             company = company.copyWith(structure: value);
           },
           onFieldSubmitted: (String value) {
+            companyNameFocus.requestFocus();
             company = company.copyWith(structure: value);
           },
+          focusNode: structureFocus,
+          textInputAction: TextInputAction.next,
           // TODO: adicionar ao AppLocalizations
           options: const <String>[
             'government instrumentality',
@@ -140,8 +85,59 @@ class _CompanyFormState extends State<CompanyForm> {
             'private corporation'
           ],
           labelText: AppLocalizations.of(context).translate('structure'),
-          validatorMessage: AppLocalizations.of(context).translate('structure_error'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('structure_error'),
           icon: Icons.assignment_rounded),
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: widget.readOnly,
+          isRequired: true,
+          textInputAction: TextInputAction.next,
+          focusNode: companyNameFocus,
+          onChanged: (String value) {
+            company = company.copyWith(companyName: value);
+          },
+          labelText: AppLocalizations.of(context).translate('company_name'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('company_name_error'),
+          icon: Icons.short_text),
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: widget.readOnly,
+          isRequired: true,
+          textInputAction: TextInputAction.next,
+          textInputType: TextInputType.number,
+          onChanged: (String value) {
+            company = company.copyWith(companyNumber: value);
+          },
+          labelText: AppLocalizations.of(context).translate('company_number'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('company_number_error'),
+          icon: Icons.business),
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: widget.readOnly,
+          isRequired: true,
+          textInputAction: TextInputAction.next,
+          textInputType: TextInputType.number,
+          onChanged: (String value) {
+            company = company.copyWith(phone: value);
+          },
+          labelText: AppLocalizations.of(context).translate('phone'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('phone_error'),
+          icon: Icons.contact_phone),
+      const SizedBox(height: 26),
+      OutlinedTextFormField(
+          readOnly: widget.readOnly,
+          isRequired: true,
+          onChanged: (String value) {
+            company = company.copyWith(address: value);
+          },
+          labelText: AppLocalizations.of(context).translate('address'),
+          validatorMessage:
+              AppLocalizations.of(context).translate('address_error'),
+          icon: Icons.markunread_mailbox_rounded),
       const SizedBox(height: 26),
       Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
         AddButton(

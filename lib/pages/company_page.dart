@@ -6,9 +6,10 @@ import 'package:perna/models/company.dart';
 import 'package:perna/widgets/form/company_form.dart';
 
 class CompanyPage extends StatefulWidget {
-  const CompanyPage({this.readOnly = false});
+  const CompanyPage({this.readOnly = false, this.email});
 
   final bool readOnly;
+  final String email;
 
   @override
   _CompanyPageState createState() => _CompanyPageState();
@@ -58,7 +59,8 @@ class _CompanyPageState extends State<CompanyPage> {
                         CompanyForm(
                           onSubmmitCompany: (Company company) {
                             print(company.copyWith(
-                                employees: <String>[company.manager]).toJson());
+                                manager: widget.email,
+                                employees: <String>[widget.email]).toJson());
                           },
                         ),
                       ]))));

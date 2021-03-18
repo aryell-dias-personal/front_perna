@@ -68,8 +68,9 @@ class SideMenu extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute<CompanyListPage>(
-                    builder: (BuildContext context) =>
-                        CompanyListPage()));
+                    builder: (BuildContext context) => CompanyListPage(
+                          email: email,
+                        )));
           },
           icon: Icons.business,
         ),

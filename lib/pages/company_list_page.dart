@@ -5,6 +5,10 @@ import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/pages/company_page.dart';
 
 class CompanyListPage extends StatefulWidget {
+  const CompanyListPage({this.email});
+
+  final String email;
+
   @override
   _CompanyListPageState createState() => _CompanyListPageState();
 }
@@ -52,11 +56,11 @@ class _CompanyListPageState extends State<CompanyListPage> {
             heroTag: '3',
             backgroundColor: Theme.of(context).primaryColor,
             onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute<CompanyPage>(
-                    builder: (BuildContext context) =>
-                      const CompanyPage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute<CompanyPage>(
+                      builder: (BuildContext context) =>
+                          CompanyPage(email: widget.email)));
             },
             child: Icon(Icons.add_business_outlined,
                 color: Theme.of(context).backgroundColor)));
