@@ -49,6 +49,7 @@ class _CompanyFormState extends State<CompanyForm> {
             company = company.copyWith(businessType: value);
           },
           textInputAction: TextInputAction.next,
+          // TODO: adicionar ao AppLocalizations
           options: const <String>[
             'individual',
             'company',
@@ -71,6 +72,7 @@ class _CompanyFormState extends State<CompanyForm> {
           validatorMessage: AppLocalizations.of(context).translate('company_name_error'),
           icon: Icons.short_text),
       const SizedBox(height: 26),
+      // TODO: avaliar se num vai ser sempre o email do requerente
       OutlinedTextFormField(
           readOnly: widget.readOnly,
           isRequired: true,
@@ -127,6 +129,7 @@ class _CompanyFormState extends State<CompanyForm> {
           onFieldSubmitted: (String value) {
             company = company.copyWith(structure: value);
           },
+          // TODO: adicionar ao AppLocalizations
           options: const <String>[
             'government instrumentality',
             'governmental unit',

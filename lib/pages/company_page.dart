@@ -24,9 +24,14 @@ class _CompanyPageState extends State<CompanyPage> {
           brightness: Theme.of(context).brightness,
           centerTitle: true,
           title: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-            Text(AppLocalizations.of(context).translate('provider'),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 30.0)),
+            if (widget.readOnly)
+              Text(AppLocalizations.of(context).translate('provider'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 30.0)),
+            if (!widget.readOnly)
+              Text(AppLocalizations.of(context).translate('addProvider'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 30.0)),
             const SizedBox(width: 5),
             if (widget.readOnly) const Icon(Icons.business, size: 30),
             if (!widget.readOnly)
@@ -52,8 +57,8 @@ class _CompanyPageState extends State<CompanyPage> {
                         children: <Widget>[
                         CompanyForm(
                           onSubmmitCompany: (Company company) {
-                            print(company
-                                .copyWith(employees: <String>[company.manager]).toJson());
+                            print(company.copyWith(
+                                employees: <String>[company.manager]).toJson());
                           },
                         ),
                       ]))));
