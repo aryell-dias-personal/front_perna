@@ -1,10 +1,8 @@
-import 'package:perna/models/bank_account.dart';
-
 class Company {
   Company(
       {this.employees,
       this.manager,
-      this.bankAccount,
+      this.bankAccountId,
       this.businessType,
       this.address,
       this.companyName,
@@ -25,9 +23,8 @@ class Company {
       businessType: parsedJson['businessType'] != null
           ? parsedJson['businessType'] as String
           : null,
-      bankAccount: parsedJson['bankAccount'] != null
-          ? BankAccount.fromJson(
-              parsedJson['bankAccount'] as Map<String, dynamic>)
+      bankAccountId: parsedJson['bankAccountId'] != null
+          ? parsedJson['bankAccountId'] as String
           : null,
       address: parsedJson['address'] != null
           ? parsedJson['address'] as String
@@ -54,7 +51,7 @@ class Company {
   Company copyWith({
     List<String> employees,
     String manager,
-    BankAccount bankAccount,
+    String bankAccountId,
     String businessType,
     String address,
     String companyName,
@@ -67,7 +64,7 @@ class Company {
       Company(
           employees: employees ?? this.employees,
           manager: manager ?? this.manager,
-          bankAccount: bankAccount ?? this.bankAccount,
+          bankAccountId: bankAccountId ?? this.bankAccountId,
           businessType: businessType ?? this.businessType,
           address: address ?? this.address,
           companyName: companyName ?? this.companyName,
@@ -79,7 +76,7 @@ class Company {
 
   List<String> employees;
   String manager;
-  BankAccount bankAccount;
+  String bankAccountId;
   String businessType;
   String address;
   String companyName;
@@ -92,7 +89,7 @@ class Company {
   dynamic toJson() => <String, dynamic>{
         'employees': employees,
         'manager': manager,
-        'bankAccount': bankAccount.toJson(),
+        'bankAccountId': bankAccountId,
         'businessType': businessType,
         'address': address,
         'companyName': companyName,

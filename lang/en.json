@@ -172,5 +172,12 @@
     "company_number_error": "Please input a company number",
     "phone_error": "Please input a phone",
     "address_error": "Please input a address",
-    "structure_error": "Please input a structure"
+    "structure_error": "Please input a structure",
+    "government_instrumentality": "government instrumentality",
+    "governmental_unit": "governmental unit",
+    "incorporated_non_profit": "incorporated non profit",
+    "limited_liability_partnership": "limited liability partnership",
+    "multi_member_llc": "multi member llc",
+    "non_profit": "sem fins lucrativos",
+    "government_entity": "entidade governamental"
 }

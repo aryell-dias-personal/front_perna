@@ -17,6 +17,7 @@ class Agent {
       this.askedStartAt,
       this.askedEndAt,
       this.email,
+      this.companyId,
       this.fromEmail,
       this.old = false,
       this.askedPointIds,
@@ -66,6 +67,7 @@ class Agent {
         history: parsedJson['history']?.map<DateTime>(parseDate)?.toList()
             as List<DateTime>,
         email: parsedJson['email'] as String,
+        companyId: parsedJson['companyId'] as String,
         fromEmail: parsedJson['fromEmail'] as String,
         watchedBy: parsedJson['watchedBy']
             ?.map<String>((dynamic email) => '$email')
@@ -90,6 +92,7 @@ class Agent {
   Duration askedEndAt;
   Duration askedStartAt;
   String email;
+  String companyId;
   String fromEmail;
   List<String> askedPointIds;
   List<String> watchedBy;
@@ -108,6 +111,7 @@ class Agent {
           Duration askedStartAt,
           Duration askedEndAt,
           String email,
+          String companyId,
           String fromEmail,
           List<String> askedPointIds,
           LatLng position,
@@ -127,6 +131,7 @@ class Agent {
           askedStartAt: askedStartAt ?? this.askedStartAt,
           askedEndAt: askedEndAt ?? this.askedEndAt,
           email: email ?? this.email,
+          companyId: companyId ?? this.companyId,
           fromEmail: fromEmail ?? this.fromEmail,
           askedPointIds: askedPointIds ?? this.askedPointIds,
           watchedBy: watchedBy ?? this.watchedBy,
@@ -152,6 +157,7 @@ class Agent {
         'askedStartAt': askedStartAt?.inSeconds,
         'askedEndAt': askedEndAt?.inSeconds,
         'email': email,
+        'companyId': companyId,
         'fromEmail': fromEmail,
         'askedPointIds': askedPointIds,
         'watchedBy': watchedBy,

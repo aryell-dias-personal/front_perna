@@ -4,9 +4,10 @@ class BankAccount {
       this.accountHolderType,
       this.bankName,
       this.countryCode,
+      this.email,
       this.currency,
       this.accountNumber,
-      // routing_number é `codigo do banco-agencia` no brasil (fora é só um número ou string)
+      // NOTE: routing_number é `codigo do banco-agencia` no brasil (fora é só um número ou string)
       this.routingNumber});
 
   factory BankAccount.fromJson(Map<String, dynamic> parsedJson) {
@@ -26,6 +27,9 @@ class BankAccount {
       countryCode: parsedJson['countryCode'] != null
           ? parsedJson['countryCode'] as String
           : null,
+      email: parsedJson['email'] != null
+          ? parsedJson['email'] as String
+          : null,
       currency: parsedJson['currency'] != null
           ? parsedJson['currency'] as String
           : null,
@@ -40,6 +44,7 @@ class BankAccount {
   String bankName;
   String accountNumber;
   String countryCode;
+  String email;
   String currency;
   String routingNumber;
 
@@ -49,6 +54,7 @@ class BankAccount {
           String bankName,
           String accountNumber,
           String countryCode,
+          String email,
           String currency,
           String routingNumber}) =>
       BankAccount(
@@ -57,6 +63,7 @@ class BankAccount {
           bankName: bankName ?? this.bankName,
           accountNumber: accountNumber ?? this.accountNumber,
           countryCode: countryCode ?? this.countryCode,
+          email: email ?? this.email,
           currency: currency ?? this.currency,
           routingNumber: routingNumber ?? this.routingNumber);
 
@@ -66,6 +73,7 @@ class BankAccount {
         'bankName': bankName,
         'accountNumber': accountNumber,
         'countryCode': countryCode,
+        'email': email,
         'currency': currency,
         'routingNumber': routingNumber,
       };

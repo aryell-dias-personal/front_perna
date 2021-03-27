@@ -6,6 +6,7 @@ import 'package:perna/constants/constants.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/my_decoder.dart';
 import 'package:perna/pages/main_page.dart';
+import 'package:perna/services/company.dart';
 import 'package:perna/services/directions.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/payments.dart';
@@ -109,6 +110,9 @@ Future<void> main() async {
   );
   getIt.registerSingleton<DriverService>(
     DriverService(myDecoder: myDecoder),
+  );
+  getIt.registerSingleton<CompanyService>(
+    CompanyService(myDecoder: myDecoder),
   );
   getIt.registerSingleton<PaymentsService>(
     PaymentsService(myDecoder: myDecoder),

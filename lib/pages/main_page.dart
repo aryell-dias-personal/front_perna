@@ -95,7 +95,7 @@ class _MainPageState extends State<MainPage> {
       }
     }
     final int statusCodeAnswer = await getIt<DriverService>()
-        .answerNewAgent(agent.fromEmail, agent.email, accepted: accepted);
+        .answerNewAgent(agent, accepted: accepted);
     if (statusCodeAnswer == 200) {
       final String answer = AppLocalizations.of(context)
           .translate(accepted ? 'accepted' : 'denied');

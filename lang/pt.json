@@ -172,5 +172,14 @@
     "company_number_error": "Insira um Número da empresa",
     "phone_error": "Insira um telefone",
     "address_error": "Insira um endereço",
-    "structure_error": "Insira um estrutura"
+    "structure_error": "Insira um estrutura",
+    "government_instrumentality": "Instrumentalidade do governo",
+    "governmental_unit": "Unidade governamental",
+    "incorporated_non_profit": "Incorporado sem fins lucrativos",
+    "limited_liability_partnership": "Sociedade de responsabilidade limitada",
+    "multi_member_llc": "Multi-membro LLC",
+    "private_company": "Empresa privada",
+    "private_corporatio": "Corporação privada",
+    "non_profit": "non profit",
+    "government_entity": "government entity"
 }

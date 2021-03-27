@@ -2,8 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/main.dart';
+import 'package:perna/models/bank_account.dart';
 import 'package:perna/models/company.dart';
 import 'package:perna/widgets/form/company_form.dart';
+import 'package:perna/services/company.dart';
+import 'package:perna/services/sign_in.dart';
 
 class CompanyPage extends StatefulWidget {
   const CompanyPage({this.readOnly = false, this.email});
@@ -57,10 +61,16 @@ class _CompanyPageState extends State<CompanyPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         CompanyForm(
-                          onSubmmitCompany: (Company company) {
-                            print(company.copyWith(
-                                manager: widget.email,
-                                employees: <String>[widget.email]).toJson());
+                          onSubmmitCompany:
+                              (Company company, BankAccount bankAccount) async {
+                            final String token =
+                                await getIt<SignInService>().getRefreshToken();
+                            await getIt<CompanyService>().createCompany(
+                                company.copyWith(
+                                    manager: widget.email,
+                                    employees: <String>[widget.email]),
+                                bankAccount,
+                                token);
                           },
                         ),
                       ]))));
