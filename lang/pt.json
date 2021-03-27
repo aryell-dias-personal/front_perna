@@ -180,6 +180,6 @@
     "multi_member_llc": "Multi-membro LLC",
     "private_company": "Empresa privada",
     "private_corporatio": "Corporação privada",
-    "non_profit": "non profit",
-    "government_entity": "government entity"
+    "non_profit": "sem fins lucrativos",
+    "government_entity": "entidade governamental"
 }

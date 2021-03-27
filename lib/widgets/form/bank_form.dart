@@ -160,10 +160,7 @@ class _BankFormState extends State<BankForm> {
             bankAccount = bankAccount.copyWith(accountNumber: value);
           },
           onFieldSubmitted: (String value) {
-            final bool valide = _formKey.currentState.validate();
-            if (valide) {
-              widget.onSubmmitBankAccount(bankAccount);
-            }
+            _formKey.currentState.validate();
           },
           labelText: AppLocalizations.of(context).translate('account_number')),
       const SizedBox(height: 26),
