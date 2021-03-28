@@ -11,7 +11,11 @@ import 'package:perna/widgets/input/outlined_text_form_field.dart';
 class BankForm extends StatefulWidget {
   BankForm(
       {this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
-    if (!readOnly) assert(onSubmmitBankAccount != null);
+    if (!readOnly) {
+      assert(onSubmmitBankAccount != null);
+    } else {
+      assert(bankAccount != null);
+    }
   }
 
   final void Function(BankAccount) onSubmmitBankAccount;
@@ -44,6 +48,7 @@ class _BankFormState extends State<BankForm> {
     return FormContainer(formkey: _formKey, children: <Widget>[
       AutoCompleteField(
           readOnly: widget.readOnly,
+          initialValue: widget.bankAccount?.accountHolderType,
           isRequired: true,
           validatorMessage: AppLocalizations.of(context)
               .translate('account_holder_type_error'),
@@ -65,6 +70,7 @@ class _BankFormState extends State<BankForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.bankAccount?.accountHolderName,
           isRequired: true,
           validatorMessage: AppLocalizations.of(context)
               .translate('account_holder_name_error'),
@@ -82,6 +88,7 @@ class _BankFormState extends State<BankForm> {
         children: <Widget>[
           AutoCompleteField(
               readOnly: widget.readOnly,
+              initialValue: widget.bankAccount?.countryCode,
               isRequired: true,
               validatorMessage:
                   AppLocalizations.of(context).translate('country_error'),
@@ -99,6 +106,7 @@ class _BankFormState extends State<BankForm> {
           const SizedBox(width: 10),
           AutoCompleteField(
               readOnly: widget.readOnly,
+              initialValue: widget.bankAccount?.currency?.toUpperCase(),
               isRequired: true,
               validatorMessage:
                   AppLocalizations.of(context).translate('currency_error'),
@@ -124,6 +132,7 @@ class _BankFormState extends State<BankForm> {
         children: <Widget>[
           OutlinedTextFormField(
               readOnly: widget.readOnly,
+              initialValue: widget.bankAccount?.routingNumber?.split('-')?.first,
               isRequired: true,
               textInputType: TextInputType.number,
               validatorMessage:
@@ -137,6 +146,7 @@ class _BankFormState extends State<BankForm> {
           const SizedBox(width: 10),
           OutlinedTextFormField(
               readOnly: widget.readOnly,
+              initialValue: widget.bankAccount?.routingNumber?.split('-')?.last,
               textInputAction: TextInputAction.next,
               isRequired: true,
               textInputType: TextInputType.number,
@@ -151,6 +161,7 @@ class _BankFormState extends State<BankForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.bankAccount?.accountNumber,
           isRequired: true,
           textInputType: TextInputType.number,
           validatorMessage:

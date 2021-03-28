@@ -130,7 +130,7 @@
     "no_credit_card_description": "You haven't entered any payment information yet 😬",
     "credit_card": "Credit Card",
     "add_credit_card": "Add Credit Card",
-    "selected_credit_card": "Selected",
+    "selected": "Selected",
     "delete_credit_card": "Delete",
     "turn_credit_card_default": "Turn Default",
     "default_credit_card": "Default",
@@ -179,5 +179,10 @@
     "limited_liability_partnership": "limited liability partnership",
     "multi_member_llc": "multi member llc",
     "non_profit": "non profit",
-    "government_entity": "government entity"
+    "government_entity": "government entity",
+    "no_company": "No company",
+    "no_company_description": "You don't have any company",
+    "contact": "Contact",
+    "manager_email": "Manager's email",
+    "consult_bank_data": "Consult bank data"
 }

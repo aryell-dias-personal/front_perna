@@ -73,7 +73,7 @@ class _AutoCompleteFieldState extends State<AutoCompleteField> {
           return null;
         },
         textFieldConfiguration: TextFieldConfiguration(
-          controller: textEditingController,
+          controller: widget.readOnly ? null : textEditingController,
           focusNode: widget.focusNode,
           enabled: !widget.readOnly,
           keyboardType: widget.textInputType,

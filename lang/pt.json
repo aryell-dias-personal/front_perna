@@ -130,7 +130,7 @@
     "no_credit_card_description": "Você ainda não cadastrou nenhuma informação de pagamento ainda 😬",
     "credit_card": "Cartão",
     "add_credit_card": "Adicionar Cartão",
-    "selected_credit_card": "Selecionado",
+    "selected": "Selecionado",
     "delete_credit_card": "Deletar",
     "turn_credit_card_default": "Tornar Padrão",
     "default_credit_card": "Padrão",
@@ -181,5 +181,10 @@
     "private_company": "Empresa privada",
     "private_corporatio": "Corporação privada",
     "non_profit": "sem fins lucrativos",
-    "government_entity": "entidade governamental"
+    "government_entity": "entidade governamental",
+    "no_company": "Nenhuma empresa",
+    "no_company_description": "Você não tem nenhuma empresa",
+    "contact": "Contato",
+    "manager_email": "Email do gerente",
+    "consult_bank_data": "Consultar dados bancários"
 }

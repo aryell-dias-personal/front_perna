@@ -35,6 +35,7 @@ class _HistoryPageState extends State<HistoryPage> {
   StreamSubscription<QuerySnapshot> agentsListener;
   List<dynamic> askedPoints;
   List<dynamic> agents;
+  List<dynamic> history;
   Timer timer;
 
   @override
@@ -55,6 +56,7 @@ class _HistoryPageState extends State<HistoryPage> {
         agents = agentsSnapshot.docs.map((QueryDocumentSnapshot agent) {
           return agent.data();
         }).toList();
+        history = getHistory();
         isLoadingAgents = false;
       });
     });
@@ -71,6 +73,7 @@ class _HistoryPageState extends State<HistoryPage> {
             askedPointsSnapshot.docs.map((QueryDocumentSnapshot askedPoint) {
           return askedPoint.data();
         }).toList();
+        history = getHistory();
         isLoadingAskedPoints = false;
       });
     });
@@ -171,12 +174,11 @@ class _HistoryPageState extends State<HistoryPage> {
                 : Builder(
                     builder: (BuildContext context) {
                       return ListView.separated(
-                        itemCount: getHistory().length,
+                        itemCount: history.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const Divider();
                         },
                         itemBuilder: (BuildContext context, int index) {
-                          final List<dynamic> history = getHistory();
                           final dynamic operation = history[index];
                           return TextButton(
                               key: UniqueKey(),

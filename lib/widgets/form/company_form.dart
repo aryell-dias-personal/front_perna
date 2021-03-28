@@ -42,6 +42,7 @@ class _CompanyFormState extends State<CompanyForm> {
       AutoCompleteField(
           readOnly: widget.readOnly,
           isRequired: true,
+          initialValue: widget.company?.businessType,
           onFieldSubmitted: (String value) {
             structureFocus.requestFocus();
             company = company.copyWith(businessType: value);
@@ -64,6 +65,7 @@ class _CompanyFormState extends State<CompanyForm> {
       AutoCompleteField(
           readOnly: widget.readOnly,
           isRequired: true,
+          initialValue: widget.company?.structure,
           onChanged: (String value) {
             company = company.copyWith(structure: value);
           },
@@ -89,6 +91,7 @@ class _CompanyFormState extends State<CompanyForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.company?.companyName,
           isRequired: true,
           textInputAction: TextInputAction.next,
           focusNode: companyNameFocus,
@@ -102,6 +105,7 @@ class _CompanyFormState extends State<CompanyForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.company?.companyNumber,
           isRequired: true,
           textInputAction: TextInputAction.next,
           textInputType: TextInputType.number,
@@ -115,6 +119,7 @@ class _CompanyFormState extends State<CompanyForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.company?.phone,
           isRequired: true,
           textInputAction: TextInputAction.next,
           textInputType: TextInputType.number,
@@ -128,6 +133,7 @@ class _CompanyFormState extends State<CompanyForm> {
       const SizedBox(height: 26),
       OutlinedTextFormField(
           readOnly: widget.readOnly,
+          initialValue: widget.company?.address,
           isRequired: true,
           onChanged: (String value) {
             company = company.copyWith(address: value);
@@ -136,6 +142,14 @@ class _CompanyFormState extends State<CompanyForm> {
           validatorMessage:
               AppLocalizations.of(context).translate('address_error'),
           icon: Icons.markunread_mailbox_rounded),
+      if (widget.readOnly) ...<Widget>[
+        const SizedBox(height: 26),
+        OutlinedTextFormField(
+            readOnly: true,
+            initialValue: widget.company?.manager,
+            labelText: AppLocalizations.of(context).translate('manager_email'),
+            icon: Icons.admin_panel_settings),
+      ],
       const SizedBox(height: 26),
       Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
         AddButton(
