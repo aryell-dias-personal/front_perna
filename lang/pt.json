@@ -186,5 +186,9 @@
     "no_company_description": "Você não tem nenhuma empresa",
     "contact": "Contato",
     "manager_email": "Email do gerente",
-    "consult_bank_data": "Consultar dados bancários"
+    "consult_bank_data": "Consultar dados bancários",
+    "successful_company_added": "Empresa cadastrada com sucesso",
+    "unsuccessful_company_added": "Não foi possível cadastradar empresa, verifique os dados e tente novamente",
+    "successful_company_deleted": "Empresa apagada com sucesso",
+    "unsuccessful_company_deleted": "Não foi possível excluir companhia"
 }

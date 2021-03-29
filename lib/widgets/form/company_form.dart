@@ -14,7 +14,7 @@ class CompanyForm extends StatefulWidget {
     if (!readOnly) assert(onSubmmitCompany != null);
   }
 
-  final void Function(Company, BankAccount) onSubmmitCompany;
+  final Future<void> Function(Company, BankAccount) onSubmmitCompany;
   final Company company;
   final bool readOnly;
 
@@ -76,13 +76,15 @@ class _CompanyFormState extends State<CompanyForm> {
           focusNode: structureFocus,
           textInputAction: TextInputAction.next,
           options: <String>[
-              AppLocalizations.of(context).translate('government_instrumentality'),
-              AppLocalizations.of(context).translate('governmental_unit'),
-              AppLocalizations.of(context).translate('incorporated_non_profit'),
-              AppLocalizations.of(context).translate('limited_liability_partnership'),
-              AppLocalizations.of(context).translate('multi_member_llc'),
-              AppLocalizations.of(context).translate('private_company'),
-              AppLocalizations.of(context).translate('private_corporatio')
+            AppLocalizations.of(context)
+                .translate('government_instrumentality'),
+            AppLocalizations.of(context).translate('governmental_unit'),
+            AppLocalizations.of(context).translate('incorporated_non_profit'),
+            AppLocalizations.of(context)
+                .translate('limited_liability_partnership'),
+            AppLocalizations.of(context).translate('multi_member_llc'),
+            AppLocalizations.of(context).translate('private_company'),
+            AppLocalizations.of(context).translate('private_corporatio')
           ],
           labelText: AppLocalizations.of(context).translate('structure'),
           validatorMessage:
@@ -162,11 +164,13 @@ class _CompanyFormState extends State<CompanyForm> {
                   context,
                   MaterialPageRoute<BankPage>(
                       builder: (BuildContext context) => BankPage(
-                            onSubmmitBankAccount: (BankAccount bankAccount) {
+                            onSubmmitBankAccount:
+                                (BankAccount bankAccount) async {
                               company = company.copyWith(
                                   country: bankAccount.countryCode,
                                   currency: bankAccount.currency);
-                              widget.onSubmmitCompany(company, bankAccount);
+                              await widget.onSubmmitCompany(
+                                  company, bankAccount);
                             },
                           )));
             }

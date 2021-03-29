@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
 import 'package:perna/models/company.dart';
 import 'package:perna/pages/company_page.dart';
 import 'package:perna/widgets/company/company_widget.dart';
+import 'package:perna/services/company.dart';
+import 'package:perna/services/sign_in.dart';
 
 class CompanyListPage extends StatefulWidget {
   const CompanyListPage({this.email});
@@ -23,6 +26,7 @@ class CompanyListPage extends StatefulWidget {
 class _CompanyListPageState extends State<CompanyListPage> {
   int selectedIndex;
   Timer timer;
+  String userToken;
   bool isLoading = false;
   List<Company> companys;
   bool passedTime = false;
@@ -36,7 +40,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
         .listen((QuerySnapshot companysSnapshot) {
       setState(() {
         companys = companysSnapshot.docs.map((QueryDocumentSnapshot company) {
-          return Company.fromJson(company.data());
+          return Company.fromJson(company.data()).copyWith(id: company.id);
         }).toList();
         isLoading = false;
       });
@@ -60,6 +64,11 @@ class _CompanyListPageState extends State<CompanyListPage> {
         });
       });
       isLoading = true;
+      getIt<SignInService>().getRefreshToken().then((String token) {
+        setState(() {
+          userToken = token;
+        });
+      });
       companysListener = _initcompanysListener();
     });
   }
@@ -86,7 +95,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
                   fontFamily:
                       Theme.of(context).textTheme.headline6.fontFamily)),
         ),
-        body: isLoading || !passedTime
+        body: isLoading || !passedTime || userToken == null
             ? Center(
                 child: SpinKitDoubleBounce(
                     size: 100.0, color: Theme.of(context).primaryColor))
@@ -171,7 +180,10 @@ class _CompanyListPageState extends State<CompanyListPage> {
                         backgroundColor: Theme.of(context).primaryColor,
                         children: <SpeedDialChild>[
                           SpeedDialChild(
-                            onTap: () {},
+                            onTap: () {
+                              // redireciona pra uma tela de cadastro de banco
+                              // getIt<CompanyService>().changeBank(companys[selectedIndex].id, BankAccount(), userToken);
+                            },
                             child: Icon(Icons.account_balance,
                                 color: Theme.of(context).backgroundColor),
                             label: AppLocalizations.of(context)
@@ -179,7 +191,10 @@ class _CompanyListPageState extends State<CompanyListPage> {
                             backgroundColor: Colors.blueAccent,
                           ),
                           SpeedDialChild(
-                            onTap: () {},
+                            onTap: () {
+                              // redireciona pra uma tela de gerencia de employes
+                              // getIt<CompanyService>().updateCompany(companys[selectedIndex], userToken);
+                            },
                             child: Icon(Icons.person_add_alt_1_outlined,
                                 color: Theme.of(context).backgroundColor),
                             label: AppLocalizations.of(context)
@@ -187,7 +202,35 @@ class _CompanyListPageState extends State<CompanyListPage> {
                             backgroundColor: Colors.amberAccent,
                           ),
                           SpeedDialChild(
-                              onTap: () {},
+                              onTap: () async {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                final int statusCode =
+                                    await getIt<CompanyService>().deleteCompany(
+                                        companys[selectedIndex].id, userToken);
+                                if (statusCode == 200) {
+                                  setState(() {
+                                    selectedIndex = null;
+                                    isLoading = false;
+                                  });
+                                  showSnackBar(
+                                      AppLocalizations.of(context).translate(
+                                          'successful_company_deleted'),
+                                      Colors.greenAccent,
+                                      context);
+                                } else {
+                                  setState(() {
+                                    selectedIndex = null;
+                                    isLoading = false;
+                                  });
+                                  showSnackBar(
+                                      AppLocalizations.of(context).translate(
+                                          'unsuccessful_company_deleted'),
+                                      Colors.redAccent,
+                                      context);
+                                }
+                              },
                               child: Icon(Icons.delete_outline,
                                   color: Theme.of(context).backgroundColor),
                               label: AppLocalizations.of(context)

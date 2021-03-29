@@ -1,6 +1,7 @@
 class Company {
   Company(
       {this.employees,
+      this.id,
       this.manager,
       this.bankAccountId,
       this.businessType,
@@ -51,6 +52,7 @@ class Company {
   Company copyWith({
     List<String> employees,
     String manager,
+    String id,
     String bankAccountId,
     String businessType,
     String address,
@@ -63,6 +65,7 @@ class Company {
   }) =>
       Company(
           employees: employees ?? this.employees,
+          id: id ?? this.id,
           manager: manager ?? this.manager,
           bankAccountId: bankAccountId ?? this.bankAccountId,
           businessType: businessType ?? this.businessType,
@@ -76,6 +79,7 @@ class Company {
 
   List<String> employees;
   String manager;
+  String id;
   String bankAccountId;
   String businessType;
   String address;

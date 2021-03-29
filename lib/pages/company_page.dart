@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
 import 'package:perna/models/bank_account.dart';
 import 'package:perna/models/company.dart';
@@ -119,14 +120,30 @@ class _CompanyPageState extends State<CompanyPage> {
                               (Company company, BankAccount bankAccount) async {
                             final String token =
                                 await getIt<SignInService>().getRefreshToken();
-                            await getIt<CompanyService>().createCompany(
-                                company.copyWith(
-                                    manager: widget.email,
-                                    employees: <String>[widget.email]),
-                                bankAccount.copyWith(
-                                  email: widget.email,
-                                ),
-                                token);
+                            final int statusCode = await getIt<CompanyService>()
+                                .createCompany(
+                                    company.copyWith(
+                                        manager: widget.email,
+                                        employees: <String>[widget.email]),
+                                    bankAccount.copyWith(
+                                      email: widget.email,
+                                    ),
+                                    token);
+                            if (statusCode == 200) {
+                              Navigator.popUntil(context,
+                                  (Route<dynamic> route) => route.isFirst);
+                              showSnackBar(
+                                  AppLocalizations.of(context)
+                                      .translate('successful_company_added'),
+                                  Colors.greenAccent,
+                                  context);
+                            } else {
+                              showSnackBar(
+                                  AppLocalizations.of(context)
+                                      .translate('unsuccessful_company_added'),
+                                  Colors.redAccent,
+                                  context);
+                            }
                           },
                         ),
                       ]))));

@@ -15,7 +15,7 @@ class BankPage extends StatefulWidget {
     }
   }
 
-  final void Function(BankAccount) onSubmmitBankAccount;
+  final Future<void> Function(BankAccount) onSubmmitBankAccount;
   final BankAccount bankAccount;
   final bool readOnly;
 
@@ -58,10 +58,18 @@ class _BankPageState extends State<BankPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         BankForm(
-                          bankAccount: widget.bankAccount,
-                          readOnly: widget.readOnly,
-                          onSubmmitBankAccount: widget.onSubmmitBankAccount,
-                        ),
+                            bankAccount: widget.bankAccount,
+                            readOnly: widget.readOnly,
+                            onSubmmitBankAccount:
+                                (BankAccount bankAccount) async {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              await widget.onSubmmitBankAccount(bankAccount);
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }),
                       ]))));
   }
 }

@@ -21,9 +21,11 @@ class CompanyService {
     return res.statusCode;
   }
 
-  Future<int> deleteCompany(Company company, String token) async {
+  Future<int> deleteCompany(String companyId, String token) async {
     final Response res = await post(Uri.parse('$baseUrl/deleteCompany'),
-        body: await myDecoder.encode(company.toJson()),
+        body: await myDecoder.encode(<String, dynamic>{
+          'companyId': companyId,
+        }),
         headers: <String, String>{'Authorization': token});
     return res.statusCode;
   }
@@ -36,10 +38,10 @@ class CompanyService {
   }
 
   Future<int> changeBank(
-      Company company, BankAccount bankAccount, String token) async {
+      String companyId, BankAccount bankAccount, String token) async {
     final Response res = await post(Uri.parse('$baseUrl/changeBank'),
         body: await myDecoder.encode(<String, dynamic>{
-          'company': company.toJson(),
+          'companyId': companyId,
           'bankAccount': bankAccount.toJson()
         }),
         headers: <String, String>{'Authorization': token});

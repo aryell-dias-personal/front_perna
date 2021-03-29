@@ -132,7 +132,8 @@ class _BankFormState extends State<BankForm> {
         children: <Widget>[
           OutlinedTextFormField(
               readOnly: widget.readOnly,
-              initialValue: widget.bankAccount?.routingNumber?.split('-')?.first,
+              initialValue:
+                  widget.bankAccount?.routingNumber?.split('-')?.first,
               isRequired: true,
               textInputType: TextInputType.number,
               validatorMessage:
@@ -183,7 +184,6 @@ class _BankFormState extends State<BankForm> {
               bankAccount =
                   bankAccount.copyWith(routingNumber: '$bankCode-$branchCode');
               widget.onSubmmitBankAccount(bankAccount);
-              Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
             }
           })
     ]);

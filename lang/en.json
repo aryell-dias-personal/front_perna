@@ -184,5 +184,9 @@
     "no_company_description": "You don't have any company",
     "contact": "Contact",
     "manager_email": "Manager's email",
-    "consult_bank_data": "Consult bank data"
+    "consult_bank_data": "Consult bank data",
+    "successful_company_added": "Company successfully registered",
+    "unsuccessful_company_added": "Could not register company, check the data and try again",
+    "successful_company_deleted": "Company successfully deleted",
+    "unsuccessful_company_deleted": "Could not delete company"
 }
