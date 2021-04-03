@@ -200,8 +200,10 @@ class _MainPageState extends State<MainPage> {
     final String companyId = message.data['companyId'] as String;
     final NavigatorState navigatorState = Navigator.of(context);
     await navigatorState.push(MaterialPageRoute<Scaffold>(
-        builder: (BuildContext context) => Scaffold(
-            body: CompanyPage(
+        builder: (BuildContext context) => StoreConnector<StoreState, String>(
+            converter: (Store<StoreState> store) => store.state.user?.email,
+            builder: (BuildContext context, String email) => CompanyPage(
+                email: email,
                 companyId: companyId,
                 readOnly: true,
                 accept: (Company company) async {
@@ -222,11 +224,11 @@ class _MainPageState extends State<MainPage> {
             .translate(accepted ? 'accepted' : 'denied');
         showSnackBar(
             AppLocalizations.of(context)
-                .translateFormat('answer_order', <String>[answer]),
+                .translateFormat('answer_employee', <String>[answer]),
             Colors.greenAccent,
             context);
       } else {
-        showSnackBar(AppLocalizations.of(context).translate('not_answer_order'),
+        showSnackBar(AppLocalizations.of(context).translate('not_answer_employee'),
             Colors.redAccent, context);
       }
       Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);

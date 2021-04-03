@@ -200,5 +200,7 @@
     "request_employee": "Request",
     "successfully_requested_employee": "Successfully requested employee",
     "unsuccessfully_requested_employee": "Not requested employee",
+    "answer_employee": "You <?> to become a company employee",
+    "not_answer_employee": "It wasn't possible to respond at the moment",
     "save": "Save"
 }

@@ -54,8 +54,8 @@ class _CompanyPageState extends State<CompanyPage> {
     });
     if (widget.company == null) {
       getIt<FirebaseFirestore>()
-          .collection('bank')
-          .doc(company.bankAccountId)
+          .collection('company')
+          .doc(widget.companyId)
           .get()
           .then((DocumentSnapshot documentSnapshot) {
         setState(() {

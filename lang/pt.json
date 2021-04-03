@@ -202,5 +202,7 @@
     "request_employee": "Solicitar",
     "successfully_requested_employee": "Funcionário solicitado com sucesso",
     "unsuccessfully_requested_employee": "Empregado não solicitado",
+    "answer_employee": "Você <?> se tornar funcionário da empresa",
+    "not_answer_employee": "Não foi possivel responder no momento",
     "save": "Salvar"
 }
