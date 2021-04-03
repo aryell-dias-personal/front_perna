@@ -16,13 +16,24 @@ import 'package:perna/services/sign_in.dart';
 enum CompanyOptions { consultBankData, consultEmployees }
 
 class CompanyPage extends StatefulWidget {
-  CompanyPage({this.company, this.readOnly = false, this.email}) {
+  CompanyPage(
+      {this.company,
+      this.readOnly = false,
+      this.companyId,
+      this.showActionButtons,
+      this.email,
+      this.accept,
+      this.deny}) {
     if (readOnly) {
-      assert(company != null);
+      assert(company != null || companyId != null);
     }
     assert(email != null);
   }
 
+  final Future<void> Function(Company) accept;
+  final Future<void> Function(Company) deny;
+  final bool showActionButtons;
+  final String companyId;
   final Company company;
   final bool readOnly;
   final String email;
@@ -33,6 +44,43 @@ class CompanyPage extends StatefulWidget {
 
 class _CompanyPageState extends State<CompanyPage> {
   bool isLoading = false;
+  Company company;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isLoading = true;
+    });
+    if (widget.company == null) {
+      getIt<FirebaseFirestore>()
+          .collection('bank')
+          .doc(company.bankAccountId)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        setState(() {
+          company = Company.fromJson(documentSnapshot.data());
+          isLoading = false;
+        });
+      });
+    } else {
+      setState(() {
+        company = widget.company;
+        isLoading = false;
+      });
+    }
+  }
+
+  void _acceptOrDenny(bool accept) {
+    setState(() {
+      isLoading = true;
+    });
+    (accept ? widget.accept(company) : widget.deny(company)).then((_) {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +102,13 @@ class _CompanyPageState extends State<CompanyPage> {
             if (!widget.readOnly)
               const Icon(Icons.add_business_outlined, size: 30),
           ]),
-          actions: widget.readOnly && widget.company.manager == widget.email
+          actions: widget.readOnly && company.manager == widget.email
               ? <Widget>[
                   PopupMenuButton<CompanyOptions>(
                     tooltip:
                         AppLocalizations.of(context).translate('open_menu'),
                     onSelected: (CompanyOptions result) async {
-                      if (widget.readOnly &&
-                          widget.company.manager == widget.email) {
+                      if (widget.readOnly && company.manager == widget.email) {
                         if (result == CompanyOptions.consultBankData) {
                           setState(() {
                             isLoading = true;
@@ -69,7 +116,7 @@ class _CompanyPageState extends State<CompanyPage> {
                           final DocumentReference ref =
                               getIt<FirebaseFirestore>()
                                   .collection('bank')
-                                  .doc(widget.company.bankAccountId);
+                                  .doc(company.bankAccountId);
                           final DocumentSnapshot documentSnapshot =
                               await ref.get();
                           final BankAccount bankAccount =
@@ -92,7 +139,7 @@ class _CompanyPageState extends State<CompanyPage> {
                                   title: AppLocalizations.of(context)
                                       .translate('manage_employees'),
                                   readOnly: true,
-                                  keys: widget.company.employees),
+                                  keys: company.employees),
                             ),
                           );
                         }
@@ -132,8 +179,13 @@ class _CompanyPageState extends State<CompanyPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         CompanyForm(
+                          acceptPressed: () => _acceptOrDenny(true),
+                          denyPressed: () => _acceptOrDenny(false),
+                          showActionButtons: widget.accept != null &&
+                              widget.deny != null &&
+                              widget.readOnly,
                           readOnly: widget.readOnly,
-                          company: widget.company,
+                          company: company,
                           onSubmmitCompany:
                               (Company company, BankAccount bankAccount) async {
                             final String token =

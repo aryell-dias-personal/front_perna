@@ -4,19 +4,29 @@ import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/bank_account.dart';
 import 'package:perna/models/company.dart';
 import 'package:perna/pages/bank_page.dart';
+import 'package:perna/widgets/button/action_buttons.dart';
 import 'package:perna/widgets/button/add_button.dart';
 import 'package:perna/widgets/form/form_container.dart';
 import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
 
 class CompanyForm extends StatefulWidget {
-  CompanyForm({this.company, this.readOnly = false, this.onSubmmitCompany}) {
+  CompanyForm(
+      {this.company,
+      this.readOnly = false,
+      this.onSubmmitCompany,
+      this.denyPressed,
+      this.acceptPressed,
+      this.showActionButtons}) {
     if (!readOnly) assert(onSubmmitCompany != null);
   }
 
   final Future<void> Function(Company, BankAccount) onSubmmitCompany;
   final Company company;
   final bool readOnly;
+  final bool showActionButtons;
+  final void Function() denyPressed;
+  final void Function() acceptPressed;
 
   @override
   _CompanyFormState createState() => _CompanyFormState();
@@ -153,7 +163,9 @@ class _CompanyFormState extends State<CompanyForm> {
             icon: Icons.admin_panel_settings),
       ],
       const SizedBox(height: 26),
-      Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+      if (widget.showActionButtons)
+        ActionButtons(accept: widget.acceptPressed, deny: widget.denyPressed),
+      if (!widget.showActionButtons)
         AddButton(
           addAndcontinue: widget.readOnly,
           readOnly: widget.readOnly,
@@ -176,7 +188,6 @@ class _CompanyFormState extends State<CompanyForm> {
             }
           },
         )
-      ])
     ]);
   }
 }

@@ -47,4 +47,22 @@ class CompanyService {
         headers: <String, String>{'Authorization': token});
     return res.statusCode;
   }
+
+  Future<int> answerManager(String companyId, String token,
+      {bool accepted}) async {
+    final String body = await myDecoder.encode(
+        <String, dynamic>{'companyId': companyId, 'accepted': accepted});
+    final Response res = await post(Uri.parse('$baseUrl/answerManager'),
+        body: body, headers: <String, String>{'Authorization': token});
+    return res.statusCode;
+  }
+
+  Future<int> askEmploye(
+      String companyId, String employeEmail, String token) async {
+    final Response res = await post(Uri.parse('$baseUrl/askEmploye'),
+        body: await myDecoder.encode(
+            <String, dynamic>{'companyId': companyId, 'employe': employeEmail}),
+        headers: <String, String>{'Authorization': token});
+    return res.statusCode;
+  }
 }
