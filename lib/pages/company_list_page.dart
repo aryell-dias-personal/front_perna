@@ -235,6 +235,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
                                   MaterialPageRoute<UserListPage>(
                                       builder: (BuildContext context) =>
                                           UserListPage(
+                                            companyId: companys[selectedIndex].id,
                                             title: AppLocalizations.of(context)
                                                 .translate('manage_employees'),
                                             email: widget.email,

@@ -197,5 +197,8 @@
     "change_bank_account": "Change bank account",
     "successful_company_edit": "Successfully edited company",
     "unsuccessful_company_edit": "Could not edit company",
+    "request_employee": "Request",
+    "successfully_requested_employee": "Successfully requested employee",
+    "unsuccessfully_requested_employee": "Not requested employee",
     "save": "Save"
 }

@@ -7,24 +7,31 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/main.dart';
 import 'package:perna/models/user.dart';
+import 'package:perna/pages/employee_page.dart';
 
 enum UserFetchFrom { userEmails, askedPointIds }
 
 class UserListPage extends StatefulWidget {
-  const UserListPage(
+  UserListPage(
       {this.userFetchFrom = UserFetchFrom.userEmails,
       this.readOnly = false,
       this.keys,
       this.email,
+      this.companyId,
       this.onSubmmitChanges,
-      @required this.title})
-      : assert(userFetchFrom == UserFetchFrom.userEmails);
+      @required this.title}) {
+        if (!readOnly) {
+          assert(companyId != null);
+        }
+        assert(userFetchFrom == UserFetchFrom.userEmails);
+      }
 
   final UserFetchFrom userFetchFrom;
   final Future<void> Function(List<User>) onSubmmitChanges;
   final bool readOnly;
   final String title;
   final String email;
+  final String companyId;
   final List<String> keys;
 
   @override
@@ -82,8 +89,14 @@ class _UserListPageState extends State<UserListPage> {
           actions: <Widget>[
             if (!widget.readOnly)
               IconButton(
-                  icon: const Icon(Icons.person_add_outlined), onPressed: () {
-                    // TODO: pedir para usuário confirmar que quer ingressar na empresa x
+                  icon: const Icon(Icons.person_add_outlined),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<AddEmployeePage>(
+                            builder: (BuildContext context) => AddEmployeePage(
+                                companyId: widget.companyId,
+                                )));
                   })
           ],
           textTheme: TextTheme(

@@ -199,5 +199,8 @@
     "delete_company": "Excluir empresa",
     "manage_employees": "Funcionários",
     "change_bank_account": "Alterar conta bancária",
+    "request_employee": "Solicitar",
+    "successfully_requested_employee": "Funcionário solicitado com sucesso",
+    "unsuccessfully_requested_employee": "Empregado não solicitado",
     "save": "Salvar"
 }
