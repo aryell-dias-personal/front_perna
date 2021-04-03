@@ -8,8 +8,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/helpers/show_snack_bar.dart';
 import 'package:perna/main.dart';
+import 'package:perna/models/bank_account.dart';
 import 'package:perna/models/company.dart';
+import 'package:perna/models/user.dart';
+import 'package:perna/pages/bank_page.dart';
 import 'package:perna/pages/company_page.dart';
+import 'package:perna/pages/user_list_page.dart';
 import 'package:perna/widgets/company/company_widget.dart';
 import 'package:perna/services/company.dart';
 import 'package:perna/services/sign_in.dart';
@@ -167,6 +171,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
                                   builder: (BuildContext context) =>
                                       CompanyPage(email: widget.email)));
                         },
+                        tooltip: AppLocalizations.of(context).translate('addProvider'),
                         child: Icon(Icons.add_business_outlined,
                             color: Theme.of(context).backgroundColor))
                     : SpeedDial(
@@ -181,8 +186,41 @@ class _CompanyListPageState extends State<CompanyListPage> {
                         children: <SpeedDialChild>[
                           SpeedDialChild(
                             onTap: () {
-                              // redireciona pra uma tela de cadastro de banco
-                              // getIt<CompanyService>().changeBank(companys[selectedIndex].id, BankAccount(), userToken);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute<BankPage>(
+                                      builder: (BuildContext context) =>
+                                          BankPage(
+                                            onSubmmitBankAccount: (BankAccount
+                                                bankAccount) async {
+                                              final int statusCode =
+                                                  await getIt<CompanyService>()
+                                                      .changeBank(
+                                                          companys[
+                                                                  selectedIndex]
+                                                              .id,
+                                                          bankAccount.copyWith(
+                                                            email: widget.email,
+                                                          ),
+                                                          userToken);
+                                              if (statusCode == 200) {
+                                                showSnackBar(
+                                                    AppLocalizations.of(context)
+                                                        .translate(
+                                                            'successful_company_edit'),
+                                                    Colors.greenAccent,
+                                                    context);
+                                                Navigator.of(context).pop();
+                                              } else {
+                                                showSnackBar(
+                                                    AppLocalizations.of(context)
+                                                        .translate(
+                                                            'unsuccessful_company_edit'),
+                                                    Colors.redAccent,
+                                                    context);
+                                              }
+                                            },
+                                          )));
                             },
                             child: Icon(Icons.account_balance,
                                 color: Theme.of(context).backgroundColor),
@@ -192,8 +230,47 @@ class _CompanyListPageState extends State<CompanyListPage> {
                           ),
                           SpeedDialChild(
                             onTap: () {
-                              // redireciona pra uma tela de gerencia de employes
-                              // getIt<CompanyService>().updateCompany(companys[selectedIndex], userToken);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute<UserListPage>(
+                                      builder: (BuildContext context) =>
+                                          UserListPage(
+                                            title: AppLocalizations.of(context)
+                                                .translate('manage_employees'),
+                                            email: widget.email,
+                                            keys: companys[selectedIndex]
+                                                .employees,
+                                            onSubmmitChanges:
+                                                (List<User> users) async {
+                                              final Company currCompany =
+                                                  companys[selectedIndex];
+                                              final int statusCode = await getIt<
+                                                      CompanyService>()
+                                                  .updateCompany(
+                                                      currCompany.copyWith(
+                                                          employees: users
+                                                              .map((User
+                                                                      user) =>
+                                                                  user.email)
+                                                              .toList()),
+                                                      userToken);
+                                              if (statusCode == 200) {
+                                                showSnackBar(
+                                                    AppLocalizations.of(context)
+                                                        .translate(
+                                                            'successful_company_edit'),
+                                                    Colors.greenAccent,
+                                                    context);
+                                              } else {
+                                                showSnackBar(
+                                                    AppLocalizations.of(context)
+                                                        .translate(
+                                                            'unsuccessful_company_edit'),
+                                                    Colors.redAccent,
+                                                    context);
+                                              }
+                                            },
+                                          )));
                             },
                             child: Icon(Icons.person_add_alt_1_outlined,
                                 color: Theme.of(context).backgroundColor),

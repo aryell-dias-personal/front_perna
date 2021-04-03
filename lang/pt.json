@@ -184,11 +184,20 @@
     "government_entity": "entidade governamental",
     "no_company": "Nenhuma empresa",
     "no_company_description": "Você não tem nenhuma empresa",
+    "no_user": "Nenhum usuário",
+    "no_user_description": "Você não tem nenhum usuário aqui",
     "contact": "Contato",
     "manager_email": "Email do gerente",
     "consult_bank_data": "Consultar dados bancários",
     "successful_company_added": "Empresa cadastrada com sucesso",
     "unsuccessful_company_added": "Não foi possível cadastradar empresa, verifique os dados e tente novamente",
     "successful_company_deleted": "Empresa apagada com sucesso",
-    "unsuccessful_company_deleted": "Não foi possível excluir companhia"
+    "unsuccessful_company_deleted": "Não foi possível excluir companhia",
+    "successful_company_edit": "Empresa editada com sucesso",
+    "unsuccessful_company_edit": "Não foi possível editar companhia",
+    "edit_company": "Editar empresa",
+    "delete_company": "Excluir empresa",
+    "manage_employees": "Funcionários",
+    "change_bank_account": "Alterar conta bancária",
+    "save": "Salvar"
 }

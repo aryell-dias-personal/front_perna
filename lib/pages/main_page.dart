@@ -158,6 +158,7 @@ class _MainPageState extends State<MainPage> {
       } else if (message.data['agent'] != null) {
         await askNewAgentHandler(message);
       }
+      // TODO: redirecionar para tela onde usuário responderá a requisição do gerente da empresa
     }
   }
 

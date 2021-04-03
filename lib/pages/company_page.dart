@@ -8,11 +8,12 @@ import 'package:perna/main.dart';
 import 'package:perna/models/bank_account.dart';
 import 'package:perna/models/company.dart';
 import 'package:perna/pages/bank_page.dart';
+import 'package:perna/pages/user_list_page.dart';
 import 'package:perna/widgets/form/company_form.dart';
 import 'package:perna/services/company.dart';
 import 'package:perna/services/sign_in.dart';
 
-enum CompanyOptions { consultBankData }
+enum CompanyOptions { consultBankData, consultEmployees }
 
 class CompanyPage extends StatefulWidget {
   CompanyPage({this.company, this.readOnly = false, this.email}) {
@@ -59,29 +60,42 @@ class _CompanyPageState extends State<CompanyPage> {
                     tooltip:
                         AppLocalizations.of(context).translate('open_menu'),
                     onSelected: (CompanyOptions result) async {
-                      if (result == CompanyOptions.consultBankData &&
-                          widget.readOnly &&
+                      if (widget.readOnly &&
                           widget.company.manager == widget.email) {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        final DocumentReference ref = getIt<FirebaseFirestore>()
-                            .collection('bank')
-                            .doc(widget.company.bankAccountId);
-                        final DocumentSnapshot documentSnapshot =
-                            await ref.get();
-                        final BankAccount bankAccount =
-                            BankAccount.fromJson(documentSnapshot.data());
-                        Navigator.push(
+                        if (result == CompanyOptions.consultBankData) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          final DocumentReference ref =
+                              getIt<FirebaseFirestore>()
+                                  .collection('bank')
+                                  .doc(widget.company.bankAccountId);
+                          final DocumentSnapshot documentSnapshot =
+                              await ref.get();
+                          final BankAccount bankAccount =
+                              BankAccount.fromJson(documentSnapshot.data());
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute<BankPage>(
+                                  builder: (BuildContext context) => BankPage(
+                                        bankAccount: bankAccount,
+                                        readOnly: true,
+                                      )));
+                          setState(() {
+                            isLoading = false;
+                          });
+                        } else if (result == CompanyOptions.consultEmployees) {
+                          Navigator.push(
                             context,
-                            MaterialPageRoute<BankPage>(
-                                builder: (BuildContext context) => BankPage(
-                                      bankAccount: bankAccount,
-                                      readOnly: true,
-                                    )));
-                        setState(() {
-                          isLoading = false;
-                        });
+                            MaterialPageRoute<UserListPage>(
+                              builder: (BuildContext context) => UserListPage(
+                                  title: AppLocalizations.of(context)
+                                      .translate('manage_employees'),
+                                  readOnly: true,
+                                  keys: widget.company.employees),
+                            ),
+                          );
+                        }
                       }
                     },
                     itemBuilder: (BuildContext context) =>
@@ -89,7 +103,11 @@ class _CompanyPageState extends State<CompanyPage> {
                       PopupMenuItem<CompanyOptions>(
                           value: CompanyOptions.consultBankData,
                           child: Text(AppLocalizations.of(context)
-                              .translate('consult_bank_data')))
+                              .translate('consult_bank_data'))),
+                      PopupMenuItem<CompanyOptions>(
+                          value: CompanyOptions.consultEmployees,
+                          child: Text(AppLocalizations.of(context)
+                              .translate('manage_employees')))
                     ],
                     offset: const Offset(0, 30),
                   )

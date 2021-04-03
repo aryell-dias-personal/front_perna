@@ -182,11 +182,20 @@
     "government_entity": "government entity",
     "no_company": "No company",
     "no_company_description": "You don't have any company",
+    "no_user": "No users",
+    "no_user_description": "You don't have any user here",
     "contact": "Contact",
     "manager_email": "Manager's email",
     "consult_bank_data": "Consult bank data",
     "successful_company_added": "Company successfully registered",
     "unsuccessful_company_added": "Could not register company, check the data and try again",
     "successful_company_deleted": "Company successfully deleted",
-    "unsuccessful_company_deleted": "Could not delete company"
+    "unsuccessful_company_deleted": "Could not delete company",
+    "edit_company": "Enterprise",
+    "delete_company": "Exclude company",
+    "manage_employees": "Employees",
+    "change_bank_account": "Change bank account",
+    "successful_company_edit": "Successfully edited company",
+    "unsuccessful_company_edit": "Could not edit company",
+    "save": "Save"
 }

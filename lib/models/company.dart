@@ -102,5 +102,6 @@ class Company {
         'companyNumber': companyNumber,
         'phone': phone,
         'currency': currency,
+        'id': id,
       };
 }
