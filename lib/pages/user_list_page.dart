@@ -82,14 +82,14 @@ class _UserListPageState extends State<UserListPage> {
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 30.0)),
             const SizedBox(width: 5),
-            const Icon(Icons.business, size: 30),
+            const Icon(Icons.people_alt_outlined, size: 30),
           ]),
           backgroundColor: Theme.of(context).backgroundColor,
           iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
           actions: <Widget>[
             if (!widget.readOnly)
               IconButton(
-                  icon: const Icon(Icons.person_add_outlined),
+                  icon: const Icon(Icons.person_add_alt_1_outlined),
                   onPressed: () {
                     Navigator.push(
                         context,
