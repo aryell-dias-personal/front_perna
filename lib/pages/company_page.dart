@@ -52,7 +52,7 @@ class _CompanyPageState extends State<CompanyPage> {
     setState(() {
       isLoading = true;
     });
-    if (widget.company == null) {
+    if (widget.company == null && widget.readOnly) {
       getIt<FirebaseFirestore>()
           .collection('company')
           .doc(widget.companyId)
@@ -102,7 +102,7 @@ class _CompanyPageState extends State<CompanyPage> {
             if (!widget.readOnly)
               const Icon(Icons.add_business_outlined, size: 30),
           ]),
-          actions: widget.readOnly && company.manager == widget.email
+          actions: widget.readOnly && company != null && company.manager == widget.email
               ? <Widget>[
                   PopupMenuButton<CompanyOptions>(
                     tooltip:

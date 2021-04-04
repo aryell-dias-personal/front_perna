@@ -15,18 +15,21 @@ class AddEmployeePage extends StatefulWidget {
   final String companyId;
 
   @override
-  _ExpedientState createState() => _ExpedientState();
+  _AddEmployeePageState createState() => _AddEmployeePageState();
 }
 
-class _ExpedientState extends State<AddEmployeePage> {
+class _AddEmployeePageState extends State<AddEmployeePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String email = '';
   bool isLoading = false;
 
   Future<void> answerManager(String companyId) async {
     if (_formKey.currentState.validate()) {
+      setState(() {
+        isLoading = true;
+      });
       final String token = await getIt<SignInService>().getRefreshToken();
-      final int statusCode = await getIt<CompanyService>().askEmploye(companyId, email, token);
+      final int statusCode = await getIt<CompanyService>().askEmployee(companyId, email, token);
       if (statusCode == 200) {
         Navigator.pop(context);
         showSnackBar(

@@ -57,11 +57,11 @@ class CompanyService {
     return res.statusCode;
   }
 
-  Future<int> askEmploye(
-      String companyId, String employeEmail, String token) async {
-    final Response res = await post(Uri.parse('$baseUrl/askEmploye'),
+  Future<int> askEmployee(
+      String companyId, String employeeEmail, String token) async {
+    final Response res = await post(Uri.parse('$baseUrl/askEmployee'),
         body: await myDecoder.encode(
-            <String, dynamic>{'companyId': companyId, 'employe': employeEmail}),
+            <String, dynamic>{'companyId': companyId, 'employee': employeeEmail}),
         headers: <String, String>{'Authorization': token});
     return res.statusCode;
   }

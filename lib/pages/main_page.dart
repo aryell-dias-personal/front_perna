@@ -161,7 +161,7 @@ class _MainPageState extends State<MainPage> {
       } else if (message.data['agent'] != null) {
         await askNewAgentHandler(message);
       } else if (message.data['companyId'] != null) {
-        await askNewEmployeHandler(message);
+        await askNewEmployeeHandler(message);
       }
     }
   }
@@ -196,7 +196,26 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  Future<void> askNewEmployeHandler(RemoteMessage message) async {
+  Future<void> answerNewEmployeeHandler(Company company, {bool accepted}) async {
+    final String token = await getIt<SignInService>().getRefreshToken();
+    final int statusCodeNewAgent = await getIt<CompanyService>()
+        .answerManager(company.id, token, accepted: accepted);
+    if (statusCodeNewAgent == 200) {
+      final String answer = AppLocalizations.of(context)
+          .translate(accepted ? 'accepted' : 'denied');
+      showSnackBar(
+          AppLocalizations.of(context)
+              .translateFormat('answer_employee', <String>[answer]),
+          Colors.greenAccent,
+          context);
+    } else {
+      showSnackBar(AppLocalizations.of(context).translate('not_answer_employee'),
+          Colors.redAccent, context);
+    }
+    Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
+  }
+
+  Future<void> askNewEmployeeHandler(RemoteMessage message) async {
     final String companyId = message.data['companyId'] as String;
     final NavigatorState navigatorState = Navigator.of(context);
     await navigatorState.push(MaterialPageRoute<Scaffold>(
@@ -207,32 +226,11 @@ class _MainPageState extends State<MainPage> {
                 companyId: companyId,
                 readOnly: true,
                 accept: (Company company) async {
-                  await answerNewEmployeHandler(company, accepted: true);
+                  await answerNewEmployeeHandler(company.copyWith(id: companyId), accepted: true);
                 },
                 deny: (Company company) async {
-                  await answerNewEmployeHandler(company, accepted: false);
+                  await answerNewEmployeeHandler(company.copyWith(id: companyId), accepted: false);
                 }))));
-  }
-
-  Future<void> answerNewEmployeHandler(Company company, {bool accepted}) async {
-    if (accepted) {
-      final String token = await getIt<SignInService>().getRefreshToken();
-      final int statusCodeNewAgent = await getIt<CompanyService>()
-          .answerManager(company.id, token, accepted: accepted);
-      if (statusCodeNewAgent == 200) {
-        final String answer = AppLocalizations.of(context)
-            .translate(accepted ? 'accepted' : 'denied');
-        showSnackBar(
-            AppLocalizations.of(context)
-                .translateFormat('answer_employee', <String>[answer]),
-            Colors.greenAccent,
-            context);
-      } else {
-        showSnackBar(AppLocalizations.of(context).translate('not_answer_employee'),
-            Colors.redAccent, context);
-      }
-      Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
-    }
   }
 
   @override

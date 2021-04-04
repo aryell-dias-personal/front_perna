@@ -101,7 +101,6 @@ class Company {
         'country': country,
         'companyNumber': companyNumber,
         'phone': phone,
-        'currency': currency,
-        'id': id,
+        'currency': currency
       };
 }
