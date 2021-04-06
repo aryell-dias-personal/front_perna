@@ -113,7 +113,8 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   List<dynamic> getHistory() {
-    final List<dynamic> history = agents + askedPoints;
+    final List<dynamic> history = (agents ?? <Map<String, dynamic>>[]) +
+        (askedPoints ?? <Map<String, dynamic>>[]);
     history.sort((dynamic first, dynamic second) {
       final dynamic firstTime = first['date'] + (first['askedEndAt'] ?? 0);
       final dynamic secondTime = second['date'] + (second['askedEndAt'] ?? 0);
