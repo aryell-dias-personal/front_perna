@@ -46,6 +46,7 @@
     "nothing_here": "Nothing here.",
     "no_operation": "You haven't booked a trip yet 😢",
     "successful_work_order": "The work order was successfully placed",
+    "no_company_error": "You need at least one registered company",
     "unsuccessful_work_order": "Unable to place order",
     "successfully_added_expedient": "The expedient was added successfully",
     "unsuccessfully_added_expedient": "Couldn't add expedient",

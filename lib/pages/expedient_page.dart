@@ -61,9 +61,7 @@ class _ExpedientState extends State<ExpedientPage> {
           .then((DocumentSnapshot documentSnapshot) {
         setState(() {
           final Company company = Company.fromJson(documentSnapshot.data());
-          allCompanys = <Company>[
-            company.copyWith(id: documentSnapshot.id)
-          ];
+          allCompanys = <Company>[company.copyWith(id: documentSnapshot.id)];
           isLoading = agent.staticMap == null;
         });
       });
@@ -78,6 +76,14 @@ class _ExpedientState extends State<ExpedientPage> {
               companysSnapshot.docs.map((QueryDocumentSnapshot company) {
             return Company.fromJson(company.data()).copyWith(id: company.id);
           }).toList();
+          if (allCompanys.isEmpty) {
+            showSnackBar(
+                AppLocalizations.of(context).translate('no_company_error'),
+                Colors.redAccent,
+                context);
+            Navigator.popUntil(
+                context, (Route<dynamic> route) => route.isFirst);
+          }
           isLoading = agent.staticMap == null;
         });
       });

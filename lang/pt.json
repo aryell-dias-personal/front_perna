@@ -46,6 +46,7 @@
     "nothing_here": "Nada por aqui.",
     "no_operation": "Você ainda não agendou nenhuma viagem 😢",
     "successful_work_order": "O pedido de expediente foi feito com sucesso",
+    "no_company_error": "Você precisa de ao menos uma empresa cadastrada",
     "unsuccessful_work_order": "Não foi possível fazer o pedido",
     "successfully_added_expedient": "O expediente foi adicionado com sucesso",
     "unsuccessfully_added_expedient": "Não foi possivel adicionar o expediente",
