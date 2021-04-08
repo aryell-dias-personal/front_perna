@@ -36,18 +36,20 @@ class _BankPageState extends State<BankPage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      isLoading = true;
-    });
-    if (widget.bankAccount != null) {
+    if (widget.bankAccount != null || !widget.readOnly) {
       bankAccount = widget.bankAccount;
     } else {
+      setState(() {
+        isLoading = true;
+      });
       final DocumentReference ref = getIt<FirebaseFirestore>()
           .collection('bank')
           .doc(widget.bankAccountId);
       ref.get().then((DocumentSnapshot documentSnapshot) {
-        bankAccount = BankAccount.fromJson(documentSnapshot.data());
-        isLoading = false;
+        setState(() {
+          bankAccount = BankAccount.fromJson(documentSnapshot.data());
+          isLoading = false;
+        });
       });
     }
   }
@@ -84,7 +86,7 @@ class _BankPageState extends State<BankPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                         BankForm(
-                            bankAccount: widget.bankAccount,
+                            bankAccount: bankAccount,
                             readOnly: widget.readOnly,
                             onSubmmitBankAccount:
                                 (BankAccount bankAccount) async {
