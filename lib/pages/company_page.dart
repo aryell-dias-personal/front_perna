@@ -102,7 +102,9 @@ class _CompanyPageState extends State<CompanyPage> {
             if (!widget.readOnly)
               const Icon(Icons.add_business_outlined, size: 30),
           ]),
-          actions: widget.readOnly && company != null && company.manager == widget.email
+          actions: widget.readOnly &&
+                  company != null &&
+                  company.manager == widget.email
               ? <Widget>[
                   PopupMenuButton<CompanyOptions>(
                     tooltip:
@@ -110,27 +112,13 @@ class _CompanyPageState extends State<CompanyPage> {
                     onSelected: (CompanyOptions result) async {
                       if (widget.readOnly && company.manager == widget.email) {
                         if (result == CompanyOptions.consultBankData) {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          final DocumentReference ref =
-                              getIt<FirebaseFirestore>()
-                                  .collection('bank')
-                                  .doc(company.bankAccountId);
-                          final DocumentSnapshot documentSnapshot =
-                              await ref.get();
-                          final BankAccount bankAccount =
-                              BankAccount.fromJson(documentSnapshot.data());
                           Navigator.push(
                               context,
                               MaterialPageRoute<BankPage>(
                                   builder: (BuildContext context) => BankPage(
-                                        bankAccount: bankAccount,
+                                        bankAccountId: company.bankAccountId,
                                         readOnly: true,
                                       )));
-                          setState(() {
-                            isLoading = false;
-                          });
                         } else if (result == CompanyOptions.consultEmployees) {
                           Navigator.push(
                             context,

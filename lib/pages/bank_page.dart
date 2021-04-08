@@ -1,22 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/helpers/app_localizations.dart';
+import 'package:perna/main.dart';
 import 'package:perna/models/bank_account.dart';
 import 'package:perna/widgets/form/bank_form.dart';
 
 class BankPage extends StatefulWidget {
   BankPage(
-      {this.bankAccount, this.readOnly = false, this.onSubmmitBankAccount}) {
+      {this.bankAccount,
+      this.readOnly = false,
+      this.onSubmmitBankAccount,
+      this.bankAccountId}) {
     if (!readOnly) {
       assert(onSubmmitBankAccount != null);
     } else {
-      assert(bankAccount != null);
+      assert(bankAccount != null || bankAccountId != null);
     }
   }
 
   final Future<void> Function(BankAccount) onSubmmitBankAccount;
   final BankAccount bankAccount;
+  final String bankAccountId;
   final bool readOnly;
 
   @override
@@ -25,6 +31,26 @@ class BankPage extends StatefulWidget {
 
 class _BankPageState extends State<BankPage> {
   bool isLoading = false;
+  BankAccount bankAccount;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isLoading = true;
+    });
+    if (widget.bankAccount != null) {
+      bankAccount = widget.bankAccount;
+    } else {
+      final DocumentReference ref = getIt<FirebaseFirestore>()
+          .collection('bank')
+          .doc(widget.bankAccountId);
+      ref.get().then((DocumentSnapshot documentSnapshot) {
+        bankAccount = BankAccount.fromJson(documentSnapshot.data());
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
