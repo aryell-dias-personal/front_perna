@@ -16,11 +16,10 @@ class DriverService {
     return res.statusCode;
   }
 
-  Future<int> answerNewAgent(String fromEmail, String toEmail,
+  Future<int> answerNewAgent(Agent agent,
       {bool accepted}) async {
     final String body = await myDecoder.encode(<String, dynamic>{
-      'fromEmail': fromEmail,
-      'toEmail': toEmail,
+      'agent': agent.toJson(),
       'accepted': accepted
     });
     final Response res =

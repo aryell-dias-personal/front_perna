@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:perna/models/company.dart';
 import 'package:perna/services/static_map.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:perna/main.dart';
@@ -21,13 +22,19 @@ import 'package:intl/intl.dart';
 enum ExpedientOptions { aboutDriver, aboutRequester }
 
 class ExpedientPage extends StatefulWidget {
-  const ExpedientPage(
+  ExpedientPage(
       {@required this.readOnly,
       @required this.agent,
       @required this.clear,
+      this.email,
       this.accept,
-      this.deny});
+      this.deny}) {
+    if (!readOnly) {
+      assert(email != null);
+    }
+  }
 
+  final String email;
   final Agent agent;
   final bool readOnly;
   final Function() deny;
@@ -43,18 +50,57 @@ class _ExpedientState extends State<ExpedientPage> {
   void initState() {
     super.initState();
     setState(() {
+      isLoading = true;
       agent = widget.agent;
     });
+    if (widget.readOnly && agent.companyId != null) {
+      getIt<FirebaseFirestore>()
+          .collection('company')
+          .doc(agent.companyId)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        setState(() {
+          final Company company = Company.fromJson(documentSnapshot.data());
+          allCompanys = <Company>[company.copyWith(id: documentSnapshot.id)];
+          isLoading = agent.staticMap == null;
+        });
+      });
+    } else {
+      getIt<FirebaseFirestore>()
+          .collection('company')
+          .where('employees', arrayContains: widget.email)
+          .snapshots()
+          .listen((QuerySnapshot companysSnapshot) {
+        setState(() {
+          allCompanys =
+              companysSnapshot.docs.map((QueryDocumentSnapshot company) {
+            return Company.fromJson(company.data()).copyWith(id: company.id);
+          }).toList();
+          if (allCompanys.isEmpty) {
+            showSnackBar(
+                AppLocalizations.of(context).translate('no_company_error'),
+                Colors.redAccent,
+                context);
+            Navigator.popUntil(
+                context, (Route<dynamic> route) => route.isFirst);
+          }
+          isLoading = agent.staticMap == null;
+        });
+      });
+    }
     if (agent.staticMap == null) {
       getIt<StaticMapService>()
           .getUint8List(markerA: agent.garage)
           .then((Uint8List uint8List) {
         setState(() {
           agent = agent.copyWith(staticMap: uint8List);
+          isLoading = false;
         });
       });
     }
   }
+
+  List<Company> allCompanys;
 
   final DateFormat format = DateFormat('HH:mm dd/MM/yyyy');
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
@@ -87,6 +133,7 @@ class _ExpedientState extends State<ExpedientPage> {
       String fromEmail,
       String askedEndAt,
       String askedStartAt,
+      String companyId,
       String date,
       String places}) async {
     if (formKey.currentState.validate()) {
@@ -101,6 +148,7 @@ class _ExpedientState extends State<ExpedientPage> {
       final Agent agent = this.agent.copyWith(
           email: email,
           date: dateTime,
+          companyId: companyId,
           askedStartAt: askedStartAtTime.difference(dateTime),
           askedEndAt: askedEndAtTime.difference(dateTime),
           fromEmail: fromEmail != email ? fromEmail : null,
@@ -233,11 +281,6 @@ class _ExpedientState extends State<ExpedientPage> {
                                   width: 600,
                                   child: Stack(
                                     children: <Widget>[
-                                      Center(
-                                          child: SpinKitDoubleBounce(
-                                              size: 100.0,
-                                              color: Theme.of(context)
-                                                  .primaryColor)),
                                       if (agent.staticMap != null)
                                         Image.memory(agent.staticMap)
                                     ],
@@ -246,6 +289,7 @@ class _ExpedientState extends State<ExpedientPage> {
                                 acceptPressed: () => _acceptOrDenny(true),
                                 denyPressed: () => _acceptOrDenny(false),
                                 agent: agent,
+                                allCompanys: allCompanys,
                                 onAddPressed: _onPressed,
                                 readOnly: widget.readOnly,
                                 fromEmail: resources['email'] as String,

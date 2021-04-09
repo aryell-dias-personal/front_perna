@@ -87,6 +87,7 @@ class _MapsContainerState extends State<MapsContainer> {
           MaterialPageRoute<dynamic>(
               builder: (BuildContext context) => ExpedientPage(
                     agent: agent,
+                    email: widget.email,
                     readOnly: false,
                     clear: markers.clear,
                   )));

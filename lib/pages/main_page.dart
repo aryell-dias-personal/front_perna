@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:perna/main.dart';
+import 'package:perna/models/company.dart';
+import 'package:perna/pages/company_page.dart';
+import 'package:perna/services/company.dart';
 import 'package:perna/services/driver.dart';
 import 'package:perna/services/sign_in.dart';
 import 'package:redux/redux.dart';
@@ -60,6 +63,40 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool isConnected;
 
+  Future<void> answerNewAgentHandler(Agent agent, {bool accepted}) async {
+    if (accepted) {
+      final String token = await getIt<SignInService>().getRefreshToken();
+      final int statusCodeNewAgent =
+          await getIt<DriverService>().postNewAgent(agent, token);
+      if (statusCodeNewAgent != 200) {
+        showSnackBar(
+            AppLocalizations.of(context).translateFormat(
+                'accept_not_possible', <String>[agent.fromEmail]),
+            Colors.redAccent,
+            context);
+        return;
+      }
+    }
+    final int statusCodeAnswer =
+        await getIt<DriverService>().answerNewAgent(agent, accepted: accepted);
+    if (statusCodeAnswer == 200) {
+      final String answer = AppLocalizations.of(context)
+          .translate(accepted ? 'accepted' : 'denied');
+      showSnackBar(
+          AppLocalizations.of(context).translateFormat(
+              'answer_order', <String>[answer, agent.fromEmail]),
+          Colors.greenAccent,
+          context);
+    } else {
+      showSnackBar(
+          AppLocalizations.of(context)
+              .translateFormat('not_answer_order', <String>[agent.fromEmail]),
+          Colors.redAccent,
+          context);
+    }
+    Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
+  }
+
   Future<void> askNewAgentHandler(RemoteMessage message) async {
     const JsonDecoder dec = JsonDecoder();
     final NavigatorState navigatorState = Navigator.of(context);
@@ -78,40 +115,6 @@ class _MainPageState extends State<MainPage> {
                 deny: () async {
                   await answerNewAgentHandler(agent, accepted: false);
                 }))));
-  }
-
-  Future<void> answerNewAgentHandler(Agent agent, {bool accepted}) async {
-    if (accepted) {
-      final String token = await getIt<SignInService>().getRefreshToken();
-      final int statusCodeNewAgent =
-          await getIt<DriverService>().postNewAgent(agent, token);
-      if (statusCodeNewAgent != 200) {
-        showSnackBar(
-            AppLocalizations.of(context).translateFormat(
-                'accept_not_possible', <String>[agent.fromEmail]),
-            Colors.redAccent,
-            context);
-        return;
-      }
-    }
-    final int statusCodeAnswer = await getIt<DriverService>()
-        .answerNewAgent(agent.fromEmail, agent.email, accepted: accepted);
-    if (statusCodeAnswer == 200) {
-      final String answer = AppLocalizations.of(context)
-          .translate(accepted ? 'accepted' : 'denied');
-      showSnackBar(
-          AppLocalizations.of(context).translateFormat(
-              'answer_order', <String>[answer, agent.fromEmail]),
-          Colors.greenAccent,
-          context);
-    } else {
-      showSnackBar(
-          AppLocalizations.of(context)
-              .translateFormat('not_answer_order', <String>[agent.fromEmail]),
-          Colors.redAccent,
-          context);
-    }
-    Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
   }
 
   Future<void> scheduleMessage(RemoteMessage message) async {
@@ -157,6 +160,8 @@ class _MainPageState extends State<MainPage> {
         await scheduleMessage(message);
       } else if (message.data['agent'] != null) {
         await askNewAgentHandler(message);
+      } else if (message.data['companyId'] != null) {
+        await askNewEmployeeHandler(message);
       }
     }
   }
@@ -189,6 +194,43 @@ class _MainPageState extends State<MainPage> {
             connection == ConnectivityResult.wifi;
       });
     });
+  }
+
+  Future<void> answerNewEmployeeHandler(Company company, {bool accepted}) async {
+    final String token = await getIt<SignInService>().getRefreshToken();
+    final int statusCodeNewAgent = await getIt<CompanyService>()
+        .answerManager(company.id, token, accepted: accepted);
+    if (statusCodeNewAgent == 200) {
+      final String answer = AppLocalizations.of(context)
+          .translate(accepted ? 'accepted' : 'denied');
+      showSnackBar(
+          AppLocalizations.of(context)
+              .translateFormat('answer_employee', <String>[answer]),
+          Colors.greenAccent,
+          context);
+    } else {
+      showSnackBar(AppLocalizations.of(context).translate('not_answer_employee'),
+          Colors.redAccent, context);
+    }
+    Navigator.of(context).popUntil((Route<dynamic> route) => route.isFirst);
+  }
+
+  Future<void> askNewEmployeeHandler(RemoteMessage message) async {
+    final String companyId = message.data['companyId'] as String;
+    final NavigatorState navigatorState = Navigator.of(context);
+    await navigatorState.push(MaterialPageRoute<Scaffold>(
+        builder: (BuildContext context) => StoreConnector<StoreState, String>(
+            converter: (Store<StoreState> store) => store.state.user?.email,
+            builder: (BuildContext context, String email) => CompanyPage(
+                email: email,
+                companyId: companyId,
+                readOnly: true,
+                accept: (Company company) async {
+                  await answerNewEmployeeHandler(company.copyWith(id: companyId), accepted: true);
+                },
+                deny: (Company company) async {
+                  await answerNewEmployeeHandler(company.copyWith(id: companyId), accepted: false);
+                }))));
   }
 
   @override

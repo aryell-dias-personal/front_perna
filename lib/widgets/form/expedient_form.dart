@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:perna/helpers/app_localizations.dart';
 import 'package:perna/models/agent.dart';
+import 'package:perna/models/company.dart';
 import 'package:perna/widgets/button/action_buttons.dart';
 import 'package:perna/widgets/button/add_button.dart';
 import 'package:perna/widgets/form/form_container.dart';
+import 'package:perna/widgets/input/auto_complete_field.dart';
 import 'package:perna/widgets/input/form_date_picker.dart';
 import 'package:perna/widgets/input/form_time_picker.dart';
 import 'package:perna/widgets/input/outlined_text_form_field.dart';
@@ -18,18 +20,21 @@ class ExpedientForm extends StatefulWidget {
       this.onAddPressed,
       this.denyPressed,
       this.acceptPressed,
+      this.allCompanys,
       this.fromEmail});
 
   final bool readOnly;
   final Agent agent;
   final bool showActionButtons;
   final String fromEmail;
+  final List<Company> allCompanys;
   final void Function(GlobalKey<FormState> formKey,
       {String email,
       String fromEmail,
       String askedEndAt,
       String askedStartAt,
       String date,
+      String companyId,
       String places}) onAddPressed;
   final void Function() denyPressed;
   final void Function() acceptPressed;
@@ -46,16 +51,37 @@ class _ExpedientFormState extends State<ExpedientForm> {
   DateTime minTime;
   String date;
   String email;
+  String company;
   String places;
   String askedEndAt;
   String askedStartAt;
   Agent agent;
+  Map<String, Company> companyOptions = <String, Company>{};
+  List<String> emailOptions = <String>[];
 
   @override
   void initState() {
     super.initState();
+    final Map<String, Company> initialCompanyOptions = <String, Company>{};
+    List<String> initialEmailOptions = <String>[];
+    int i = 1;
+    for (final Company company in widget.allCompanys) {
+      initialCompanyOptions['${i++}. ${company.companyName}'] = company;
+      initialEmailOptions = <String>[
+        ...initialEmailOptions,
+        ...company.employees
+            .where((String email) => !initialEmailOptions.contains(email)),
+      ];
+    }
     setState(() {
+      emailOptions = initialEmailOptions;
       agent = widget.agent;
+      companyOptions = initialCompanyOptions;
+      if (agent.companyId != null) {
+        final int i = widget.allCompanys
+            .indexWhere((Company company) => company.id == agent.companyId);
+        company = '${i+1}. ${widget.allCompanys[i].companyName}';
+      }
     });
     initialDateTime = DateTime(
         initialDateTime.year, initialDateTime.month, initialDateTime.day + 1);
@@ -112,9 +138,28 @@ class _ExpedientFormState extends State<ExpedientForm> {
   @override
   Widget build(BuildContext context) {
     return FormContainer(formkey: _formKey, children: <Widget>[
-      OutlinedTextFormField(
+      AutoCompleteField(
+          readOnly: widget.readOnly,
+          initialValue: widget.readOnly ? company : null,
+          onChanged: (String text) {
+            company = text;
+          },
+          labelText:
+              AppLocalizations.of(context).translate('company_name_error'),
+          icon: Icons.business,
+          textInputAction: TextInputAction.next,
+          isRequired: true,
+          options: companyOptions.keys.toList(),
+          validatorMessage:
+              AppLocalizations.of(context).translate('company_name'),
+          onFieldSubmitted: (String text) {
+            company = text;
+            FocusScope.of(context).nextFocus();
+          }),
+      const SizedBox(height: 26),
+      AutoCompleteField(
         readOnly: widget.readOnly,
-        initialValue: (agent.email ?? email) ?? '',
+        initialValue: widget.readOnly ? (agent.email ?? email) : null,
         onChanged: (String text) {
           email = text;
         },
@@ -122,9 +167,12 @@ class _ExpedientFormState extends State<ExpedientForm> {
         labelText: AppLocalizations.of(context).translate('driver_email'),
         icon: Icons.email,
         textInputAction: TextInputAction.next,
+        isRequired: true,
+        options: emailOptions,
         validatorMessage:
             AppLocalizations.of(context).translate('enter_driver_email'),
         onFieldSubmitted: (String text) {
+          email = text;
           FocusScope.of(context).nextFocus();
         },
       ),
@@ -141,7 +189,6 @@ class _ExpedientFormState extends State<ExpedientForm> {
       Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
         FormDatePicker(
           value: date,
-          isRequired: true,
           initialValue: initialDateTime,
           onChanged: _updateMinTime,
           labelText: AppLocalizations.of(context).translate('date'),
@@ -150,12 +197,12 @@ class _ExpedientFormState extends State<ExpedientForm> {
           onSubmit: (String text) {
             FocusScope.of(context).nextFocus();
           },
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('select_a_date'),
         ),
         const SizedBox(width: 10),
         FormTimePicker(
-          isRequired: true,
           minTime: initialDateTime,
           onChanged: (String text) {
             final List<String> chuncks = text.split(' ');
@@ -176,13 +223,13 @@ class _ExpedientFormState extends State<ExpedientForm> {
           onSubmit: (String text) {
             FocusScope.of(context).nextFocus();
           },
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('enter_start_expedient'),
         ),
       ]),
       const SizedBox(height: 26),
       FormTimePicker(
-          isRequired: true,
           minTime: minTime,
           selectedDay: date,
           value: askedEndAt,
@@ -200,6 +247,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
             });
           },
           readOnly: widget.readOnly,
+          isRequired: true,
           validatorMessage:
               AppLocalizations.of(context).translate('enter_end_expedient'),
           onSubmit: (String text) {
@@ -216,6 +264,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
         labelText: AppLocalizations.of(context).translate('seats_number'),
         icon: Icons.airline_seat_legroom_normal,
         textInputAction: TextInputAction.done,
+        isRequired: true,
         validatorMessage:
             AppLocalizations.of(context).translate('enter_seats_number'),
         onFieldSubmitted: (String text) => widget.onAddPressed(
@@ -224,6 +273,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
           fromEmail: widget.fromEmail,
           askedEndAt: askedEndAt,
           askedStartAt: askedStartAt,
+          companyId: companyOptions[company].id,
           date: date,
           places: places,
         ),
@@ -245,6 +295,7 @@ class _ExpedientFormState extends State<ExpedientForm> {
             fromEmail: widget.fromEmail,
             askedEndAt: askedEndAt,
             askedStartAt: askedStartAt,
+            companyId: companyOptions[company].id,
             date: date,
             places: places,
           ),

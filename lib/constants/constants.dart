@@ -58,3 +58,13 @@ Map<CardType, Set<List<String>>> cardNumPatterns =
 
 enum MenuOption { logout, clear }
 enum MarkerType { origin, destiny }
+
+const List<String> countries = <String>[
+  'US',
+  'BR'
+];
+
+const List<String> currencies = <String>[
+  'USD',
+  'BRL'
+];

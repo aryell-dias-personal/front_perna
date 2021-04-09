@@ -5,9 +5,11 @@ class TitledValueWidget extends StatelessWidget {
   const TitledValueWidget(
       {@required this.title,
       @required this.value,
+      this.maxLines = 2,
       this.titleSize = 14,
       this.valueSize = 14});
 
+  final int maxLines;
   final String title;
   final String value;
   final double titleSize;
@@ -35,7 +37,7 @@ class TitledValueWidget extends StatelessWidget {
                     text: ' $value', style: TextStyle(fontSize: valueSize)),
               ],
             ),
-            maxLines: 2)
+            maxLines: maxLines)
         : const SizedBox();
   }
 }

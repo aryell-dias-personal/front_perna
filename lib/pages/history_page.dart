@@ -35,6 +35,7 @@ class _HistoryPageState extends State<HistoryPage> {
   StreamSubscription<QuerySnapshot> agentsListener;
   List<dynamic> askedPoints;
   List<dynamic> agents;
+  List<dynamic> history;
   Timer timer;
 
   @override
@@ -55,6 +56,7 @@ class _HistoryPageState extends State<HistoryPage> {
         agents = agentsSnapshot.docs.map((QueryDocumentSnapshot agent) {
           return agent.data();
         }).toList();
+        history = getHistory();
         isLoadingAgents = false;
       });
     });
@@ -71,6 +73,7 @@ class _HistoryPageState extends State<HistoryPage> {
             askedPointsSnapshot.docs.map((QueryDocumentSnapshot askedPoint) {
           return askedPoint.data();
         }).toList();
+        history = getHistory();
         isLoadingAskedPoints = false;
       });
     });
@@ -110,7 +113,8 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   List<dynamic> getHistory() {
-    final List<dynamic> history = agents + askedPoints;
+    final List<dynamic> history = (agents ?? <Map<String, dynamic>>[]) +
+        (askedPoints ?? <Map<String, dynamic>>[]);
     history.sort((dynamic first, dynamic second) {
       final dynamic firstTime = first['date'] + (first['askedEndAt'] ?? 0);
       final dynamic secondTime = second['date'] + (second['askedEndAt'] ?? 0);
@@ -171,14 +175,14 @@ class _HistoryPageState extends State<HistoryPage> {
                 : Builder(
                     builder: (BuildContext context) {
                       return ListView.separated(
-                        itemCount: getHistory().length,
+                        itemCount: history.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const Divider();
                         },
                         itemBuilder: (BuildContext context, int index) {
-                          final List<dynamic> history = getHistory();
                           final dynamic operation = history[index];
                           return TextButton(
+                              key: UniqueKey(),
                               style: ButtonStyle(
                                   overlayColor: MaterialStateProperty.all(
                                       Theme.of(context).splashColor)),

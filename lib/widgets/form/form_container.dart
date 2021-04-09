@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class FormContainer extends StatelessWidget {
-  const FormContainer({Key key, this.formkey, this.children}) : super(key: key);
+  const FormContainer({this.formkey, this.children});
 
   final Key formkey;
   final List<Widget> children;

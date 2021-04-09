@@ -10,7 +10,7 @@ class RippleCreditCard extends StatelessWidget {
       @required this.isSelected,
       @required this.creditCard,
       this.onLongPress,
-      this.top = 15});
+      this.top = 5});
 
   final Function() onLongPress;
   final double top;
@@ -84,7 +84,7 @@ class RippleCreditCard extends StatelessWidget {
                                     const SizedBox(width: 2),
                                     Text(
                                       AppLocalizations.of(context)
-                                          .translate('selected_credit_card'),
+                                          .translate('selected'),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Theme.of(context)
